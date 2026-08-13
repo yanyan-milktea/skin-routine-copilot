@@ -195,7 +195,7 @@ test("eval: legacy provider copy is normalized to English", () => {
     note: "肌肤状态较稳定。",
     morning: [
       { time: "01", name: "beplain 绿豆洁面", detail: "温和清洁", tag: "清洁" },
-      { time: "02", name: "EltaMD UV Clear", detail: "晨间最后一步", tag: "防晒" },
+      { time: "02", name: "Centella Sunscreen", detail: "晨间最后一步", tag: "防晒" },
     ],
     evening: [
       { time: "01", name: "壬二酸 10%", detail: "薄涂于干燥肌肤", tag: "活性" },

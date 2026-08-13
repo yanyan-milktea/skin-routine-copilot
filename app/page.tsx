@@ -31,12 +31,12 @@ const concerns: { id: Concern; emoji: string; label: string }[] = [
 ];
 
 const products = [
-  { name: "beplain Mung Bean Cleanser", kind: "Cleanser", color: "mint" },
+  { name: "Beplain Mung Bean Cleanser", kind: "Cleanser", color: "mint" },
   { name: "Micro Essence", kind: "Essence", color: "peach" },
   { name: "Torriden Dive-In", kind: "Hydrating serum", color: "blue" },
   { name: "Azelaic Acid 10%", kind: "Active treatment", color: "cream" },
   { name: "Lancôme Youth Activating Cream", kind: "Moisturizer", color: "rose" },
-  { name: "EltaMD UV Clear", kind: "Sunscreen", color: "sand" },
+  { name: "Centella Sunscreen", kind: "Sunscreen", color: "sand" },
 ];
 
 export default function Home() {

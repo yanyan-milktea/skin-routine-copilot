@@ -29,12 +29,12 @@ export type RoutineResponse = {
 
 export const PRODUCT_NAMES = {
   "water-cleanse": "Water rinse",
-  "beplain-cleanser": "beplain Mung Bean Cleanser",
+  "beplain-cleanser": "Beplain Mung Bean Cleanser",
   "micro-essence": "Micro Essence",
   "torriden-serum": "Torriden Dive-In",
   "azelaic-acid": "Azelaic Acid 10%",
   "lancome-cream": "Lancôme Youth Activating Cream",
-  "eltamd-sunscreen": "EltaMD UV Clear",
+  "eltamd-sunscreen": "Centella Sunscreen",
 } as const;
 
 export type ProductId = keyof typeof PRODUCT_NAMES;
@@ -148,7 +148,7 @@ function normalizeLegacyProductName(name: string): string {
   if (/torriden/i.test(name)) return PRODUCT_NAMES["torriden-serum"];
   if (/壬二酸|azelaic/i.test(name)) return PRODUCT_NAMES["azelaic-acid"];
   if (/lanc.me|青春面霜/i.test(name)) return PRODUCT_NAMES["lancome-cream"];
-  if (/eltamd|uv clear/i.test(name)) return PRODUCT_NAMES["eltamd-sunscreen"];
+  if (/eltamd|uv clear|centella sunscreen/i.test(name)) return PRODUCT_NAMES["eltamd-sunscreen"];
   return name;
 }
 

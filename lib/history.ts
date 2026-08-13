@@ -35,7 +35,12 @@ export type TrendSummaryResponse = {
 };
 
 const validConcerns = new Set<Concern>(["breakouts", "oily", "sensitive", "redness", "dry", "dull"]);
-const allowedProductNames = new Set<string>(Object.values(PRODUCT_NAMES));
+const allowedProductNames = new Set<string>([
+  ...Object.values(PRODUCT_NAMES),
+  // Keep version 1 browser history readable after user-facing shelf renames.
+  "beplain Mung Bean Cleanser",
+  "EltaMD UV Clear",
+]);
 const nonDiagnosticDisclaimer = "This summary describes your saved check-ins only. It is not a diagnosis or medical advice.";
 const medicalClaimPattern = /\b(?:diagnos(?:e|ed|is|tic)|prescrib(?:e|ed|ing)|cure[sd]?|medical condition|disease|disorder|treat(?:s|ed|ment|ing)?|you have|indicates?\s+(?:acne|rosacea|eczema))\b/i;
 
