@@ -1,6 +1,19 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import {
+  addHistoryEntry,
+  createEmptyHistoryStore,
+  generateFallbackTrendSummary,
+  guardTrendSummary,
+  HISTORY_SCHEMA_VERSION,
+  HISTORY_STORAGE_KEY,
+  HistoryEntry,
+  parseHistoryStore,
+  recentHistory,
+  TrendSummary,
+  TrendSummaryResponse,
+} from "../lib/history";
 import { Concern, enforceGuardrails, generateFallbackPlan, normalizePlanToEnglish, RoutinePlan, RoutineResponse } from "../lib/routine";
 
 // Leave NEXT_PUBLIC_AI_API_URL empty in .env.local to use this repo's local API route.
@@ -36,10 +49,29 @@ export default function Home() {
   const [showShelf, setShowShelf] = useState(false);
   const [generatedPlan, setGeneratedPlan] = useState<RoutinePlan | null>(null);
   const [engine, setEngine] = useState<RoutineResponse["meta"] | null>(null);
+  const [history, setHistory] = useState<HistoryEntry[]>([]);
+  const [historyReady, setHistoryReady] = useState(false);
+  const [trendSummary, setTrendSummary] = useState<TrendSummary | null>(null);
+  const [trendEngine, setTrendEngine] = useState<TrendSummaryResponse["meta"] | null>(null);
+  const [summaryLoading, setSummaryLoading] = useState(false);
 
   const localRoutine = useMemo(() => generateFallbackPlan(selected, sleep, notes), [selected, sleep, notes]);
   const routine = generatedPlan ?? localRoutine;
   const steps = tab === "morning" ? routine.morning : routine.evening;
+  const visibleHistory = useMemo(() => recentHistory(history), [history]);
+
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(() => {
+      setHistory(parseHistoryStore(window.localStorage.getItem(HISTORY_STORAGE_KEY)).entries);
+      setHistoryReady(true);
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, []);
+
+  useEffect(() => {
+    if (!historyReady) return;
+    window.localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify({ version: HISTORY_SCHEMA_VERSION, entries: history }));
+  }, [history, historyReady]);
 
   function toggleConcern(id: Concern) {
     setSelected((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id]);
@@ -49,6 +81,8 @@ export default function Home() {
 
   async function generate() {
     setLoading(true);
+    let completedPlan = localRoutine;
+    let completedMeta: RoutineResponse["meta"] = { source: "fallback", provider: null, model: null, latency_ms: 0, reason: "network_error" };
     try {
       const response = await fetch(`${AI_API_URL}/api/generate-routine`, {
         method: "POST",
@@ -58,16 +92,63 @@ export default function Home() {
       if (!response.ok) throw new Error("Routine request failed");
       const result = await response.json() as RoutineResponse;
       const englishPlan = normalizePlanToEnglish(result.plan, selected, sleep, notes);
-      setGeneratedPlan(enforceGuardrails(englishPlan, selected, notes));
-      setEngine(result.meta);
+      completedPlan = enforceGuardrails(englishPlan, selected, notes);
+      completedMeta = result.meta;
     } catch {
-      setGeneratedPlan(localRoutine);
-      setEngine({ source: "fallback", provider: null, model: null, latency_ms: 0, reason: "network_error" });
+      completedPlan = localRoutine;
     } finally {
+      setGeneratedPlan(completedPlan);
+      setEngine(completedMeta);
+      const entry: HistoryEntry = {
+        id: globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+        created_at: new Date().toISOString(),
+        concerns: selected,
+        sleep,
+        notes: notes.trim().slice(0, 500),
+        plan: completedPlan,
+        meta: completedMeta,
+      };
+      setHistory((current) => addHistoryEntry(current, entry));
+      setTrendSummary(null);
+      setTrendEngine(null);
       setLoading(false);
       setGenerated(true);
       window.setTimeout(() => document.getElementById("plan")?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
     }
+  }
+
+  async function summarizeHistory() {
+    if (visibleHistory.length === 0) return;
+    setSummaryLoading(true);
+    try {
+      const response = await fetch(`${AI_API_URL}/api/summarize-history`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ entries: visibleHistory }),
+      });
+      if (!response.ok) throw new Error("Trend summary request failed");
+      const result = await response.json() as TrendSummaryResponse;
+      setTrendSummary(guardTrendSummary(result.summary, visibleHistory));
+      setTrendEngine(result.meta);
+    } catch {
+      setTrendSummary(generateFallbackTrendSummary(visibleHistory));
+      setTrendEngine({ source: "fallback", provider: null, model: null, latency_ms: 0, reason: "network_error" });
+    } finally {
+      setSummaryLoading(false);
+    }
+  }
+
+  function deleteHistoryEntry(id: string) {
+    setHistory((current) => current.filter((entry) => entry.id !== id));
+    setTrendSummary(null);
+    setTrendEngine(null);
+  }
+
+  function clearHistory() {
+    if (!window.confirm("Clear all history stored in this browser?")) return;
+    setHistory(createEmptyHistoryStore().entries);
+    setTrendSummary(null);
+    setTrendEngine(null);
   }
 
   const today = new Intl.DateTimeFormat("en-US", { month: "long", day: "numeric", weekday: "short" }).format(new Date());
@@ -158,6 +239,51 @@ export default function Home() {
               <p className="plan-footnote">If stinging persists, swelling appears, or a rash worsens, stop the relevant products and seek professional care.</p>
             </>
           )}
+        </div>
+      </section>
+
+      <section className="history-section" id="history">
+        <div className="shell history-shell">
+          <div className="history-heading">
+            <div><span className="step-kicker">YOUR RECENT PATTERNS</span><h2>History</h2></div>
+            <div className="history-actions">
+              <button className="summary-button" onClick={summarizeHistory} disabled={summaryLoading || visibleHistory.length === 0}>
+                {summaryLoading ? "Reading the week…" : "Summarize my week"}<span>✦</span>
+              </button>
+              {history.length > 0 && <button className="clear-history" onClick={clearHistory}>Clear history</button>}
+            </div>
+          </div>
+          <p className="history-privacy"><span>⌂</span><b>Private to this browser.</b> Your latest 30 check-ins are stored only in localStorage on this device. No API keys or secrets are stored.</p>
+
+          {trendSummary && (
+            <article className="trend-card" aria-live="polite">
+              <div className="trend-topline"><span>WEEKLY TREND SUMMARY</span>{trendEngine && <small className={`engine-badge ${trendEngine.source}`}>{trendEngine.source === "ai" ? "Gemini Structured AI" : "Deterministic fallback"}</small>}</div>
+              <h3>{trendSummary.headline}</h3>
+              <p>{trendSummary.overview}</p>
+              <div className="trend-columns">
+                <div><b>Patterns noticed</b><ul>{trendSummary.patterns.map((pattern) => <li key={pattern}>{pattern}</li>)}</ul></div>
+                <div><b>Gentle next steps</b><ul>{trendSummary.gentle_next_steps.map((step) => <li key={step}>{step}</li>)}</ul></div>
+              </div>
+              <small className="trend-disclaimer">{trendSummary.disclaimer}</small>
+            </article>
+          )}
+
+          <div className="history-list" aria-live="polite">
+            {visibleHistory.length === 0 ? (
+              <div className="empty-history"><span>○</span><div><b>No saved check-ins yet</b><p>Generate a routine to start a private, browser-only history.</p></div></div>
+            ) : visibleHistory.map((entry) => (
+              <article className="history-item" key={entry.id}>
+                <div className="history-date"><b>{new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(new Date(entry.created_at))}</b><small>{new Intl.DateTimeFormat("en-US", { weekday: "short" }).format(new Date(entry.created_at))}</small></div>
+                <div className="history-content">
+                  <div className="signal-tags">{entry.concerns.length > 0 ? entry.concerns.map((concern) => <span key={concern}>{concerns.find((item) => item.id === concern)?.label ?? concern}</span>) : <span>No signal selected</span>}</div>
+                  <b>{entry.plan.priority}</b>
+                  <small>Sleep {entry.sleep}/5</small>
+                </div>
+                <div className="history-source"><span className={entry.meta.source}>{entry.meta.source === "ai" && entry.meta.provider === "gemini" ? "Gemini" : entry.meta.source === "ai" ? "AI" : "Fallback"}</span><button onClick={() => deleteHistoryEntry(entry.id)} aria-label={`Delete history entry from ${new Intl.DateTimeFormat("en-US", { month: "long", day: "numeric" }).format(new Date(entry.created_at))}`}>Delete entry</button></div>
+              </article>
+            ))}
+          </div>
+          {history.length > visibleHistory.length && <p className="history-limit-note">Showing the 7 most recent check-ins. Up to 30 are retained in this browser.</p>}
         </div>
       </section>
     </main>

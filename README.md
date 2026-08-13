@@ -51,6 +51,11 @@ flowchart LR
     E -->|No| F
     F --> G
     G --> H["Morning and evening routine<br/>with AI or fallback provenance"]
+    H --> I["Versioned browser history<br/>maximum 30 entries"]
+    I --> J["POST /api/summarize-history"]
+    J --> K{"Structured summary valid<br/>and non-diagnostic?"}
+    K -->|Yes| L["AI trend summary"]
+    K -->|No or error| M["Deterministic trend fallback"]
 ```
 
 The browser uses the repository API route during local development. Production
@@ -95,6 +100,24 @@ schema failures return the same deterministic fallback planner. The response
 includes provenance metadata so the UI can clearly label AI output versus the
 safety fallback.
 
+### History and AI trend summaries
+
+Every completed routine—including deterministic fallbacks—is saved with its
+date, selected skin signals, sleep score, routine priority, provenance, and
+notes. The History section displays the seven most recent check-ins and lets
+the user delete one entry or clear all history.
+
+“Summarize my week” sends only the seven recent, validated entries to the same
+server-side provider proxy used for routine generation. Gemini is asked for a
+strict structured summary. Runtime validation rejects malformed output, and a
+deterministic guard rejects diagnostic or medical claims. Provider errors,
+timeouts, invalid output, and unsafe output all return a concise deterministic
+summary instead.
+
+Historical notes and model-generated routine text are marked as untrusted data
+in the prompt. Instructions embedded inside either cannot change the summary
+schema or safety boundary.
+
 ## Evaluation coverage
 
 Run the focused suite with:
@@ -116,6 +139,12 @@ calls a live model and does not require `GEMINI_API_KEY` or `OPENAI_API_KEY`.
 | Prompt injection | Instructions inside notes cannot override deterministic safety rules |
 | Provider outage | The response matches the deterministic fallback |
 | Invalid provider output | Runtime validation rejects it and returns the fallback |
+| History validation | Versioned entries must match the bounded local schema |
+| Corrupted browser data | Invalid JSON, versions, and entries safely reset or are dropped |
+| Maximum history size | No more than 30 valid entries are retained |
+| Historical prompt injection | Instructions inside saved notes cannot produce diagnostic output |
+| Non-diagnostic summaries | Valid structured summaries remain descriptive and conservative |
+| Trend provider outage | Weekly summaries fall back deterministically |
 
 GitHub Actions runs type checking and these synthetic evals on every push and
 pull request. The workflow explicitly leaves provider credentials empty.
@@ -142,6 +171,8 @@ npm run check:codex  # TypeScript check
 npm run evals        # Focused synthetic AI evals
 npm run lint         # ESLint
 npm test             # Production build plus the complete test suite
+npm ci --prefix vercel-api && npm run typecheck --prefix vercel-api && npm test --prefix vercel-api
+                     # Install, type-check, and test the backend-only Vercel package
 ```
 
 ## Project map
@@ -149,9 +180,15 @@ npm test             # Production build plus the complete test suite
 ```text
 app/page.tsx                         Client check-in and routine UI
 app/api/generate-routine/route.ts    Provider calls, schema validation, fallback
+app/api/summarize-history/route.ts   Structured trend summary and safe fallback
 lib/routine.ts                       Product allow-list and deterministic guardrails
+lib/history.ts                       Versioned browser schema and trend guardrails
 tests/evals.test.mjs                 Synthetic applied-AI evaluation suite
 .github/workflows/ci.yml             Keyless type-check and eval CI
+vercel-api/                           Isolated Vercel API package; no frontend assets
+vercel-api/api/                       Routine and weekly-summary function entrypoints
+vercel-api/lib/                       Shared validation, guardrails, fallback, and CORS
+vercel-api/tests/                     Synthetic endpoint tests with provider keys disabled
 ```
 
 ## Scope and privacy
@@ -160,3 +197,11 @@ This is a conservative planning demo, not a diagnostic or medical product.
 Synthetic examples are used in tests and evals. Free-text skin notes and
 provider credentials are not logged, and secrets are excluded from source
 control.
+
+History is intentionally device-local. A versioned localStorage document keeps
+at most 30 validated entries in the current browser; it is not synced to an
+account or server. The UI explains this storage model and provides per-entry
+deletion and full clearing controls. No API keys, access tokens, or other
+secrets are written to browser storage. When the user requests a weekly
+summary, only the seven most recent validated entries are sent to the configured
+server-side AI proxy for that request.

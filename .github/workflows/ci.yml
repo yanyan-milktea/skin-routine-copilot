@@ -40,3 +40,12 @@ jobs:
 
       - name: Run synthetic evals
         run: npm run evals
+
+      - name: Install backend API dependencies
+        run: npm ci --prefix vercel-api
+
+      - name: Type check backend API
+        run: npm run typecheck --prefix vercel-api
+
+      - name: Test backend API with synthetic data
+        run: npm test --prefix vercel-api

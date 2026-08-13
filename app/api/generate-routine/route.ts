@@ -7,6 +7,7 @@ import {
   RoutinePlan,
   RoutineResponse,
 } from "../../../lib/routine";
+import { corsPreflightResponse, jsonWithCors } from "../../../lib/cors";
 
 const validConcerns = new Set<Concern>(["breakouts", "oily", "sensitive", "redness", "dry", "dull"]);
 const productIds = Object.keys(PRODUCT_NAMES) as ProductId[];
@@ -163,7 +164,7 @@ export async function POST(request: Request) {
 
   if (!geminiKey && !openAIKey) {
     const result: RoutineResponse = { plan: fallback, meta: { source: "fallback", provider: null, model: null, latency_ms: Date.now() - started, reason: "api_key_not_configured" } };
-    return Response.json(result);
+    return jsonWithCors(request, result);
   }
 
   const provider = geminiKey ? "gemini" : "openai";
@@ -185,11 +186,15 @@ export async function POST(request: Request) {
       : await callOpenAI(openAIKey!, model, input, controller.signal);
     const plan = enforceGuardrails(normalizeModelPlan(parsed), selected, notes);
     const result: RoutineResponse = { plan, meta: { source: "ai", provider, model, latency_ms: Date.now() - started } };
-    return Response.json(result);
+    return jsonWithCors(request, result);
   } catch {
     const result: RoutineResponse = { plan: fallback, meta: { source: "fallback", provider, model, latency_ms: Date.now() - started, reason: "model_or_validation_error" } };
-    return Response.json(result);
+    return jsonWithCors(request, result);
   } finally {
     clearTimeout(timer);
   }
+}
+
+export async function OPTIONS(request: Request) {
+  return corsPreflightResponse(request);
 }
