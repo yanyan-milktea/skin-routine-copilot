@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Concern, generateFallbackPlan, RoutinePlan, RoutineResponse } from "../lib/routine";
+import { Concern, enforceGuardrails, generateFallbackPlan, normalizePlanToEnglish, RoutinePlan, RoutineResponse } from "../lib/routine";
 
 // Leave NEXT_PUBLIC_AI_API_URL empty in .env.local to use this repo's local API route.
 // The default keeps the deployed Sites frontend connected to the production proxy.
@@ -57,7 +57,8 @@ export default function Home() {
       });
       if (!response.ok) throw new Error("Routine request failed");
       const result = await response.json() as RoutineResponse;
-      setGeneratedPlan(result.plan);
+      const englishPlan = normalizePlanToEnglish(result.plan, selected, sleep, notes);
+      setGeneratedPlan(enforceGuardrails(englishPlan, selected, notes));
       setEngine(result.meta);
     } catch {
       setGeneratedPlan(localRoutine);

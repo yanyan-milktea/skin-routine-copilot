@@ -4,6 +4,7 @@ import test from "node:test";
 import {
   enforceGuardrails,
   generateFallbackPlan,
+  normalizePlanToEnglish,
   PRODUCT_NAMES,
 } from "../lib/routine.ts";
 
@@ -136,6 +137,28 @@ test("eval: generated routines use only PRODUCT_NAMES", () => {
   assert.ok(names.every((name) => allowedProducts.has(name)));
   assert.equal(names.includes("Invented exfoliant"), false);
   assert.equal(names.includes("Prescription cream"), false);
+});
+
+test("eval: legacy provider copy is normalized to English", () => {
+  const normalized = normalizePlanToEnglish({
+    priority: "控油抗痘与基础保湿",
+    note: "肌肤状态较稳定。",
+    morning: [
+      { time: "01", name: "beplain 绿豆洁面", detail: "温和清洁", tag: "清洁" },
+      { time: "02", name: "EltaMD UV Clear", detail: "晨间最后一步", tag: "防晒" },
+    ],
+    evening: [
+      { time: "01", name: "壬二酸 10%", detail: "薄涂于干燥肌肤", tag: "活性" },
+      { time: "02", name: "Lancôme 青春面霜", detail: "锁住水分", tag: "保湿" },
+    ],
+    warnings: ["如有持续刺痛，请停止使用。"],
+    need_professional_help: false,
+  }, ["breakouts"], 3, "Synthetic check-in.");
+  const guarded = enforceGuardrails(normalized, ["breakouts"], "Synthetic check-in.");
+
+  assert.equal(/[\u3400-\u9fff]/.test(JSON.stringify(guarded)), false);
+  assert.ok([...guarded.morning, ...guarded.evening].every((step) => allowedProducts.has(step.name)));
+  assert.equal(guarded.morning.at(-1)?.name, PRODUCT_NAMES["eltamd-sunscreen"]);
 });
 
 test("eval: sunscreen is always the final morning step", () => {

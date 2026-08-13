@@ -127,3 +127,61 @@ export function enforceGuardrails(plan: RoutinePlan, selected: Concern[], notes:
     need_professional_help: plan.need_professional_help || warningSignals.test(notes),
   };
 }
+
+const hanCharacters = /[\u3400-\u9fff]/;
+
+const englishStepCopy: Record<ProductId, Pick<RoutineStep, "detail" | "tag">> = {
+  "water-cleanse": { detail: "Rinse gently with lukewarm water to keep the skin barrier comfortable.", tag: "Gentle" },
+  "beplain-cleanser": { detail: "Cleanse gently without scrubbing or aiming for a squeaky finish.", tag: "Cleanse" },
+  "micro-essence": { detail: "Pat on one light layer to prepare skin for hydration.", tag: "Prep" },
+  "torriden-serum": { detail: "Apply one thin layer to support steady hydration.", tag: "Hydrate" },
+  "azelaic-acid": { detail: "Apply a thin layer to dry, comfortable skin and avoid irritated areas.", tag: "Active" },
+  "lancome-cream": { detail: "Apply a light layer to seal in moisture.", tag: "Moisturize" },
+  "eltamd-sunscreen": { detail: "Apply a generous final morning layer and let it set before heading out.", tag: "Essential" },
+};
+
+function normalizeLegacyProductName(name: string): string {
+  if (Object.values(PRODUCT_NAMES).includes(name as (typeof PRODUCT_NAMES)[ProductId])) return name;
+  if (/beplain|绿豆洁面/i.test(name)) return PRODUCT_NAMES["beplain-cleanser"];
+  if (/清水|water rinse/i.test(name)) return PRODUCT_NAMES["water-cleanse"];
+  if (/micro essence|微精华/i.test(name)) return PRODUCT_NAMES["micro-essence"];
+  if (/torriden/i.test(name)) return PRODUCT_NAMES["torriden-serum"];
+  if (/壬二酸|azelaic/i.test(name)) return PRODUCT_NAMES["azelaic-acid"];
+  if (/lanc.me|青春面霜/i.test(name)) return PRODUCT_NAMES["lancome-cream"];
+  if (/eltamd|uv clear/i.test(name)) return PRODUCT_NAMES["eltamd-sunscreen"];
+  return name;
+}
+
+/**
+ * Keeps the Sites frontend compatible with the existing production Gemini proxy,
+ * which can still return legacy Chinese labels. AI-selected products are retained,
+ * while user-facing legacy copy is replaced with deterministic English copy before
+ * the normal safety guardrails run.
+ */
+export function normalizePlanToEnglish(plan: RoutinePlan, selected: Concern[], sleep: number, notes: string): RoutinePlan {
+  const fallback = generateFallbackPlan(selected, sleep, notes);
+  const normalizeSteps = (steps: RoutineStep[]) => steps.map((step) => {
+    const name = normalizeLegacyProductName(step.name);
+    const productId = (Object.entries(PRODUCT_NAMES) as [ProductId, string][])
+      .find(([, productName]) => productName === name)?.[0];
+    const copy = productId ? englishStepCopy[productId] : null;
+
+    return {
+      ...step,
+      name,
+      detail: hanCharacters.test(step.detail) && copy ? copy.detail : step.detail,
+      tag: step.tag && hanCharacters.test(step.tag) && copy ? copy.tag : step.tag,
+    };
+  });
+
+  return {
+    ...plan,
+    priority: hanCharacters.test(plan.priority) ? fallback.priority : plan.priority,
+    note: hanCharacters.test(plan.note) ? fallback.note : plan.note,
+    morning: normalizeSteps(plan.morning),
+    evening: normalizeSteps(plan.evening),
+    warnings: plan.warnings.map((warning) => hanCharacters.test(warning)
+      ? "Stop any product that causes persistent stinging, heat, swelling, or a worsening rash, and seek professional care."
+      : warning),
+  };
+}
