@@ -64,9 +64,11 @@ First-time users receive six seed products, and corrupted or outdated shelf data
 recovers to that safe seed. Product records are capped at 30 and every field is
 runtime-validated and length-bounded.
 
-The browser uses the repository API route during local development. Production
-can use a separate server-side AI proxy through `NEXT_PUBLIC_AI_API_URL`; API
-keys never belong in browser-visible variables.
+The browser resolves one shared API base for both routine generation and weekly
+summaries. An unset, empty, or whitespace-only `NEXT_PUBLIC_AI_API_URL` uses the
+stable production proxy at `https://skin-routine-ai-api.vercel.app`. Configured
+URLs are trimmed and trailing slashes are removed. API keys never belong in
+browser-visible variables.
 
 ## Applied-AI safety design
 
@@ -176,9 +178,17 @@ npm run dev:codex
 ```
 
 Open [http://localhost:5173](http://localhost:5173). No provider key is needed:
-the app remains fully usable through the deterministic fallback. To test a live
-provider locally, add a key only to the ignored `.env.local` file—never commit
-it or paste it into client-side configuration.
+an unset or empty `NEXT_PUBLIC_AI_API_URL` sends requests to the production
+Vercel API. To call this repository's local API routes instead, set the variable
+to the exact origin printed by the development server, for example:
+
+```bash
+NEXT_PUBLIC_AI_API_URL=http://localhost:5173
+```
+
+To test a live provider through the local API route, add a key only to the
+ignored `.env.local` file—never commit it or paste it into client-side
+configuration.
 
 ## Development commands
 
@@ -200,6 +210,7 @@ app/api/summarize-history/route.ts   Structured trend summary and safe fallback
 lib/routine.ts                       Product allow-list and deterministic guardrails
 lib/shelf.ts                         Versioned product schema, seed shelf, CRUD, migration
 lib/history.ts                       Versioned browser schema and trend guardrails
+lib/api-base.ts                      Shared production-safe frontend API-base resolver
 tests/evals.test.mjs                 Synthetic applied-AI evaluation suite
 .github/workflows/ci.yml             Keyless type-check and eval CI
 vercel-api/                           Isolated Vercel API package; no frontend assets

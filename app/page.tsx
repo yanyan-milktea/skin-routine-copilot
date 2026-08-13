@@ -15,6 +15,7 @@ import {
   TrendSummaryResponse,
 } from "../lib/history";
 import { Concern, enforceGuardrails, generateFallbackPlan, normalizePlanToEnglish, RoutinePlan, RoutineResponse } from "../lib/routine";
+import { resolveAiApiBaseUrl } from "../lib/api-base";
 import {
   addShelfProduct,
   createDefaultShelfStore,
@@ -30,10 +31,9 @@ import {
   updateShelfProduct,
 } from "../lib/shelf";
 
-// Leave NEXT_PUBLIC_AI_API_URL empty in .env.local to use this repo's local API route.
-// The default keeps the deployed Sites frontend connected to the production proxy.
-const AI_API_URL = process.env.NEXT_PUBLIC_AI_API_URL
-  ?? "https://skin-routine-ai-api-imyanchen-3068-imyanchen-3068s-projects.vercel.app";
+// Empty and unset values use the stable production proxy. Set the exact local
+// origin explicitly when local development should call this repo's API routes.
+const AI_API_URL = resolveAiApiBaseUrl(process.env.NEXT_PUBLIC_AI_API_URL);
 
 const concerns: { id: Concern; emoji: string; label: string }[] = [
   { id: "breakouts", emoji: "◌", label: "Breakouts" },
