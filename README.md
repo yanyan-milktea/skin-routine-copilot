@@ -16,7 +16,7 @@ but the user needs a small, contextual plan: what to use today, in what order,
 and what to skip when skin feels irritated.
 
 Skin Routine Copilot reduces that decision load without diagnosing, prescribing,
-or introducing new products. It creates a conservative plan from a fixed shelf
+or introducing new products. It creates a conservative plan from a user-managed shelf
 and explains the reasoning in short, practical language.
 
 ## Why use an LLM?
@@ -42,11 +42,12 @@ testable code.
 ```mermaid
 flowchart LR
     A["Daily skin check-in"] --> B["POST /api/generate-routine"]
-    S["Fixed product shelf"] --> B
+    S["Versioned browser-private<br/>product shelf"] --> B
+    S --> SM["Add · edit · pause · delete"]
     B --> C{"Provider available?"}
     C -->|Yes| D["Gemini or OpenAI<br/>structured JSON"]
     C -->|No or error| F["Deterministic fallback"]
-    D --> E{"Runtime schema valid?"}
+    D --> E{"Runtime schema and<br/>dynamic shelf references valid?"}
     E -->|Yes| G["Post-model guardrails"]
     E -->|No| F
     F --> G
@@ -58,6 +59,11 @@ flowchart LR
     K -->|No or error| M["Deterministic trend fallback"]
 ```
 
+The product shelf and history are independent, versioned localStorage documents.
+First-time users receive six seed products, and corrupted or outdated shelf data
+recovers to that safe seed. Product records are capped at 30 and every field is
+runtime-validated and length-bounded.
+
 The browser uses the repository API route during local development. Production
 can use a separate server-side AI proxy through `NEXT_PUBLIC_AI_API_URL`; API
 keys never belong in browser-visible variables.
@@ -68,19 +74,20 @@ keys never belong in browser-visible variables.
 
 The API requests a strict JSON schema containing the day's priority,
 explanation, morning steps, evening steps, warnings, and a professional-help
-flag. Products are represented as allow-listed product IDs rather than
-free-form model text. Parsed responses are validated again at runtime before
-normalization.
+flag. Each request supplies the enabled shelf, but client product IDs and text
+are never treated as instructions. The server assigns short request-scoped
+references (`p0`, `p1`, and so on), constrains model output to those references,
+and resolves them back to validated products only after generation.
 
 ### Deterministic guardrails
 
 Model output passes through code-level rules in `lib/routine.ts`:
 
-- Every step must resolve to a name in `PRODUCT_NAMES`.
-- Sunscreen is deduplicated and moved to the final morning position.
-- Azelaic acid is evening-only.
-- Azelaic acid is removed for sensitivity, redness, persistent stinging, heat,
-  damaged skin, swelling, oozing, or a worsening rash.
+- Every step must resolve to an enabled product from that request's validated shelf.
+- Paused, deleted, unknown, duplicated, and time-ineligible products are removed.
+- An enabled morning sunscreen is deduplicated and moved to the final morning position.
+- Active/treatment products respect their saved time and are removed for sensitivity,
+  redness, persistent stinging, heat, damaged skin, swelling, oozing, or a worsening rash.
 - Step counts and warnings are bounded.
 
 These constraints run after generation, so correctness does not depend on the
@@ -88,15 +95,18 @@ model following instructions perfectly.
 
 ### Prompt-injection resistance
 
-Free-text notes are treated as untrusted data. The system prompt tells the
-model to ignore instructions embedded in notes, and deterministic post-model
+Free-text notes, product names, brands, categories, IDs, and usage notes are
+treated as untrusted data. The system prompt tells the model to ignore instructions
+embedded in them, and deterministic post-model
 guardrails still apply if a note attempts to override the role, schema,
 product list, ordering, or sensitivity rules.
 
 ### Provider-failure fallback
 
 Missing credentials, provider errors, timeouts, malformed JSON, and runtime
-schema failures return the same deterministic fallback planner. The response
+schema failures return the same deterministic fallback planner, built from the
+enabled submitted shelf. If required categories are missing, it returns a useful
+partial routine and explains the limitation instead of inventing a product. The response
 includes provenance metadata so the UI can clearly label AI output versus the
 safety fallback.
 
@@ -139,6 +149,12 @@ calls a live model and does not require `GEMINI_API_KEY` or `OPENAI_API_KEY`.
 | Prompt injection | Instructions inside notes cannot override deterministic safety rules |
 | Provider outage | The response matches the deterministic fallback |
 | Invalid provider output | Runtime validation rejects it and returns the fallback |
+| Shelf CRUD and migration | Add, edit, pause, delete, and pre-versioned migration remain validated |
+| Dynamic allow-list | Paused, deleted, and unknown products never appear in routines |
+| Untrusted product data | Instructions in product names and notes cannot override safety |
+| Time restrictions | Products remain within their configured morning/evening window |
+| Active-product safety | Sensitivity and irritation remove all active/treatment products |
+| Incomplete shelf | Fallback explains missing categories without inventing products |
 | History validation | Versioned entries must match the bounded local schema |
 | Corrupted browser data | Invalid JSON, versions, and entries safely reset or are dropped |
 | Maximum history size | No more than 30 valid entries are retained |
@@ -182,6 +198,7 @@ app/page.tsx                         Client check-in and routine UI
 app/api/generate-routine/route.ts    Provider calls, schema validation, fallback
 app/api/summarize-history/route.ts   Structured trend summary and safe fallback
 lib/routine.ts                       Product allow-list and deterministic guardrails
+lib/shelf.ts                         Versioned product schema, seed shelf, CRUD, migration
 lib/history.ts                       Versioned browser schema and trend guardrails
 tests/evals.test.mjs                 Synthetic applied-AI evaluation suite
 .github/workflows/ci.yml             Keyless type-check and eval CI
@@ -198,7 +215,12 @@ Synthetic examples are used in tests and evals. Free-text skin notes and
 provider credentials are not logged, and secrets are excluded from source
 control.
 
-History is intentionally device-local. A versioned localStorage document keeps
+The product shelf is intentionally device-local. A separate versioned
+localStorage document stores at most 30 validated products. Users can add, edit,
+pause/resume, or delete products, and deletion requires confirmation. Only enabled
+products are sent with a routine request; no shelf is synced to an account.
+
+History is also intentionally device-local. Its existing versioned localStorage document keeps
 at most 30 validated entries in the current browser; it is not synced to an
 account or server. The UI explains this storage model and provides per-entry
 deletion and full clearing controls. No API keys, access tokens, or other

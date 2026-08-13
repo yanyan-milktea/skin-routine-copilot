@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import {
   addHistoryEntry,
   createEmptyHistoryStore,
@@ -15,6 +15,20 @@ import {
   TrendSummaryResponse,
 } from "../lib/history";
 import { Concern, enforceGuardrails, generateFallbackPlan, normalizePlanToEnglish, RoutinePlan, RoutineResponse } from "../lib/routine";
+import {
+  addShelfProduct,
+  createDefaultShelfStore,
+  deleteShelfProduct,
+  MAX_SHELF_PRODUCTS,
+  parseShelfStore,
+  PRODUCT_CATEGORIES,
+  PRODUCT_TIMES,
+  productDisplayName,
+  SHELF_SCHEMA_VERSION,
+  SHELF_STORAGE_KEY,
+  ShelfProduct,
+  updateShelfProduct,
+} from "../lib/shelf";
 
 // Leave NEXT_PUBLIC_AI_API_URL empty in .env.local to use this repo's local API route.
 // The default keeps the deployed Sites frontend connected to the production proxy.
@@ -30,14 +44,17 @@ const concerns: { id: Concern; emoji: string; label: string }[] = [
   { id: "dull", emoji: "✦", label: "Dullness" },
 ];
 
-const products = [
-  { name: "Beplain Mung Bean Cleanser", kind: "Cleanser", color: "mint" },
-  { name: "Micro Essence", kind: "Essence", color: "peach" },
-  { name: "Torriden Dive-In", kind: "Hydrating serum", color: "blue" },
-  { name: "Azelaic Acid 10%", kind: "Active treatment", color: "cream" },
-  { name: "Lancôme Youth Activating Cream", kind: "Moisturizer", color: "rose" },
-  { name: "Centella Sunscreen", kind: "Sunscreen", color: "sand" },
-];
+const categoryLabels: Record<ShelfProduct["category"], string> = {
+  cleanser: "Cleanser", "toner-essence": "Toner / essence", serum: "Serum",
+  treatment: "Treatment", moisturizer: "Moisturizer", sunscreen: "Sunscreen", other: "Other",
+};
+const timeLabels: Record<ShelfProduct["allowed_time"], string> = {
+  morning: "Morning", evening: "Evening", both: "Morning & evening",
+};
+const emptyProduct = (): ShelfProduct => ({
+  id: "", brand: "", name: "", category: "other", allowed_time: "both",
+  is_active: false, usage_note: "", enabled: true,
+});
 
 export default function Home() {
   const [selected, setSelected] = useState<Concern[]>(["breakouts", "oily"]);
@@ -54,8 +71,12 @@ export default function Home() {
   const [trendSummary, setTrendSummary] = useState<TrendSummary | null>(null);
   const [trendEngine, setTrendEngine] = useState<TrendSummaryResponse["meta"] | null>(null);
   const [summaryLoading, setSummaryLoading] = useState(false);
+  const [shelf, setShelf] = useState<ShelfProduct[]>(() => createDefaultShelfStore().products);
+  const [shelfReady, setShelfReady] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<ShelfProduct | null>(null);
+  const [shelfMessage, setShelfMessage] = useState("");
 
-  const localRoutine = useMemo(() => generateFallbackPlan(selected, sleep, notes), [selected, sleep, notes]);
+  const localRoutine = useMemo(() => generateFallbackPlan(selected, sleep, notes, shelf), [selected, sleep, notes, shelf]);
   const routine = generatedPlan ?? localRoutine;
   const steps = tab === "morning" ? routine.morning : routine.evening;
   const visibleHistory = useMemo(() => recentHistory(history), [history]);
@@ -63,7 +84,9 @@ export default function Home() {
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => {
       setHistory(parseHistoryStore(window.localStorage.getItem(HISTORY_STORAGE_KEY)).entries);
+      setShelf(parseShelfStore(window.localStorage.getItem(SHELF_STORAGE_KEY)).products);
       setHistoryReady(true);
+      setShelfReady(true);
     });
     return () => window.cancelAnimationFrame(frame);
   }, []);
@@ -72,6 +95,11 @@ export default function Home() {
     if (!historyReady) return;
     window.localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify({ version: HISTORY_SCHEMA_VERSION, entries: history }));
   }, [history, historyReady]);
+
+  useEffect(() => {
+    if (!shelfReady) return;
+    window.localStorage.setItem(SHELF_STORAGE_KEY, JSON.stringify({ version: SHELF_SCHEMA_VERSION, products: shelf }));
+  }, [shelf, shelfReady]);
 
   function toggleConcern(id: Concern) {
     setSelected((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id]);
@@ -87,12 +115,12 @@ export default function Home() {
       const response = await fetch(`${AI_API_URL}/api/generate-routine`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ concerns: selected, sleep, notes }),
+        body: JSON.stringify({ concerns: selected, sleep, notes, products: shelf }),
       });
       if (!response.ok) throw new Error("Routine request failed");
       const result = await response.json() as RoutineResponse;
-      const englishPlan = normalizePlanToEnglish(result.plan, selected, sleep, notes);
-      completedPlan = enforceGuardrails(englishPlan, selected, notes);
+      const englishPlan = normalizePlanToEnglish(result.plan, selected, sleep, notes, shelf);
+      completedPlan = enforceGuardrails(englishPlan, selected, notes, shelf);
       completedMeta = result.meta;
     } catch {
       completedPlan = localRoutine;
@@ -151,6 +179,44 @@ export default function Home() {
     setTrendEngine(null);
   }
 
+  function startAddingProduct() {
+    if (shelf.length >= MAX_SHELF_PRODUCTS) { setShelfMessage(`Your shelf is limited to ${MAX_SHELF_PRODUCTS} products.`); return; }
+    setEditingProduct(emptyProduct());
+    setShelfMessage("");
+    setShowShelf(true);
+  }
+
+  function saveProduct(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!editingProduct?.name.trim()) { setShelfMessage("Add a product name before saving."); return; }
+    if (editingProduct.id) {
+      setShelf((current) => updateShelfProduct(current, editingProduct.id, editingProduct));
+    } else {
+      const id = `product-${globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(16).slice(2)}`}`;
+      setShelf((current) => addShelfProduct(current, { ...editingProduct, id }));
+    }
+    setEditingProduct(null);
+    setShelfMessage("Shelf saved in this browser.");
+    setGenerated(false);
+    setGeneratedPlan(null);
+  }
+
+  function removeProduct(product: ShelfProduct) {
+    if (!window.confirm(`Delete ${productDisplayName(product)}? This removes it from routines saved in this browser.`)) return;
+    setShelf((current) => deleteShelfProduct(current, product.id));
+    setEditingProduct((current) => current?.id === product.id ? null : current);
+    setShelfMessage("Product deleted from this browser.");
+    setGenerated(false);
+    setGeneratedPlan(null);
+  }
+
+  function toggleProduct(product: ShelfProduct) {
+    setShelf((current) => updateShelfProduct(current, product.id, { ...product, enabled: !product.enabled }));
+    setShelfMessage(product.enabled ? "Product paused." : "Product resumed.");
+    setGenerated(false);
+    setGeneratedPlan(null);
+  }
+
   const today = new Intl.DateTimeFormat("en-US", { month: "long", day: "numeric", weekday: "short" }).format(new Date());
 
   return (
@@ -206,13 +272,23 @@ export default function Home() {
           <p className="microcopy">Built from your shelf · Do not enter names or medical records · Not a substitute for professional care</p>
         </div>
 
-        <aside className={`shelf-card ${showShelf ? "open" : ""}`}>
-          <div className="shelf-heading"><div><span className="step-kicker">MY SHELF</span><h2>My products</h2></div><button aria-label="Add a product">+</button></div>
-          <p>Copilot only plans with products already on your shelf.</p>
+        <aside className={`shelf-card ${showShelf ? "open" : ""}`} id="shelf">
+          <div className="shelf-heading"><div><span className="step-kicker">MY PRODUCT SHELF</span><h2>My products</h2></div><button onClick={startAddingProduct} aria-label="Add a product">+</button></div>
+          <p><b>Private to this browser.</b> Copilot only plans with enabled products saved locally on this device.</p>
           <div className="product-list">
-            {products.map((product) => <div className="product" key={product.name}><span className={`product-icon ${product.color}`} /><div><b>{product.name}</b><small>{product.kind}</small></div><i>•••</i></div>)}
+            {shelf.map((product, index) => <div className={`product ${product.enabled ? "" : "paused"}`} key={product.id}><span className={`product-icon tone-${index % 6}`} /><div className="product-copy"><div className="product-name-row"><b>{productDisplayName(product)}</b>{!product.enabled && <span className="paused-badge">Paused</span>}</div><small>{categoryLabels[product.category]} · {timeLabels[product.allowed_time]}{product.is_active ? " · Potentially irritating active" : ""}</small></div><div className="product-actions"><button onClick={() => toggleProduct(product)}>{product.enabled ? "Pause" : "Resume"}</button><button onClick={() => setEditingProduct({ ...product })}>Edit</button><button className="delete-product" onClick={() => removeProduct(product)}>Delete</button></div></div>)}
+            {shelf.length === 0 && <div className="empty-shelf">No products yet. Add what you already own.</div>}
           </div>
-          <button className="manage">Manage all products <span>→</span></button>
+          {editingProduct && <form className="product-form" onSubmit={saveProduct}>
+            <div className="form-topline"><b>{editingProduct.id ? "Edit product" : "Add product"}</b><button type="button" onClick={() => setEditingProduct(null)} aria-label="Close product form">×</button></div>
+            <div className="form-grid"><div className="form-field"><label htmlFor="product-brand">Brand <span>Optional</span></label><input id="product-brand" maxLength={60} value={editingProduct.brand} onChange={(event) => setEditingProduct({ ...editingProduct, brand: event.target.value })} /></div><div className="form-field"><label htmlFor="product-name">Product name <span className="required-marker">Required</span></label><input id="product-name" required aria-required="true" maxLength={100} value={editingProduct.name} onChange={(event) => setEditingProduct({ ...editingProduct, name: event.target.value })} /></div></div>
+            <div className="form-grid"><div className="form-field"><label htmlFor="product-category">Category</label><select id="product-category" value={editingProduct.category} onChange={(event) => setEditingProduct({ ...editingProduct, category: event.target.value as ShelfProduct["category"] })}>{PRODUCT_CATEGORIES.map((category) => <option key={category} value={category}>{categoryLabels[category]}</option>)}</select></div><div className="form-field"><label htmlFor="product-time">Use in routine</label><select id="product-time" value={editingProduct.allowed_time} onChange={(event) => setEditingProduct({ ...editingProduct, allowed_time: event.target.value as ShelfProduct["allowed_time"] })}>{PRODUCT_TIMES.map((time) => <option key={time} value={time}>{timeLabels[time]}</option>)}</select></div></div>
+            <label htmlFor="product-note">Short usage note</label><small className="form-helper" id="product-note-help">Optional — for example, use 2–3 nights per week.</small><textarea id="product-note" aria-describedby="product-note-help" maxLength={180} value={editingProduct.usage_note} onChange={(event) => setEditingProduct({ ...editingProduct, usage_note: event.target.value })} />
+            <div className="form-checks"><div className="check-field"><label htmlFor="product-active"><input id="product-active" type="checkbox" aria-describedby="product-active-help" checked={editingProduct.is_active} onChange={(event) => setEditingProduct({ ...editingProduct, is_active: event.target.checked })} /> Potentially irritating active</label><small id="product-active-help">Examples: exfoliants, retinoids, or azelaic acid. Automatically skipped on sensitive days.</small></div><div className="check-field"><label htmlFor="product-enabled"><input id="product-enabled" type="checkbox" checked={editingProduct.enabled} onChange={(event) => setEditingProduct({ ...editingProduct, enabled: event.target.checked })} /> Include in routines</label></div></div>
+            <button className="save-product" type="submit" disabled={!editingProduct.name.trim()}>Save product</button>
+          </form>}
+          {shelfMessage && <p className="shelf-message" role="status">{shelfMessage}</p>}
+          <button className="manage" onClick={startAddingProduct}>Add another product <span>+</span></button>
         </aside>
       </section>
 

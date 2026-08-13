@@ -1,4 +1,3 @@
-import { PRODUCT_NAMES } from "./routine.ts";
 import type { Concern, RoutinePlan, RoutineResponse } from "./routine.ts";
 
 export const HISTORY_STORAGE_KEY = "skin-routine-copilot.history";
@@ -35,12 +34,6 @@ export type TrendSummaryResponse = {
 };
 
 const validConcerns = new Set<Concern>(["breakouts", "oily", "sensitive", "redness", "dry", "dull"]);
-const allowedProductNames = new Set<string>([
-  ...Object.values(PRODUCT_NAMES),
-  // Keep version 1 browser history readable after user-facing shelf renames.
-  "beplain Mung Bean Cleanser",
-  "EltaMD UV Clear",
-]);
 const nonDiagnosticDisclaimer = "This summary describes your saved check-ins only. It is not a diagnosis or medical advice.";
 const medicalClaimPattern = /\b(?:diagnos(?:e|ed|is|tic)|prescrib(?:e|ed|ing)|cure[sd]?|medical condition|disease|disorder|treat(?:s|ed|ment|ing)?|you have|indicates?\s+(?:acne|rosacea|eczema))\b/i;
 
@@ -57,9 +50,9 @@ function isRoutinePlan(value: unknown): value is RoutinePlan {
   const validStep = (step: unknown) => isRecord(step)
     && isBoundedString(step.time, 8)
     && isBoundedString(step.name, 80)
-    && allowedProductNames.has(step.name)
     && isBoundedString(step.detail, 500)
-    && (step.tag === undefined || isBoundedString(step.tag, 80));
+    && (step.tag === undefined || isBoundedString(step.tag, 80))
+    && (step.product_id === undefined || isBoundedString(step.product_id, 80));
 
   return isBoundedString(value.priority, 300)
     && isBoundedString(value.note, 1_000)
