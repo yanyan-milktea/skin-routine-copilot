@@ -47,6 +47,37 @@ Keep explanations short and practical. Flag concerning or persistent symptoms fo
 type ModelStep = { product_id: ProductId; detail: string; tag: string | null };
 type ModelPlan = Omit<RoutinePlan, "morning" | "evening"> & { morning: ModelStep[]; evening: ModelStep[] };
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function isModelStep(value: unknown): value is ModelStep {
+  if (!isRecord(value)) return false;
+  return typeof value.product_id === "string"
+    && productIds.includes(value.product_id as ProductId)
+    && typeof value.detail === "string"
+    && (typeof value.tag === "string" || value.tag === null);
+}
+
+function isModelPlan(value: unknown): value is ModelPlan {
+  if (!isRecord(value)) return false;
+  return typeof value.priority === "string"
+    && typeof value.note === "string"
+    && Array.isArray(value.morning)
+    && value.morning.every(isModelStep)
+    && Array.isArray(value.evening)
+    && value.evening.every(isModelStep)
+    && Array.isArray(value.warnings)
+    && value.warnings.every((warning) => typeof warning === "string")
+    && typeof value.need_professional_help === "boolean";
+}
+
+function parseModelPlan(text: string): ModelPlan {
+  const parsed: unknown = JSON.parse(text);
+  if (!isModelPlan(parsed)) throw new Error("Provider output failed routine validation");
+  return parsed;
+}
+
 function normalizeModelPlan(value: ModelPlan): RoutinePlan {
   const mapSteps = (steps: ModelStep[]) => steps.map((step, index) => ({
     time: String(index + 1).padStart(2, "0"),
@@ -94,7 +125,7 @@ async function callGemini(apiKey: string, model: string, input: Record<string, u
   if (!response.ok) throw new Error(`Gemini request failed: ${response.status}`);
   const text = geminiOutputText(await response.json() as Record<string, unknown>);
   if (!text) throw new Error("No Gemini structured output returned");
-  return JSON.parse(text) as ModelPlan;
+  return parseModelPlan(text);
 }
 
 async function callOpenAI(apiKey: string, model: string, input: Record<string, unknown>, signal: AbortSignal): Promise<ModelPlan> {
@@ -113,7 +144,7 @@ async function callOpenAI(apiKey: string, model: string, input: Record<string, u
   if (!response.ok) throw new Error(`OpenAI request failed: ${response.status}`);
   const text = openAIOutputText(await response.json() as Record<string, unknown>);
   if (!text) throw new Error("No OpenAI structured output returned");
-  return JSON.parse(text) as ModelPlan;
+  return parseModelPlan(text);
 }
 
 export async function POST(request: Request) {
@@ -140,9 +171,9 @@ export async function POST(request: Request) {
     ? process.env.GEMINI_MODEL || "gemini-3.6-flash"
     : process.env.OPENAI_MODEL || "gpt-5.6";
 
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 15_000);
   try {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 15_000);
     const input = {
       skin_signals: selected,
       sleep_score: sleep,
@@ -152,12 +183,13 @@ export async function POST(request: Request) {
     const parsed = provider === "gemini"
       ? await callGemini(geminiKey!, model, input, controller.signal)
       : await callOpenAI(openAIKey!, model, input, controller.signal);
-    clearTimeout(timer);
     const plan = enforceGuardrails(normalizeModelPlan(parsed), selected, notes);
     const result: RoutineResponse = { plan, meta: { source: "ai", provider, model, latency_ms: Date.now() - started } };
     return Response.json(result);
   } catch {
     const result: RoutineResponse = { plan: fallback, meta: { source: "fallback", provider, model, latency_ms: Date.now() - started, reason: "model_or_validation_error" } };
     return Response.json(result);
+  } finally {
+    clearTimeout(timer);
   }
 }

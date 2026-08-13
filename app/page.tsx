@@ -141,7 +141,7 @@ export default function Home() {
           ) : (
             <>
               <div className="plan-intro">
-                <div><span className="step-kicker">TODAY'S ROUTINE</span><h2>Less can be more today.</h2></div>
+                <div><span className="step-kicker">TODAY’S ROUTINE</span><h2>Less can be more today.</h2></div>
                 <div className="priority"><small>Today’s focus</small><b>{routine.priority}</b></div>
               </div>
               <div className="insight"><span>✦</span><div><div className="insight-title"><b>Copilot’s take</b>{engine && <small className={`engine-badge ${engine.source}`}>{engine.source === "ai" ? `${engine.provider === "gemini" ? "Gemini" : "OpenAI"} Structured AI · ${engine.latency_ms}ms` : "Safety engine · fallback"}</small>}</div><p>{routine.note}</p>{routine.warnings.length > 0 && <p className="warning-copy">{routine.warnings.join(" ")}</p>}</div></div>
