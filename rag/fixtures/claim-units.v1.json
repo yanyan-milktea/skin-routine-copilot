@@ -1,0 +1,153 @@
+{
+  "schema_version": 1,
+  "fixture_kind": "synthetic_only",
+  "claim_units_version": "synthetic-claims-v1",
+  "build_eligible": false,
+  "claim_units": [
+    {
+      "claim_unit_id": "cu_q1_in_this_synthetic_guide_alpha_hydroxy_acids_may__fd566dd0",
+      "question_class": "Q1",
+      "supported_intent_ids": ["q1_sun_sensitivity_relationship"],
+      "canonical_claim_text": "In this synthetic guide, alpha hydroxy acids may increase sensitivity to sunlight.",
+      "supporting_chunk_ids": ["chk_syn_src_q1_7851bbe6_synthetic_aha_and_sunlight_note_00_50f7d5c9"],
+      "required_entities": ["alpha hydroxy acids", "sunlight"],
+      "required_qualifiers": ["In this synthetic guide", "may"],
+      "required_negation": [],
+      "required_exceptions": [],
+      "required_populations": [],
+      "required_numbers": [],
+      "source_document_hashes": [
+        {
+          "source_id": "syn_src_q1_7851bbe6",
+          "document_hash": "sha256:50f7d5c9c1e9d26c503c253b3886b3648ebfd14509803efd227c3960c99a6fb6"
+        }
+      ],
+      "review": {
+        "decision": "approved_for_synthetic_tests",
+        "reviewed_by": "synthetic-fixture-reviewer",
+        "reviewed_at": "2026-08-14",
+        "review_version": "claim-review-v1",
+        "binding_hash": "sha256:9c5cd91dd9561f6a71bd4eb46ba4daff517abdb0c9d58793fa8f5de92f8aadb2"
+      },
+      "content_hash": "sha256:50f7d5c9c1e9d26c503c253b3886b3648ebfd14509803efd227c3960c99a6fb6",
+      "enabled": true,
+      "build_eligible": false
+    },
+    {
+      "claim_unit_id": "cu_q2_in_this_synthetic_example_a_beta_hydroxy_acid_fo_db78fe4e",
+      "question_class": "Q2",
+      "supported_intent_ids": ["q2_bha_definition"],
+      "canonical_claim_text": "In this synthetic example, a beta hydroxy acid formula contains 2% salicylic acid.",
+      "supporting_chunk_ids": ["chk_syn_src_q2_b40601f3_synthetic_bha_scope_note_00_47a25fda"],
+      "required_entities": ["beta hydroxy acid", "salicylic acid"],
+      "required_qualifiers": ["In this synthetic example"],
+      "required_negation": [],
+      "required_exceptions": [],
+      "required_populations": [],
+      "required_numbers": ["2%"],
+      "source_document_hashes": [
+        {
+          "source_id": "syn_src_q2_b40601f3",
+          "document_hash": "sha256:47a25fdafc64994cff7e0cff948d59de18fa7054e471b69e653cff48f9e3c2b7"
+        }
+      ],
+      "review": {
+        "decision": "approved_for_synthetic_tests",
+        "reviewed_by": "synthetic-fixture-reviewer",
+        "reviewed_at": "2026-08-14",
+        "review_version": "claim-review-v1",
+        "binding_hash": "sha256:747c6a22594610bc1531bd5049d3df3ac8ceb71818587d13a0b7dbc00986d93c"
+      },
+      "content_hash": "sha256:47a25fdafc64994cff7e0cff948d59de18fa7054e471b69e653cff48f9e3c2b7",
+      "enabled": true,
+      "build_eligible": false
+    },
+    {
+      "claim_unit_id": "cu_q3_the_synthetic_retinoid_guide_recommends_a_gradua_33838c00",
+      "question_class": "Q3",
+      "supported_intent_ids": ["q3_general_introduction"],
+      "canonical_claim_text": "The synthetic retinoid guide recommends a gradual introduction unless the reviewed label says otherwise.",
+      "supporting_chunk_ids": ["chk_syn_src_q3_61e4bd97_synthetic_retinoid_introduction_note_00_59eefc27"],
+      "required_entities": ["retinoid"],
+      "required_qualifiers": ["gradual introduction"],
+      "required_negation": [],
+      "required_exceptions": ["unless the reviewed label says otherwise"],
+      "required_populations": [],
+      "required_numbers": [],
+      "source_document_hashes": [
+        {
+          "source_id": "syn_src_q3_61e4bd97",
+          "document_hash": "sha256:59eefc276bc8a89d9f7a3980dc9d834d654c64b4a536aa820ddd2140c00075c8"
+        }
+      ],
+      "review": {
+        "decision": "approved_for_synthetic_tests",
+        "reviewed_by": "synthetic-fixture-reviewer",
+        "reviewed_at": "2026-08-14",
+        "review_version": "claim-review-v1",
+        "binding_hash": "sha256:40a03547023e36c3d7c8404f94868445311f4bf91957312d7647618b776f9d13"
+      },
+      "content_hash": "sha256:59eefc276bc8a89d9f7a3980dc9d834d654c64b4a536aa820ddd2140c00075c8",
+      "enabled": true,
+      "build_eligible": false
+    },
+    {
+      "claim_unit_id": "cu_q4_the_fictional_regulator_does_not_pre_clear_ordin_723e9ffd",
+      "question_class": "Q4",
+      "supported_intent_ids": ["q4_premarket_approval_rule"],
+      "canonical_claim_text": "The fictional regulator does not pre-clear ordinary synthetic cosmetics, except listed color additives.",
+      "supporting_chunk_ids": ["chk_syn_src_q4_2b302b76_synthetic_cosmetic_regulation_note_00_11e95375"],
+      "required_entities": ["fictional regulator", "ordinary synthetic cosmetics", "color additives"],
+      "required_qualifiers": [],
+      "required_negation": ["does not"],
+      "required_exceptions": ["except listed color additives"],
+      "required_populations": [],
+      "required_numbers": [],
+      "source_document_hashes": [
+        {
+          "source_id": "syn_src_q4_2b302b76",
+          "document_hash": "sha256:11e95375d23f211d2f905b5ed3108d903729bcbcec4c725edeace907187ae668"
+        }
+      ],
+      "review": {
+        "decision": "approved_for_synthetic_tests",
+        "reviewed_by": "synthetic-fixture-reviewer",
+        "reviewed_at": "2026-08-14",
+        "review_version": "claim-review-v1",
+        "binding_hash": "sha256:bcdb04620d99c9ded4ca32f5b3b24321624bc5e3203ef9c49fec05a8717a6543"
+      },
+      "content_hash": "sha256:11e95375d23f211d2f905b5ed3108d903729bcbcec4c725edeace907187ae668",
+      "enabled": true,
+      "build_eligible": false
+    },
+    {
+      "claim_unit_id": "cu_q5_the_synthetic_pregnancy_guide_advises_pregnant_o_593684db",
+      "question_class": "Q5",
+      "supported_intent_ids": ["q5_discuss_with_clinician"],
+      "canonical_claim_text": "The synthetic pregnancy guide advises pregnant or breastfeeding readers to consult a clinician.",
+      "supporting_chunk_ids": ["chk_syn_src_q5_ffbd3ce5_synthetic_pregnancy_scope_note_00_a1e6d4e8"],
+      "required_entities": ["pregnancy guide", "clinician"],
+      "required_qualifiers": ["advises"],
+      "required_negation": [],
+      "required_exceptions": [],
+      "required_populations": ["pregnant or breastfeeding readers"],
+      "required_numbers": [],
+      "source_document_hashes": [
+        {
+          "source_id": "syn_src_q5_ffbd3ce5",
+          "document_hash": "sha256:a1e6d4e864eef168ff310da44a2e75d0d7f33b4c5c90e78a8bd12836408ba87a"
+        }
+      ],
+      "review": {
+        "decision": "approved_for_synthetic_tests",
+        "reviewed_by": "synthetic-fixture-reviewer",
+        "reviewed_at": "2026-08-14",
+        "review_version": "claim-review-v1",
+        "binding_hash": "sha256:ee3b9f1b64647ad7a1b9b20323aeac5c5211f5ee091248a3ea97633e98f244ae"
+      },
+      "content_hash": "sha256:a1e6d4e864eef168ff310da44a2e75d0d7f33b4c5c90e78a8bd12836408ba87a",
+      "enabled": true,
+      "build_eligible": false
+    }
+  ]
+}

@@ -11,6 +11,7 @@
     "dev:codex": "vite",
     "build": "bash scripts/build-verified.sh",
     "evals": "npm run build && node --test tests/evals.test.mjs",
+    "test:milestone0": "node --test tests/ingredient-corpus.test.mjs",
     "start": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext start",
     "test": "npm run build && node --test tests/*.test.mjs",
     "validate:artifact": "bash scripts/validate-artifact.sh",

@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skin-routine-copilot.local/schemas/claim-units.v1.schema.json",
+  "title": "Synthetic canonical claim-unit fixtures v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "fixture_kind", "claim_units_version", "build_eligible", "claim_units"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "fixture_kind": { "const": "synthetic_only" },
+    "claim_units_version": { "type": "string", "pattern": "^synthetic-claims-v[0-9]+$" },
+    "build_eligible": { "const": false },
+    "claim_units": { "type": "array", "minItems": 5, "maxItems": 100, "items": { "$ref": "#/$defs/claim_unit" } }
+  },
+  "$defs": {
+    "source_hash": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_id", "document_hash"],
+      "properties": {
+        "source_id": { "type": "string", "pattern": "^syn_src_q[1-5]_[a-f0-9]{8}$" },
+        "document_hash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" }
+      }
+    },
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["decision", "reviewed_by", "reviewed_at", "review_version", "binding_hash"],
+      "properties": {
+        "decision": { "const": "approved_for_synthetic_tests" },
+        "reviewed_by": { "type": "string", "minLength": 2, "maxLength": 100 },
+        "reviewed_at": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" },
+        "review_version": { "const": "claim-review-v1" },
+        "binding_hash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" }
+      }
+    },
+    "claim_unit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "claim_unit_id", "question_class", "supported_intent_ids", "canonical_claim_text", "supporting_chunk_ids",
+        "required_entities", "required_qualifiers", "required_negation", "required_exceptions", "required_populations",
+        "required_numbers", "source_document_hashes", "review", "content_hash", "enabled", "build_eligible"
+      ],
+      "properties": {
+        "claim_unit_id": { "type": "string", "pattern": "^cu_q[1-5]_[a-z0-9_]+_[a-f0-9]{8}$", "maxLength": 180 },
+        "question_class": { "enum": ["Q1", "Q2", "Q3", "Q4", "Q5"] },
+        "supported_intent_ids": { "type": "array", "minItems": 1, "maxItems": 5, "uniqueItems": true, "items": { "type": "string", "pattern": "^q[1-5]_[a-z0-9_]+$" } },
+        "canonical_claim_text": { "type": "string", "minLength": 1, "maxLength": 360 },
+        "supporting_chunk_ids": { "type": "array", "minItems": 1, "maxItems": 3, "uniqueItems": true, "items": { "type": "string", "pattern": "^chk_syn_src_q[1-5]_" } },
+        "required_entities": { "type": "array", "minItems": 1, "maxItems": 20, "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 100 } },
+        "required_qualifiers": { "$ref": "#/$defs/term_array" },
+        "required_negation": { "$ref": "#/$defs/term_array" },
+        "required_exceptions": { "$ref": "#/$defs/term_array" },
+        "required_populations": { "$ref": "#/$defs/term_array" },
+        "required_numbers": { "$ref": "#/$defs/term_array" },
+        "source_document_hashes": { "type": "array", "minItems": 1, "maxItems": 3, "items": { "$ref": "#/$defs/source_hash" } },
+        "review": { "$ref": "#/$defs/review" },
+        "content_hash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+        "enabled": { "const": true },
+        "build_eligible": { "const": false }
+      }
+    },
+    "term_array": {
+      "type": "array",
+      "maxItems": 20,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1, "maxLength": 120 }
+    }
+  }
+}

@@ -1,0 +1,221 @@
+{
+  "schema_version": 1,
+  "corpus_id": "ingredient-intelligence",
+  "corpus_version": "2026-08-14.1",
+  "approved_publishers": [
+    "FDA",
+    "American Academy of Dermatology"
+  ],
+  "sources": [
+    {
+      "source_id": "src_fda_fe655552",
+      "publisher": "FDA",
+      "title": "Alpha Hydroxy Acids",
+      "canonical_url": "https://www.fda.gov/cosmetics/cosmetic-ingredients/alpha-hydroxy-acids",
+      "allowed_hosts": ["www.fda.gov"],
+      "question_classes": ["Q1"],
+      "topic_tags": ["aha", "sun-sensitivity"],
+      "scope_note": "Candidate source for reviewed AHA definitions, sun-sensitivity language, and stated cautions only.",
+      "parser": {
+        "name": "readability-normalizer",
+        "version": "1.0.0",
+        "allow_scripts": false,
+        "allow_remote_resources": false
+      },
+      "corpus_review": {
+        "decision": "pending",
+        "reviewed_by": null,
+        "reviewed_at": null
+      },
+      "snapshot_storage_review": {
+        "decision": "approved",
+        "reviewed_by": "milestone-0-governance-review",
+        "reviewed_at": "2026-08-14",
+        "basis": "FDA policy review: website text and graphics are generally public domain unless otherwise noted. Any later snapshot requires exact-page contrary-notice review, attribution, canonical URL, copy date, document hash, freshness monitoring, and no FDA name/logo or endorsement use. This is not legal advice.",
+        "permission_reference": "https://www.fda.gov/about-fda/about-website/website-policies",
+        "max_public_excerpt_characters": 1200
+      },
+      "review_due_at": "2026-11-14",
+      "expiry_mode": "soft",
+      "emergency_disabled": false,
+      "emergency_disable_reason": null,
+      "retrieval_policy": "exclude",
+      "expected_content_type": "text/html"
+    },
+    {
+      "source_id": "src_fda_baee59b5",
+      "publisher": "FDA",
+      "title": "Guidance for Industry: Labeling for Cosmetics Containing Alpha Hydroxy Acids",
+      "canonical_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/guidance-industry-labeling-cosmetics-containing-alpha-hydroxy-acids",
+      "allowed_hosts": ["www.fda.gov"],
+      "question_classes": ["Q1"],
+      "topic_tags": ["aha", "labeling", "sun-sensitivity"],
+      "scope_note": "Candidate source for reviewed FDA AHA labeling and sun-protection caution language only.",
+      "parser": {
+        "name": "readability-normalizer",
+        "version": "1.0.0",
+        "allow_scripts": false,
+        "allow_remote_resources": false
+      },
+      "corpus_review": {
+        "decision": "pending",
+        "reviewed_by": null,
+        "reviewed_at": null
+      },
+      "snapshot_storage_review": {
+        "decision": "approved",
+        "reviewed_by": "milestone-0-governance-review",
+        "reviewed_at": "2026-08-14",
+        "basis": "FDA policy review: website text and graphics are generally public domain unless otherwise noted. Any later snapshot requires exact-page contrary-notice review, attribution, canonical URL, copy date, document hash, freshness monitoring, and no FDA name/logo or endorsement use. This is not legal advice.",
+        "permission_reference": "https://www.fda.gov/about-fda/about-website/website-policies",
+        "max_public_excerpt_characters": 1200
+      },
+      "review_due_at": "2026-11-14",
+      "expiry_mode": "soft",
+      "emergency_disabled": false,
+      "emergency_disable_reason": null,
+      "retrieval_policy": "exclude",
+      "expected_content_type": "text/html"
+    },
+    {
+      "source_id": "src_fda_efcb2124",
+      "publisher": "FDA",
+      "title": "Beta Hydroxy Acids",
+      "canonical_url": "https://www.fda.gov/cosmetics/cosmetic-ingredients/beta-hydroxy-acids",
+      "allowed_hosts": ["www.fda.gov"],
+      "question_classes": ["Q2"],
+      "topic_tags": ["bha", "salicylic-acid", "cosmetic-scope"],
+      "scope_note": "Candidate source for reviewed BHA definitions and FDA cosmetic-scope safety context only.",
+      "parser": {
+        "name": "readability-normalizer",
+        "version": "1.0.0",
+        "allow_scripts": false,
+        "allow_remote_resources": false
+      },
+      "corpus_review": {
+        "decision": "pending",
+        "reviewed_by": null,
+        "reviewed_at": null
+      },
+      "snapshot_storage_review": {
+        "decision": "approved",
+        "reviewed_by": "milestone-0-governance-review",
+        "reviewed_at": "2026-08-14",
+        "basis": "FDA policy review: website text and graphics are generally public domain unless otherwise noted. Any later snapshot requires exact-page contrary-notice review, attribution, canonical URL, copy date, document hash, freshness monitoring, and no FDA name/logo or endorsement use. This is not legal advice.",
+        "permission_reference": "https://www.fda.gov/about-fda/about-website/website-policies",
+        "max_public_excerpt_characters": 1200
+      },
+      "review_due_at": "2026-11-14",
+      "expiry_mode": "soft",
+      "emergency_disabled": false,
+      "emergency_disable_reason": null,
+      "retrieval_policy": "exclude",
+      "expected_content_type": "text/html"
+    },
+    {
+      "source_id": "src_aad_eacc5c0c",
+      "publisher": "American Academy of Dermatology",
+      "title": "Retinoid or retinol?",
+      "canonical_url": "https://www.aad.org/public/everyday-care/skin-care-secrets/anti-aging/retinoid-retinol",
+      "allowed_hosts": ["www.aad.org"],
+      "question_classes": ["Q3"],
+      "topic_tags": ["retinoid", "retinol", "irritation"],
+      "scope_note": "Candidate source for reviewed retinoid and retinol distinctions and general introductory considerations only.",
+      "parser": {
+        "name": "readability-normalizer",
+        "version": "1.0.0",
+        "allow_scripts": false,
+        "allow_remote_resources": false
+      },
+      "corpus_review": {
+        "decision": "pending",
+        "reviewed_by": null,
+        "reviewed_at": null
+      },
+      "snapshot_storage_review": {
+        "decision": "pending",
+        "reviewed_by": null,
+        "reviewed_at": null,
+        "basis": "AAD Terms of Use review remains pending. No AAD text, snapshot, excerpt, chunk, claim unit, or embedding may enter a distributable artifact without written permission requested via permissions@aad.org. Terms: https://www.aad.org/terms-use. No permission has been obtained; this is not legal advice.",
+        "permission_reference": null,
+        "max_public_excerpt_characters": 1200
+      },
+      "review_due_at": "2026-11-14",
+      "expiry_mode": "soft",
+      "emergency_disabled": false,
+      "emergency_disable_reason": null,
+      "retrieval_policy": "exclude",
+      "expected_content_type": "text/html"
+    },
+    {
+      "source_id": "src_fda_90bf6651",
+      "publisher": "FDA",
+      "title": "Cosmetic Ingredients",
+      "canonical_url": "https://www.fda.gov/cosmetics/cosmetic-products-ingredients/cosmetic-ingredients",
+      "allowed_hosts": ["www.fda.gov"],
+      "question_classes": ["Q4"],
+      "topic_tags": ["cosmetics", "premarket-approval", "color-additives"],
+      "scope_note": "Candidate source for reviewed FDA cosmetic ingredient and premarket-approval scope statements only.",
+      "parser": {
+        "name": "readability-normalizer",
+        "version": "1.0.0",
+        "allow_scripts": false,
+        "allow_remote_resources": false
+      },
+      "corpus_review": {
+        "decision": "pending",
+        "reviewed_by": null,
+        "reviewed_at": null
+      },
+      "snapshot_storage_review": {
+        "decision": "approved",
+        "reviewed_by": "milestone-0-governance-review",
+        "reviewed_at": "2026-08-14",
+        "basis": "FDA policy review: website text and graphics are generally public domain unless otherwise noted. Any later snapshot requires exact-page contrary-notice review, attribution, canonical URL, copy date, document hash, freshness monitoring, and no FDA name/logo or endorsement use. This is not legal advice.",
+        "permission_reference": "https://www.fda.gov/about-fda/about-website/website-policies",
+        "max_public_excerpt_characters": 1200
+      },
+      "review_due_at": "2026-11-14",
+      "expiry_mode": "soft",
+      "emergency_disabled": false,
+      "emergency_disable_reason": null,
+      "retrieval_policy": "exclude",
+      "expected_content_type": "text/html"
+    },
+    {
+      "source_id": "src_aad_3ef1f8b2",
+      "publisher": "American Academy of Dermatology",
+      "title": "Pregnancy and skin care",
+      "canonical_url": "https://www.aad.org/public/everyday-care/skin-care-secrets/routine/pregnancy-skin-care",
+      "allowed_hosts": ["www.aad.org"],
+      "question_classes": ["Q5"],
+      "topic_tags": ["pregnancy", "breastfeeding", "clinician-guidance"],
+      "scope_note": "Candidate source for reviewed general pregnancy and breastfeeding skincare guidance only.",
+      "parser": {
+        "name": "readability-normalizer",
+        "version": "1.0.0",
+        "allow_scripts": false,
+        "allow_remote_resources": false
+      },
+      "corpus_review": {
+        "decision": "pending",
+        "reviewed_by": null,
+        "reviewed_at": null
+      },
+      "snapshot_storage_review": {
+        "decision": "pending",
+        "reviewed_by": null,
+        "reviewed_at": null,
+        "basis": "AAD Terms of Use review remains pending. No AAD text, snapshot, excerpt, chunk, claim unit, or embedding may enter a distributable artifact without written permission requested via permissions@aad.org. Terms: https://www.aad.org/terms-use. No permission has been obtained; this is not legal advice.",
+        "permission_reference": null,
+        "max_public_excerpt_characters": 1200
+      },
+      "review_due_at": "2026-11-14",
+      "expiry_mode": "soft",
+      "emergency_disabled": false,
+      "emergency_disable_reason": null,
+      "retrieval_policy": "exclude",
+      "expected_content_type": "text/html"
+    }
+  ]
+}

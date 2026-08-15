@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skin-routine-copilot.local/schemas/source-manifest.v1.schema.json",
+  "title": "Ingredient Intelligence source manifest v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "corpus_id", "corpus_version", "approved_publishers", "sources"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "corpus_id": { "const": "ingredient-intelligence" },
+    "corpus_version": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}\\.[0-9]+$" },
+    "approved_publishers": {
+      "const": ["FDA", "American Academy of Dermatology"]
+    },
+    "sources": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 20,
+      "items": { "$ref": "#/$defs/source" }
+    }
+  },
+  "$defs": {
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["decision", "reviewed_by", "reviewed_at"],
+      "properties": {
+        "decision": { "enum": ["pending", "approved", "rejected"] },
+        "reviewed_by": { "type": ["string", "null"] },
+        "reviewed_at": { "type": ["string", "null"], "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" }
+      }
+    },
+    "snapshot_review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["decision", "reviewed_by", "reviewed_at", "basis", "permission_reference", "max_public_excerpt_characters"],
+      "properties": {
+        "decision": { "enum": ["pending", "approved", "rejected"] },
+        "reviewed_by": { "type": ["string", "null"] },
+        "reviewed_at": { "type": ["string", "null"], "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" },
+        "basis": { "type": "string", "minLength": 10, "maxLength": 500 },
+        "permission_reference": { "type": ["string", "null"], "maxLength": 300 },
+        "max_public_excerpt_characters": { "type": "integer", "minimum": 1, "maximum": 1200 }
+      }
+    },
+    "parser": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version", "allow_scripts", "allow_remote_resources"],
+      "properties": {
+        "name": { "const": "readability-normalizer" },
+        "version": { "const": "1.0.0" },
+        "allow_scripts": { "const": false },
+        "allow_remote_resources": { "const": false }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_id", "publisher", "title", "canonical_url", "allowed_hosts", "question_classes", "topic_tags",
+        "scope_note", "parser", "corpus_review", "snapshot_storage_review", "review_due_at", "expiry_mode",
+        "emergency_disabled", "emergency_disable_reason", "retrieval_policy", "expected_content_type"
+      ],
+      "properties": {
+        "source_id": { "type": "string", "pattern": "^src_(fda|aad)_[a-f0-9]{8}$" },
+        "publisher": { "enum": ["FDA", "American Academy of Dermatology"] },
+        "title": { "type": "string", "minLength": 1, "maxLength": 180 },
+        "canonical_url": {
+          "enum": [
+            "https://www.fda.gov/cosmetics/cosmetic-ingredients/alpha-hydroxy-acids",
+            "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/guidance-industry-labeling-cosmetics-containing-alpha-hydroxy-acids",
+            "https://www.fda.gov/cosmetics/cosmetic-ingredients/beta-hydroxy-acids",
+            "https://www.aad.org/public/everyday-care/skin-care-secrets/anti-aging/retinoid-retinol",
+            "https://www.fda.gov/cosmetics/cosmetic-products-ingredients/cosmetic-ingredients",
+            "https://www.aad.org/public/everyday-care/skin-care-secrets/routine/pregnancy-skin-care"
+          ]
+        },
+        "allowed_hosts": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "items": { "enum": ["www.fda.gov", "www.aad.org"] }
+        },
+        "question_classes": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 2,
+          "uniqueItems": true,
+          "items": { "enum": ["Q1", "Q2", "Q3", "Q4", "Q5"] }
+        },
+        "topic_tags": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 12,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1, "maxLength": 60 }
+        },
+        "scope_note": { "type": "string", "minLength": 10, "maxLength": 500 },
+        "parser": { "$ref": "#/$defs/parser" },
+        "corpus_review": { "$ref": "#/$defs/review" },
+        "snapshot_storage_review": { "$ref": "#/$defs/snapshot_review" },
+        "review_due_at": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" },
+        "expiry_mode": { "const": "soft" },
+        "emergency_disabled": { "type": "boolean" },
+        "emergency_disable_reason": { "type": ["string", "null"], "maxLength": 300 },
+        "retrieval_policy": { "enum": ["include", "exclude"] },
+        "expected_content_type": { "const": "text/html" }
+      }
+    }
+  }
+}

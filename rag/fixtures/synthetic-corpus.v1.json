@@ -1,0 +1,143 @@
+{
+  "schema_version": 1,
+  "fixture_kind": "synthetic_only",
+  "corpus_version": "synthetic-v1",
+  "build_eligible": false,
+  "documents": [
+    {
+      "source_id": "syn_src_q1_7851bbe6",
+      "publisher": "Synthetic Test Publisher",
+      "canonical_url": "https://q1.fixture.invalid/aha-sun",
+      "question_class": "Q1",
+      "title": "Synthetic AHA and sunlight note",
+      "normalized_text": "In this synthetic guide, alpha hydroxy acids may increase sensitivity to sunlight.",
+      "document_id": "doc_syn_src_q1_7851bbe6_50f7d5c9",
+      "document_hash": "sha256:50f7d5c9c1e9d26c503c253b3886b3648ebfd14509803efd227c3960c99a6fb6",
+      "retrieved_at": "2026-08-14T20:00:00Z",
+      "build_eligible": false,
+      "chunks": [
+        {
+          "chunk_id": "chk_syn_src_q1_7851bbe6_synthetic_aha_and_sunlight_note_00_50f7d5c9",
+          "source_id": "syn_src_q1_7851bbe6",
+          "document_id": "doc_syn_src_q1_7851bbe6_50f7d5c9",
+          "question_class": "Q1",
+          "section_path": ["Synthetic AHA and sunlight note"],
+          "ordinal": 0,
+          "text": "In this synthetic guide, alpha hydroxy acids may increase sensitivity to sunlight.",
+          "start_char": 0,
+          "end_char": 82,
+          "content_hash": "sha256:50f7d5c9c1e9d26c503c253b3886b3648ebfd14509803efd227c3960c99a6fb6",
+          "build_eligible": false
+        }
+      ]
+    },
+    {
+      "source_id": "syn_src_q2_b40601f3",
+      "publisher": "Synthetic Test Publisher",
+      "canonical_url": "https://q2.fixture.invalid/bha-scope",
+      "question_class": "Q2",
+      "title": "Synthetic BHA scope note",
+      "normalized_text": "In this synthetic example, a beta hydroxy acid formula contains 2% salicylic acid.",
+      "document_id": "doc_syn_src_q2_b40601f3_47a25fda",
+      "document_hash": "sha256:47a25fdafc64994cff7e0cff948d59de18fa7054e471b69e653cff48f9e3c2b7",
+      "retrieved_at": "2026-08-14T20:00:00Z",
+      "build_eligible": false,
+      "chunks": [
+        {
+          "chunk_id": "chk_syn_src_q2_b40601f3_synthetic_bha_scope_note_00_47a25fda",
+          "source_id": "syn_src_q2_b40601f3",
+          "document_id": "doc_syn_src_q2_b40601f3_47a25fda",
+          "question_class": "Q2",
+          "section_path": ["Synthetic BHA scope note"],
+          "ordinal": 0,
+          "text": "In this synthetic example, a beta hydroxy acid formula contains 2% salicylic acid.",
+          "start_char": 0,
+          "end_char": 82,
+          "content_hash": "sha256:47a25fdafc64994cff7e0cff948d59de18fa7054e471b69e653cff48f9e3c2b7",
+          "build_eligible": false
+        }
+      ]
+    },
+    {
+      "source_id": "syn_src_q3_61e4bd97",
+      "publisher": "Synthetic Test Publisher",
+      "canonical_url": "https://q3.fixture.invalid/retinoid-start",
+      "question_class": "Q3",
+      "title": "Synthetic retinoid introduction note",
+      "normalized_text": "The synthetic retinoid guide recommends a gradual introduction unless the reviewed label says otherwise.",
+      "document_id": "doc_syn_src_q3_61e4bd97_59eefc27",
+      "document_hash": "sha256:59eefc276bc8a89d9f7a3980dc9d834d654c64b4a536aa820ddd2140c00075c8",
+      "retrieved_at": "2026-08-14T20:00:00Z",
+      "build_eligible": false,
+      "chunks": [
+        {
+          "chunk_id": "chk_syn_src_q3_61e4bd97_synthetic_retinoid_introduction_note_00_59eefc27",
+          "source_id": "syn_src_q3_61e4bd97",
+          "document_id": "doc_syn_src_q3_61e4bd97_59eefc27",
+          "question_class": "Q3",
+          "section_path": ["Synthetic retinoid introduction note"],
+          "ordinal": 0,
+          "text": "The synthetic retinoid guide recommends a gradual introduction unless the reviewed label says otherwise.",
+          "start_char": 0,
+          "end_char": 104,
+          "content_hash": "sha256:59eefc276bc8a89d9f7a3980dc9d834d654c64b4a536aa820ddd2140c00075c8",
+          "build_eligible": false
+        }
+      ]
+    },
+    {
+      "source_id": "syn_src_q4_2b302b76",
+      "publisher": "Synthetic Test Publisher",
+      "canonical_url": "https://q4.fixture.invalid/cosmetic-rules",
+      "question_class": "Q4",
+      "title": "Synthetic cosmetic regulation note",
+      "normalized_text": "The fictional regulator does not pre-clear ordinary synthetic cosmetics, except listed color additives.",
+      "document_id": "doc_syn_src_q4_2b302b76_11e95375",
+      "document_hash": "sha256:11e95375d23f211d2f905b5ed3108d903729bcbcec4c725edeace907187ae668",
+      "retrieved_at": "2026-08-14T20:00:00Z",
+      "build_eligible": false,
+      "chunks": [
+        {
+          "chunk_id": "chk_syn_src_q4_2b302b76_synthetic_cosmetic_regulation_note_00_11e95375",
+          "source_id": "syn_src_q4_2b302b76",
+          "document_id": "doc_syn_src_q4_2b302b76_11e95375",
+          "question_class": "Q4",
+          "section_path": ["Synthetic cosmetic regulation note"],
+          "ordinal": 0,
+          "text": "The fictional regulator does not pre-clear ordinary synthetic cosmetics, except listed color additives.",
+          "start_char": 0,
+          "end_char": 103,
+          "content_hash": "sha256:11e95375d23f211d2f905b5ed3108d903729bcbcec4c725edeace907187ae668",
+          "build_eligible": false
+        }
+      ]
+    },
+    {
+      "source_id": "syn_src_q5_ffbd3ce5",
+      "publisher": "Synthetic Test Publisher",
+      "canonical_url": "https://q5.fixture.invalid/pregnancy-scope",
+      "question_class": "Q5",
+      "title": "Synthetic pregnancy scope note",
+      "normalized_text": "The synthetic pregnancy guide advises pregnant or breastfeeding readers to consult a clinician.",
+      "document_id": "doc_syn_src_q5_ffbd3ce5_a1e6d4e8",
+      "document_hash": "sha256:a1e6d4e864eef168ff310da44a2e75d0d7f33b4c5c90e78a8bd12836408ba87a",
+      "retrieved_at": "2026-08-14T20:00:00Z",
+      "build_eligible": false,
+      "chunks": [
+        {
+          "chunk_id": "chk_syn_src_q5_ffbd3ce5_synthetic_pregnancy_scope_note_00_a1e6d4e8",
+          "source_id": "syn_src_q5_ffbd3ce5",
+          "document_id": "doc_syn_src_q5_ffbd3ce5_a1e6d4e8",
+          "question_class": "Q5",
+          "section_path": ["Synthetic pregnancy scope note"],
+          "ordinal": 0,
+          "text": "The synthetic pregnancy guide advises pregnant or breastfeeding readers to consult a clinician.",
+          "start_char": 0,
+          "end_char": 95,
+          "content_hash": "sha256:a1e6d4e864eef168ff310da44a2e75d0d7f33b4c5c90e78a8bd12836408ba87a",
+          "build_eligible": false
+        }
+      ]
+    }
+  ]
+}

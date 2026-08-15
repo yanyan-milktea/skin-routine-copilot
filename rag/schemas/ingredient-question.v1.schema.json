@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skin-routine-copilot.local/schemas/ingredient-question.v1.schema.json",
+  "title": "Ingredient Intelligence question input v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "question"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "question": { "type": "string", "minLength": 1, "maxLength": 600 }
+  }
+}
