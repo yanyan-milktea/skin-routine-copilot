@@ -1,0 +1,446 @@
+{
+  "schema_version": 1,
+  "aliases_version": "ingredient-aliases-v1",
+  "tokenizer_version": "ingredient-tokenizer-v1",
+  "review": {
+    "reviewed_by": "synthetic-fixture-reviewer",
+    "reviewed_at": "2026-10-31",
+    "note": "Reviewed deterministic alias, class, intent, and block tables. No LLM query rewriting. Phrases are matched after the pinned tokenizer, so they are written in tokenized form. A question that matches a class but no reviewed intent trigger is not answerable (no default intent)."
+  },
+  "canonical_terms": {
+    "aha": [
+      "alpha hydroxy acid",
+      "alpha hydroxy",
+      "aha"
+    ],
+    "bha": [
+      "beta hydroxy acid",
+      "beta hydroxy",
+      "bha"
+    ],
+    "glycolic_acid": [
+      "glycolic acid",
+      "glycolic"
+    ],
+    "lactic_acid": [
+      "lactic acid",
+      "lactic"
+    ],
+    "salicylic_acid": [
+      "salicylic acid",
+      "salicylic"
+    ],
+    "retinoid": [
+      "retinoid",
+      "tretinoin",
+      "adapalene"
+    ],
+    "retinol": [
+      "retinol"
+    ],
+    "sun_sensitivity": [
+      "sun sensitivity",
+      "sensitivity sunlight",
+      "sensitivity sun",
+      "sensitive sunlight",
+      "sensitive sun",
+      "sun sensitive",
+      "photosensitivity",
+      "photosensitive"
+    ],
+    "sunscreen": [
+      "sunscreen",
+      "sunblock",
+      "spf"
+    ],
+    "sun_protection": [
+      "sun protection",
+      "protective clothing",
+      "limit sun exposure",
+      "protect skin sun",
+      "protect sun"
+    ],
+    "pregnancy": [
+      "pregnancy",
+      "pregnant"
+    ],
+    "breastfeeding": [
+      "breastfeeding",
+      "breast feeding",
+      "nursing",
+      "lactation",
+      "lactating"
+    ],
+    "clinician": [
+      "clinician",
+      "doctor",
+      "dermatologist",
+      "physician",
+      "obstetrician",
+      "health care provider",
+      "healthcare provider",
+      "midwife"
+    ],
+    "premarket_approval": [
+      "premarket approval",
+      "pre market approval",
+      "fda approved",
+      "fda approval",
+      "approved fda",
+      "approval fda",
+      "pre clear",
+      "pre cleared",
+      "pre clearance",
+      "approval before sale",
+      "approve before sale",
+      "fda approve",
+      "approve fda",
+      "approve cosmetic",
+      "cosmetic approved",
+      "approved cosmetic",
+      "cosmetic approval",
+      "approve ingredient",
+      "ingredient approved"
+    ],
+    "color_additive": [
+      "color additive",
+      "colour additive"
+    ],
+    "cosmetic_regulation": [
+      "cosmetic regulation",
+      "regulate cosmetic",
+      "regulator",
+      "regulated",
+      "regulation",
+      "regulate",
+      "oversight",
+      "enforcement action"
+    ],
+    "irritation": [
+      "irritation",
+      "irritate",
+      "irritated",
+      "irritating",
+      "stinging",
+      "sting",
+      "peeling",
+      "peel",
+      "redness"
+    ],
+    "gradual": [
+      "gradual",
+      "gradually",
+      "slowly",
+      "start slow",
+      "easing",
+      "ease"
+    ]
+  },
+  "class_precedence": [
+    "Q5",
+    "Q4"
+  ],
+  "classes": {
+    "Q1": {
+      "label": "AHA use and sun sensitivity",
+      "class_anchors": [
+        "aha",
+        "glycolic_acid",
+        "lactic_acid"
+      ],
+      "intents": {
+        "q1_aha_definition": {
+          "query_triggers": [
+            "what",
+            "define",
+            "definition",
+            "mean",
+            "example",
+            "kind",
+            "type"
+          ],
+          "chunk_anchors": [
+            "glycolic_acid",
+            "lactic_acid",
+            "family"
+          ]
+        },
+        "q1_sun_sensitivity_relationship": {
+          "query_triggers": [
+            "sun_sensitivity",
+            "sun",
+            "sunlight",
+            "uv",
+            "sunburn"
+          ],
+          "chunk_anchors": [
+            "sun_sensitivity",
+            "sunburn"
+          ]
+        },
+        "q1_sun_protection_caution": {
+          "query_triggers": [
+            "sunscreen",
+            "sun_protection",
+            "protect",
+            "precaution",
+            "caution"
+          ],
+          "chunk_anchors": [
+            "sunscreen",
+            "sun_protection"
+          ]
+        }
+      }
+    },
+    "Q2": {
+      "label": "BHA and salicylic acid within cosmetic scope",
+      "class_anchors": [
+        "bha",
+        "salicylic_acid"
+      ],
+      "intents": {
+        "q2_bha_definition": {
+          "query_triggers": [
+            "what",
+            "define",
+            "definition",
+            "mean",
+            "kind",
+            "type",
+            "example"
+          ],
+          "chunk_anchors": [
+            "salicylic_acid"
+          ]
+        },
+        "q2_fda_cosmetic_scope": {
+          "query_triggers": [
+            "cosmetic",
+            "drug",
+            "acne",
+            "treat",
+            "scope",
+            "classified",
+            "count"
+          ],
+          "chunk_anchors": [
+            "drug",
+            "cosmetic"
+          ]
+        },
+        "q2_reviewed_safety_context": {
+          "query_triggers": [
+            "safe",
+            "safety",
+            "risk",
+            "irritation",
+            "sun_sensitivity",
+            "sun",
+            "side",
+            "concern",
+            "caution"
+          ],
+          "chunk_anchors": [
+            "irritation",
+            "sun_sensitivity"
+          ]
+        }
+      }
+    },
+    "Q3": {
+      "label": "Starting retinoid or retinol skin care",
+      "class_anchors": [
+        "retinoid",
+        "retinol"
+      ],
+      "intents": {
+        "q3_retinoid_retinol_distinction": {
+          "query_triggers": [
+            "difference",
+            "different",
+            "differ",
+            "vs",
+            "versus",
+            "compare",
+            "distinction",
+            "same",
+            "stronger"
+          ],
+          "chunk_anchors": [
+            "difference",
+            "differ",
+            "stronger",
+            "prescription"
+          ]
+        },
+        "q3_general_introduction": {
+          "query_triggers": [
+            "start",
+            "starting",
+            "begin",
+            "beginning",
+            "introduce",
+            "introducing",
+            "new",
+            "gradual",
+            "first",
+            "beginner"
+          ],
+          "chunk_anchors": [
+            "gradual",
+            "start",
+            "starting",
+            "introduce"
+          ]
+        },
+        "q3_irritation_caution": {
+          "query_triggers": [
+            "irritation",
+            "dry",
+            "dryness",
+            "side",
+            "sensitive",
+            "uncomfortable"
+          ],
+          "chunk_anchors": [
+            "irritation"
+          ]
+        }
+      }
+    },
+    "Q4": {
+      "label": "Cosmetic ingredient regulation and FDA approved claims",
+      "class_anchors": [
+        "premarket_approval",
+        "color_additive",
+        "cosmetic_regulation"
+      ],
+      "intents": {
+        "q4_premarket_approval_rule": {
+          "query_triggers": [
+            "premarket_approval",
+            "approve",
+            "approved",
+            "approval",
+            "sold",
+            "sale",
+            "market",
+            "permission"
+          ],
+          "chunk_anchors": [
+            "premarket_approval"
+          ]
+        },
+        "q4_color_additive_exception": {
+          "query_triggers": [
+            "color_additive",
+            "exception",
+            "except",
+            "dye",
+            "pigment"
+          ],
+          "chunk_anchors": [
+            "color_additive"
+          ]
+        },
+        "q4_fda_role": {
+          "query_triggers": [
+            "role",
+            "responsibility",
+            "responsible",
+            "enforce",
+            "enforcement",
+            "cosmetic_regulation",
+            "job"
+          ],
+          "chunk_anchors": [
+            "cosmetic_regulation",
+            "enforce",
+            "enforcement"
+          ]
+        }
+      }
+    },
+    "Q5": {
+      "label": "Pregnancy and breastfeeding at general educational scope",
+      "class_anchors": [
+        "pregnancy",
+        "breastfeeding"
+      ],
+      "intents": {
+        "q5_general_pregnancy_scope": {
+          "query_triggers": [
+            "general",
+            "routine",
+            "change",
+            "skin",
+            "care",
+            "what"
+          ],
+          "chunk_anchors": [
+            "routine",
+            "change"
+          ]
+        },
+        "q5_discuss_with_clinician": {
+          "query_triggers": [
+            "clinician",
+            "ask",
+            "talk",
+            "consult",
+            "check",
+            "who"
+          ],
+          "chunk_anchors": [
+            "clinician"
+          ]
+        },
+        "q5_reviewed_avoidance_context": {
+          "query_triggers": [
+            "avoid",
+            "ingredient",
+            "retinoid",
+            "retinol",
+            "salicylic_acid",
+            "stop",
+            "skip",
+            "use"
+          ],
+          "chunk_anchors": [
+            "avoid",
+            "discuss",
+            "retinoid"
+          ]
+        }
+      }
+    }
+  },
+  "blocked_query_patterns": {
+    "pairwise_compatibility": [
+      "\\b(mix|mixing|combine|combining|layer|layering|together|pair|pairing|alongside)\\b",
+      "\\bsame time\\b",
+      "\\bat once\\b"
+    ],
+    "product_composition": [
+      "\\bmy (\\w+ ){0,3}(cream|serum|cleanser|toner|moisturizer|moisturiser|product|products|sunscreen|lotion|essence|mask|peel pads?)\\b",
+      "\\b(this|that) (cream|serum|cleanser|toner|moisturizer|product|sunscreen|lotion|essence)\\b",
+      "\\bbrand\\b",
+      "\\bingredient list\\b"
+    ],
+    "personal_medical": [
+      "\\b(diagnose|diagnosis|diagnosed)\\b",
+      "\\bdo i have\\b",
+      "\\bprescribe\\b",
+      "\\bprescription for me\\b",
+      "\\b(what|which) dose\\b",
+      "\\b(treat|cure) my\\b",
+      "\\b(swelling|swollen|blister|blisters|blistering|oozing)\\b",
+      "\\b(can t|cannot|can not) breathe\\b",
+      "\\bemergency\\b",
+      "\\ballergic reaction\\b",
+      "\\bsafe for (me|my baby|the baby)\\b",
+      "\\bhow (much|often|many times)\\b.*\\bshould i\\b"
+    ]
+  }
+}

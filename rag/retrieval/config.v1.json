@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "fusion": "rrf",
+  "rrf_k": 60,
+  "component_candidate_limit": 40,
+  "fused_candidate_limit": 12,
+  "generation_chunk_limit": 6,
+  "per_source_limit": 2,
+  "tie_breakers": ["rrf_desc", "cosine_desc", "lexical_desc", "chunk_id_asc"],
+  "eligibility_mode": "any",
+  "vector_answer_min_cosine": 0.62,
+  "lexical_answer_min_bm25": 6.0,
+  "lexical_anchor_required": true,
+  "vector_discovery_min_cosine": 0.52,
+  "lexical_discovery_min_bm25": 3.5,
+  "lexical_only_discovery_min_bm25": 5.0,
+  "lexical_only_exact_anchor_required": true,
+  "bm25_implementation": "ingredient-bm25-v1",
+  "tokenizer_version": "ingredient-tokenizer-v1",
+  "threshold_calibration_dataset": "ingredient-rag-evals-v1"
+}

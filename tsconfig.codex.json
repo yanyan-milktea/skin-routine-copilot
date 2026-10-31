@@ -6,7 +6,8 @@
   "include": [
     "app/**/*.ts",
     "app/**/*.tsx",
-    "lib/**/*.ts"
+    "lib/**/*.ts",
+    "scripts/rag/**/*.ts"
   ],
   "exclude": [
     "node_modules",

@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "deny_list_version": "synthetic-deny-list-v1",
+  "entries": [
+    { "source_id": "syn_q1_aha_retracted_9b322801", "reason": "Synthetic retraction fixture used to test emergency disable before retrieval.", "disabled_at": "2026-10-31T00:00:00Z" }
+  ]
+}

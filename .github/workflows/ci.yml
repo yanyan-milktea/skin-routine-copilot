@@ -41,6 +41,11 @@ jobs:
       - name: Run synthetic evals
         run: npm run evals
 
+      - name: Verify RAG index and run keyless retrieval evals
+        run: |
+          npm run rag:verify
+          npm run test:rag
+
       - name: Install backend API dependencies
         run: npm ci --prefix vercel-api
 

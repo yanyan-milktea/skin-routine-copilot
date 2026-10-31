@@ -1,8 +1,9 @@
-# Ingredient Intelligence corpus governance (Milestone 0)
+# Ingredient Intelligence corpus governance and retrieval
 
-This directory contains only the offline governance foundation for Ingredient
-Intelligence. Milestone 0 does not fetch websites, create embeddings, perform
-retrieval, call an AI provider, expose an API, or change the frontend.
+This directory holds the offline governance foundation (Milestone 0) and the
+keyless retrieval configuration (Milestone 1) for Ingredient Intelligence.
+Nothing here fetches websites, calls an AI provider, exposes an API, or changes
+the frontend.
 
 ## Versions
 
@@ -140,3 +141,45 @@ make network requests, call Gemini, access API keys, or contact FDA/AAD.
 6. Revalidate all affected chunks and claim-unit bindings.
 
 Downloaded webpages, raw HTML, and unreviewed excerpts must never be committed.
+
+## Milestone 1: reproducible index and keyless retrieval
+
+```text
+rag/retrieval/config.v1.json      frozen Section 5.2 constants (runtime rejects any change)
+rag/retrieval/aliases.v1.json     reviewed aliases, Q1-Q5 class/intent anchors, blocked query families
+rag/retrieval/deny-list.v1.json   emergency deny list, checked before retrieval (empty)
+lib/ingredient-tokenizer.ts       ingredient-tokenizer-v1
+lib/ingredient-chunking.ts        heading-aware chunker (350-500 target, 650 max, 60-80 overlap)
+lib/ingredient-embedding.ts       fixture embedder + Gemini adapter (adapter not run in CI)
+lib/ingredient-index.ts           deterministic build + fail-closed verifier
+lib/ingredient-retrieval.ts       classifier, BM25 v1, component gates, exact RRF, discovery, claim availability
+scripts/rag/                      build, verify, eval runner, report generator
+evals/ingredient-rag/v1/          synthetic retrieval corpus, claim units, cases, index, reports
+```
+
+### Production index status
+
+`node scripts/rag/build-index.ts production` exits with code 2 because no
+manifest source is build eligible: FDA Q1/Q2/Q4 still need exact-page review and
+AAD Q3/Q5 need written permission. No production index, snapshot, or real
+embedding exists in this repository.
+
+### Synthetic retrieval index
+
+The checked-in index under `evals/ingredient-rag/v1/index/` is built from
+fictional Markdown pages with the fixture-only `synthetic-concept-embedding-v1`
+embedder. The verifier refuses that model for any `production` index, and the
+retriever refuses a query embedder whose model differs from the index.
+
+```bash
+npm run rag:build     # rebuild the synthetic index (byte-identical for the same input)
+npm run rag:verify    # verify hashes, dimensions, norms, bindings, budgets; check reproducibility
+npm run rag:report    # regenerate evals/ingredient-rag/v1/reports/*
+npm run test:rag      # Milestone 0 + Milestone 1 tests, keyless
+```
+
+The eval report separates **safety** gates (hard CI gates) from **quality**
+gates (Recall@5, MRR, irrelevant evidence). Quality is regression-locked to
+`reports/baseline.json`; it is not threshold-calibration evidence for
+`gemini-embedding-2`. See `reports/retrieval-eval.md` and
+`reports/threshold-grid.md`.
