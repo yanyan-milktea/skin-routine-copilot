@@ -1,0 +1,672 @@
+[
+  {
+    "schema_version": 1,
+    "chunk_id": "chk_syn_dx_hair_dye_240e26f5_synthetic_hair_dye_note_hair_dye_and_color_addit_00_96e0eb66",
+    "source_id": "syn_dx_hair_dye_240e26f5",
+    "document_id": "doc_syn_dx_hair_dye_240e26f5_18f2c3d5",
+    "document_hash": "sha256:18f2c3d50da2973058115d879295428f673ddcb8abadc19a496b627a9514d114",
+    "publisher": "Synthetic Test Publisher",
+    "title": "Synthetic hair dye note",
+    "canonical_url": "https://dx.fixture.invalid/hair-dye",
+    "retrieved_at": "2026-10-31T00:00:00Z",
+    "question_classes": [],
+    "section_path": [
+      "Synthetic hair dye note",
+      "Hair dye and color additives"
+    ],
+    "ordinal": 0,
+    "text": "This synthetic note describes hair dye products and says that some color additives used in hair dye follow different rules from other cosmetics. It is not about skin care and is not mapped to any question class.",
+    "start_char": 60,
+    "end_char": 271,
+    "content_hash": "sha256:96e0eb6645869e5a355742231fa5614e26170c3fe77d0ebab2bf8f168f399069",
+    "token_estimate": 50,
+    "overlaps_previous": false,
+    "qualifier_continuation": false
+  },
+  {
+    "schema_version": 1,
+    "chunk_id": "chk_syn_dx_niacinamide_e25cb14e_synthetic_niacinamide_note_what_niacinamide_is_00_2818135e",
+    "source_id": "syn_dx_niacinamide_e25cb14e",
+    "document_id": "doc_syn_dx_niacinamide_e25cb14e_6dd788bc",
+    "document_hash": "sha256:6dd788bcc6aa5c2703657aacbe3dcd53811b4f9c8b3e6a5905eea522c48f4b19",
+    "publisher": "Synthetic Test Publisher",
+    "title": "Synthetic niacinamide note",
+    "canonical_url": "https://dx.fixture.invalid/niacinamide",
+    "retrieved_at": "2026-10-31T00:00:00Z",
+    "question_classes": [],
+    "section_path": [
+      "Synthetic niacinamide note",
+      "What niacinamide is"
+    ],
+    "ordinal": 0,
+    "text": "In this synthetic note, niacinamide is a form of vitamin B3 used in some moisturizers and serums. The note does not discuss sun sensitivity, pregnancy, or regulation.",
+    "start_char": 54,
+    "end_char": 220,
+    "content_hash": "sha256:2818135edf737cd1bf49ef25d780575221ffee0b181ab95c1aa6b58d3f992526",
+    "token_estimate": 36,
+    "overlaps_previous": false,
+    "qualifier_continuation": false
+  },
+  {
+    "schema_version": 1,
+    "chunk_id": "chk_syn_dx_sunscreen_basics_4acea0d1_synthetic_sunscreen_basics_choosing_a_sunscreen_00_cf23cf7f",
+    "source_id": "syn_dx_sunscreen_basics_4acea0d1",
+    "document_id": "doc_syn_dx_sunscreen_basics_4acea0d1_1f241343",
+    "document_hash": "sha256:1f2413438ebf2cb82b9ffe5393af5230fa25b863282e4467e8ef0a6c1f3cdb3e",
+    "publisher": "Synthetic Test Publisher",
+    "title": "Synthetic sunscreen basics",
+    "canonical_url": "https://dx.fixture.invalid/sunscreen-basics",
+    "retrieved_at": "2026-10-31T00:00:00Z",
+    "question_classes": [],
+    "section_path": [
+      "Synthetic sunscreen basics",
+      "Choosing a sunscreen"
+    ],
+    "ordinal": 0,
+    "text": "This synthetic page describes broad spectrum sunscreen, SPF labels, and reapplying sunscreen after swimming. It mentions sun sensitivity, sunburn, and protective clothing in general terms. Its search keywords include alpha hydroxy acids, glycolic acid, retinol, and salicylic acid, although the page does not discuss those ingredients.",
+    "start_char": 55,
+    "end_char": 390,
+    "content_hash": "sha256:cf23cf7f111908f902e0860c47c4676fde5aea4eb0049fa9ebb7c1a380bb1842",
+    "token_estimate": 62,
+    "overlaps_previous": false,
+    "qualifier_continuation": false
+  },
+  {
+    "schema_version": 1,
+    "chunk_id": "chk_syn_q1_aha_guide_0179a997_synthetic_guide_to_alpha_hydroxy_acids_what_alph_00_ed3d8187",
+    "source_id": "syn_q1_aha_guide_0179a997",
+    "document_id": "doc_syn_q1_aha_guide_0179a997_e64a0d87",
+    "document_hash": "sha256:e64a0d873f2ee7948601356e49aaad307440337dd95d61002e7aa894c829f830",
+    "publisher": "Synthetic Test Publisher",
+    "title": "Synthetic guide to alpha hydroxy acids",
+    "canonical_url": "https://q1.fixture.invalid/aha-guide",
+    "retrieved_at": "2026-10-31T00:00:00Z",
+    "question_classes": [
+      "Q1"
+    ],
+    "section_path": [
+      "Synthetic guide to alpha hydroxy acids",
+      "What alpha hydroxy acids are"
+    ],
+    "ordinal": 0,
+    "text": "In this synthetic guide, alpha hydroxy acids (AHAs) are a family of acids used in some cosmetic products. Glycolic acid and lactic acid are the examples this guide names. The guide describes them as exfoliating ingredients found in some cleansers, toners, and creams.",
+    "start_char": 75,
+    "end_char": 342,
+    "content_hash": "sha256:ed3d8187abe35d3e95f59c4c0a0f17af108d08f0b8f10e396d4712cdf7c38c52",
+    "token_estimate": 58,
+    "overlaps_previous": false,
+    "qualifier_continuation": false
+  },
+  {
+    "schema_version": 1,
+    "chunk_id": "chk_syn_q1_aha_guide_0179a997_synthetic_guide_to_alpha_hydroxy_acids_sun_sensi_00_a4710e18",
+    "source_id": "syn_q1_aha_guide_0179a997",
+    "document_id": "doc_syn_q1_aha_guide_0179a997_e64a0d87",
+    "document_hash": "sha256:e64a0d873f2ee7948601356e49aaad307440337dd95d61002e7aa894c829f830",
+    "publisher": "Synthetic Test Publisher",
+    "title": "Synthetic guide to alpha hydroxy acids",
+    "canonical_url": "https://q1.fixture.invalid/aha-guide",
+    "retrieved_at": "2026-10-31T00:00:00Z",
+    "question_classes": [
+      "Q1"
+    ],
+    "section_path": [
+      "Synthetic guide to alpha hydroxy acids",
+      "Sun sensitivity"
+    ],
+    "ordinal": 0,
+    "text": "In this synthetic guide, topical use of cosmetics containing alpha hydroxy acids may increase skin sensitivity to the sun. The guide reports that this sensitivity may make sunburn more likely. It does not state how long the effect lasts for any individual.",
+    "start_char": 364,
+    "end_char": 620,
+    "content_hash": "sha256:a4710e187f16b0bb1a2e430844c0044da4a8bf7c031ba87b7772c1ea2ac68ed9",
+    "token_estimate": 56,
+    "overlaps_previous": false,
+    "qualifier_continuation": false
+  },
+  {
+    "schema_version": 1,
+    "chunk_id": "chk_syn_q1_aha_guide_0179a997_synthetic_guide_to_alpha_hydroxy_acids_sun_prote_00_1b9e316e",
+    "source_id": "syn_q1_aha_guide_0179a997",
+    "document_id": "doc_syn_q1_aha_guide_0179a997_e64a0d87",
+    "document_hash": "sha256:e64a0d873f2ee7948601356e49aaad307440337dd95d61002e7aa894c829f830",
+    "publisher": "Synthetic Test Publisher",
+    "title": "Synthetic guide to alpha hydroxy acids",
+    "canonical_url": "https://q1.fixture.invalid/aha-guide",
+    "retrieved_at": "2026-10-31T00:00:00Z",
+    "question_classes": [
+      "Q1"
+    ],
+    "section_path": [
+      "Synthetic guide to alpha hydroxy acids",
+      "Sun protection caution"
+    ],
+    "ordinal": 0,
+    "text": "The synthetic guide advises people who use alpha hydroxy acid products to use sunscreen, wear protective clothing, and limit sun exposure while using the product and for a week afterward. However, the guide does not say that sunscreen removes every risk.",
+    "start_char": 649,
+    "end_char": 903,
+    "content_hash": "sha256:1b9e316e21a0ab6d78c1c7058a62fe89f02f18945510391fa72c9c341a7cce3b",
+    "token_estimate": 55,
+    "overlaps_previous": false,
+    "qualifier_continuation": false
+  },
+  {
+    "schema_version": 1,
+    "chunk_id": "chk_syn_q1_aha_guide_0179a997_synthetic_guide_to_alpha_hydroxy_acids_about_thi_00_6d9411da",
+    "source_id": "syn_q1_aha_guide_0179a997",
+    "document_id": "doc_syn_q1_aha_guide_0179a997_e64a0d87",
+    "document_hash": "sha256:e64a0d873f2ee7948601356e49aaad307440337dd95d61002e7aa894c829f830",
+    "publisher": "Synthetic Test Publisher",
+    "title": "Synthetic guide to alpha hydroxy acids",
+    "canonical_url": "https://q1.fixture.invalid/aha-guide",
+    "retrieved_at": "2026-10-31T00:00:00Z",
+    "question_classes": [
+      "Q1"
+    ],
+    "section_path": [
+      "Synthetic guide to alpha hydroxy acids",
+      "About this synthetic publisher"
+    ],
+    "ordinal": 0,
+    "text": "This fixture page belongs to a fictional publisher created for automated tests. It has no medical authority, and its contact page, newsletter, and site map are placeholders.",
+    "start_char": 940,
+    "end_char": 1113,
+    "content_hash": "sha256:6d9411da1acab3b21eb6de54254fd784da949356e15e79c04004023bba5cb3d6",
+    "token_estimate": 36,
+    "overlaps_previous": false,
+    "qualifier_continuation": false
+  },
+  {
+    "schema_version": 1,
+    "chunk_id": "chk_syn_q1_aha_keyword_index_2205bbb9_synthetic_site_keyword_index_keyword_list_00_6b7ccb37",
+    "source_id": "syn_q1_aha_keyword_index_2205bbb9",
+    "document_id": "doc_syn_q1_aha_keyword_index_2205bbb9_07653c1e",
+    "document_hash": "sha256:07653c1e254a8670d7fd7748c5053a15ab713834f82ddcd9e9c23def4e54cd4b",
+    "publisher": "Synthetic Test Publisher",
+    "title": "Synthetic site keyword index",
+    "canonical_url": "https://q1.fixture.invalid/keyword-index",
+    "retrieved_at": "2026-10-31T00:00:00Z",
+    "question_classes": [
+      "Q1"
+    ],
+    "section_path": [
+      "Synthetic site keyword index",
+      "Keyword list"
+    ],
+    "ordinal": 0,
+    "text": "alpha hydroxy acid, AHA, alpha hydroxy acids, AHAs, sun, sunlight, sun, sunlight, sun, UV, hair, scalp, shampoo, diet, food, eating, niacinamide, vitamin, color, dye, pigment, routine, regimen, newsletter, site map, sun, sunlight, AHA, alpha hydroxy acid.",
+    "start_char": 49,
+    "end_char": 304,
+    "content_hash": "sha256:6b7ccb37f8d1c96fe8f583797ccb1c465429b3da2ec309bf1dedb66a77b39c24",
+    "token_estimate": 48,
+    "overlaps_previous": false,
+    "qualifier_continuation": false
+  },
+  {
+    "schema_version": 1,
+    "chunk_id": "chk_syn_q1_aha_labeling_9519e0d7_synthetic_aha_labeling_note_label_statement_00_ad262eb8",
+    "source_id": "syn_q1_aha_labeling_9519e0d7",
+    "document_id": "doc_syn_q1_aha_labeling_9519e0d7_b6dad71f",
+    "document_hash": "sha256:b6dad71f439455959d46d03f6eea78de6a5fe0bfc6f43c207339cf7171aef894",
+    "publisher": "Synthetic Test Publisher",
+    "title": "Synthetic AHA labeling note",
+    "canonical_url": "https://q1.fixture.invalid/aha-labeling",
+    "retrieved_at": "2026-10-31T00:00:00Z",
+    "question_classes": [
+      "Q1"
+    ],
+    "section_path": [
+      "Synthetic AHA labeling note",
+      "Label statement"
+    ],
+    "ordinal": 0,
+    "text": "In this synthetic labeling note, cosmetics containing alpha hydroxy acids carry a sunburn alert on the label. The statement tells users that the product may increase sensitivity to the sun and that sunburn may be more likely during use.",
+    "start_char": 51,
+    "end_char": 287,
+    "content_hash": "sha256:ad262eb8772aeadf45f70b3bba5450cd78dcc485bee623cff7401c9ea4909cb1",
+    "token_estimate": 52,
+    "overlaps_previous": false,
+    "qualifier_continuation": false
+  },
+  {
+    "schema_version": 1,
+    "chunk_id": "chk_syn_q1_aha_labeling_9519e0d7_synthetic_aha_labeling_note_who_the_label_is_for_00_4d64155f",
+    "source_id": "syn_q1_aha_labeling_9519e0d7",
+    "document_id": "doc_syn_q1_aha_labeling_9519e0d7_b6dad71f",
+    "document_hash": "sha256:b6dad71f439455959d46d03f6eea78de6a5fe0bfc6f43c207339cf7171aef894",
+    "publisher": "Synthetic Test Publisher",
+    "title": "Synthetic AHA labeling note",
+    "canonical_url": "https://q1.fixture.invalid/aha-labeling",
+    "retrieved_at": "2026-10-31T00:00:00Z",
+    "question_classes": [
+      "Q1"
+    ],
+    "section_path": [
+      "Synthetic AHA labeling note",
+      "Who the label is for"
+    ],
+    "ordinal": 0,
+    "text": "The note explains that the label statement is meant for people who buy cosmetic products made with glycolic acid or lactic acid. It does not cover products sold as drugs.",
+    "start_char": 314,
+    "end_char": 484,
+    "content_hash": "sha256:4d64155f2aec1f8266d4f0ba0505a2ef75f61c1ca59f93d8c2eb802ffc696780",
+    "token_estimate": 40,
+    "overlaps_previous": false,
+    "qualifier_continuation": false
+  },
+  {
+    "schema_version": 1,
+    "chunk_id": "chk_syn_q1_aha_retracted_9b322801_retracted_synthetic_aha_claim_sun_sensitivity_00_c375f7cc",
+    "source_id": "syn_q1_aha_retracted_9b322801",
+    "document_id": "doc_syn_q1_aha_retracted_9b322801_525e862a",
+    "document_hash": "sha256:525e862a09b302be12234a2f52e710b4fb2a50edde2afa2ebfeafc610adbcd89",
+    "publisher": "Synthetic Test Publisher",
+    "title": "Retracted synthetic AHA claim",
+    "canonical_url": "https://q1.fixture.invalid/aha-retracted",
+    "retrieved_at": "2026-10-31T00:00:00Z",
+    "question_classes": [
+      "Q1"
+    ],
+    "section_path": [
+      "Retracted synthetic AHA claim",
+      "Sun sensitivity"
+    ],
+    "ordinal": 0,
+    "text": "This retracted synthetic page claimed that alpha hydroxy acids never increase sun sensitivity and that skin using them is guaranteed safe from sunburn. It exists only to test the emergency deny list.",
+    "start_char": 53,
+    "end_char": 252,
+    "content_hash": "sha256:c375f7cc6eae30c2e835aa547fe58a064d142b55981ee529f60815d4f83192b1",
+    "token_estimate": 43,
+    "overlaps_previous": false,
+    "qualifier_continuation": false
+  },
+  {
+    "schema_version": 1,
+    "chunk_id": "chk_syn_q2_bha_guide_26856373_synthetic_guide_to_beta_hydroxy_acids_what_beta__00_335395e5",
+    "source_id": "syn_q2_bha_guide_26856373",
+    "document_id": "doc_syn_q2_bha_guide_26856373_8385445d",
+    "document_hash": "sha256:8385445d6044cf6ea6b457886e346164036f15dac88350a920b1533e8fbfe0dd",
+    "publisher": "Synthetic Test Publisher",
+    "title": "Synthetic guide to beta hydroxy acids",
+    "canonical_url": "https://q2.fixture.invalid/bha-guide",
+    "retrieved_at": "2026-10-31T00:00:00Z",
+    "question_classes": [
+      "Q2"
+    ],
+    "section_path": [
+      "Synthetic guide to beta hydroxy acids",
+      "What beta hydroxy acids are"
+    ],
+    "ordinal": 0,
+    "text": "In this synthetic guide, salicylic acid is the beta hydroxy acid (BHA) most often found in cosmetic products. The guide notes that salicylic acid is chemically related to alpha hydroxy acids but is a different ingredient.",
+    "start_char": 73,
+    "end_char": 294,
+    "content_hash": "sha256:335395e54163debd5cf8656e30ea754bc8a32b06b0b13ac183e11d0d7202505d",
+    "token_estimate": 48,
+    "overlaps_previous": false,
+    "qualifier_continuation": false
+  },
+  {
+    "schema_version": 1,
+    "chunk_id": "chk_syn_q2_bha_guide_26856373_synthetic_guide_to_beta_hydroxy_acids_cosmetic_o_00_6c2fa893",
+    "source_id": "syn_q2_bha_guide_26856373",
+    "document_id": "doc_syn_q2_bha_guide_26856373_8385445d",
+    "document_hash": "sha256:8385445d6044cf6ea6b457886e346164036f15dac88350a920b1533e8fbfe0dd",
+    "publisher": "Synthetic Test Publisher",
+    "title": "Synthetic guide to beta hydroxy acids",
+    "canonical_url": "https://q2.fixture.invalid/bha-guide",
+    "retrieved_at": "2026-10-31T00:00:00Z",
+    "question_classes": [
+      "Q2"
+    ],
+    "section_path": [
+      "Synthetic guide to beta hydroxy acids",
+      "Cosmetic or drug"
+    ],
+    "ordinal": 0,
+    "text": "The synthetic guide explains that a salicylic acid product may be a cosmetic or a drug depending on its intended use. A product intended to treat acne is described as a drug in this fictional system, while a product intended only to cleanse or beautify is described as a cosmetic.",
+    "start_char": 317,
+    "end_char": 597,
+    "content_hash": "sha256:6c2fa893c17b4d6132f55ebb3c7d24fc20f14fe2f37a67158f6054671f8d29ce",
+    "token_estimate": 67,
+    "overlaps_previous": false,
+    "qualifier_continuation": false
+  },
+  {
+    "schema_version": 1,
+    "chunk_id": "chk_syn_q2_bha_guide_26856373_synthetic_guide_to_beta_hydroxy_acids_reviewed_s_00_42fea447",
+    "source_id": "syn_q2_bha_guide_26856373",
+    "document_id": "doc_syn_q2_bha_guide_26856373_8385445d",
+    "document_hash": "sha256:8385445d6044cf6ea6b457886e346164036f15dac88350a920b1533e8fbfe0dd",
+    "publisher": "Synthetic Test Publisher",
+    "title": "Synthetic guide to beta hydroxy acids",
+    "canonical_url": "https://q2.fixture.invalid/bha-guide",
+    "retrieved_at": "2026-10-31T00:00:00Z",
+    "question_classes": [
+      "Q2"
+    ],
+    "section_path": [
+      "Synthetic guide to beta hydroxy acids",
+      "Reviewed safety context"
+    ],
+    "ordinal": 0,
+    "text": "According to the synthetic guide, beta hydroxy acid products may also increase sun sensitivity, and some people may notice irritation such as stinging or redness. The guide recommends sun protection while using these products. It gives no safe concentration for any individual.",
+    "start_char": 627,
+    "end_char": 904,
+    "content_hash": "sha256:42fea4476ebfc3b27b00a9d09d148f648bc1eb9fbf367f10022552289a9735dc",
+    "token_estimate": 56,
+    "overlaps_previous": false,
+    "qualifier_continuation": false
+  },
+  {
+    "schema_version": 1,
+    "chunk_id": "chk_syn_q2_bha_label_reading_9a49bcf1_synthetic_bha_label_reading_note_reading_a_bha_l_00_1efc5fc9",
+    "source_id": "syn_q2_bha_label_reading_9a49bcf1",
+    "document_id": "doc_syn_q2_bha_label_reading_9a49bcf1_cbc280c6",
+    "document_hash": "sha256:cbc280c68fa2ae6616c899b0d5c58d209125aadfb74dfce46b1156ebe9496cc9",
+    "publisher": "Synthetic Test Publisher",
+    "title": "Synthetic BHA label reading note",
+    "canonical_url": "https://q2.fixture.invalid/bha-label-reading",
+    "retrieved_at": "2026-10-31T00:00:00Z",
+    "question_classes": [
+      "Q2"
+    ],
+    "section_path": [
+      "Synthetic BHA label reading note",
+      "Reading a BHA label"
+    ],
+    "ordinal": 0,
+    "text": "The synthetic note says an ingredient panel may list salicylic acid by name or may describe it as a beta hydroxy acid. It does not say how much salicylic acid any product contains.",
+    "start_char": 60,
+    "end_char": 240,
+    "content_hash": "sha256:1efc5fc9164cebdf4d21b7073dda246ef77570086d99c2a5b9ae6234932ce5d6",
+    "token_estimate": 44,
+    "overlaps_previous": false,
+    "qualifier_continuation": false
+  },
+  {
+    "schema_version": 1,
+    "chunk_id": "chk_syn_q3_retinoid_guide_ed39070d_synthetic_guide_to_retinoids_and_retinol_retinoi_00_166fcbdc",
+    "source_id": "syn_q3_retinoid_guide_ed39070d",
+    "document_id": "doc_syn_q3_retinoid_guide_ed39070d_07972265",
+    "document_hash": "sha256:07972265db1eba340776fafffbd4344f0b9b2681056129d3964b21fa8d26cb6f",
+    "publisher": "Synthetic Test Publisher",
+    "title": "Synthetic guide to retinoids and retinol",
+    "canonical_url": "https://q3.fixture.invalid/retinoid-guide",
+    "retrieved_at": "2026-10-31T00:00:00Z",
+    "question_classes": [
+      "Q3"
+    ],
+    "section_path": [
+      "Synthetic guide to retinoids and retinol",
+      "Retinoid or retinol: the difference"
+    ],
+    "ordinal": 0,
+    "text": "In this synthetic guide, retinoids are a group of vitamin A related ingredients, and retinol is one type of retinoid found in many cosmetic products. The guide says prescription retinoids are generally stronger than retinol products sold without a prescription.",
+    "start_char": 84,
+    "end_char": 345,
+    "content_hash": "sha256:166fcbdcd88012ae709ffd20edecbb02d3cbc8812c87dc89723c7e670cb5b7e6",
+    "token_estimate": 54,
+    "overlaps_previous": false,
+    "qualifier_continuation": false
+  },
+  {
+    "schema_version": 1,
+    "chunk_id": "chk_syn_q3_retinoid_guide_ed39070d_synthetic_guide_to_retinoids_and_retinol_startin_00_75394211",
+    "source_id": "syn_q3_retinoid_guide_ed39070d",
+    "document_id": "doc_syn_q3_retinoid_guide_ed39070d_07972265",
+    "document_hash": "sha256:07972265db1eba340776fafffbd4344f0b9b2681056129d3964b21fa8d26cb6f",
+    "publisher": "Synthetic Test Publisher",
+    "title": "Synthetic guide to retinoids and retinol",
+    "canonical_url": "https://q3.fixture.invalid/retinoid-guide",
+    "retrieved_at": "2026-10-31T00:00:00Z",
+    "question_classes": [
+      "Q3"
+    ],
+    "section_path": [
+      "Synthetic guide to retinoids and retinol",
+      "Starting gradually"
+    ],
+    "ordinal": 0,
+    "text": "The synthetic guide suggests starting a retinoid or retinol product gradually, applying it on only some nights at first and increasing use only as the skin tolerates it.",
+    "start_char": 370,
+    "end_char": 539,
+    "content_hash": "sha256:75394211e67789d199c8676436cc5689e2a2d3c9a325e1dc62c6938c051b024f",
+    "token_estimate": 38,
+    "overlaps_previous": false,
+    "qualifier_continuation": false
+  },
+  {
+    "schema_version": 1,
+    "chunk_id": "chk_syn_q3_retinoid_guide_ed39070d_synthetic_guide_to_retinoids_and_retinol_irritat_00_848e5cd0",
+    "source_id": "syn_q3_retinoid_guide_ed39070d",
+    "document_id": "doc_syn_q3_retinoid_guide_ed39070d_07972265",
+    "document_hash": "sha256:07972265db1eba340776fafffbd4344f0b9b2681056129d3964b21fa8d26cb6f",
+    "publisher": "Synthetic Test Publisher",
+    "title": "Synthetic guide to retinoids and retinol",
+    "canonical_url": "https://q3.fixture.invalid/retinoid-guide",
+    "retrieved_at": "2026-10-31T00:00:00Z",
+    "question_classes": [
+      "Q3"
+    ],
+    "section_path": [
+      "Synthetic guide to retinoids and retinol",
+      "Irritation caution"
+    ],
+    "ordinal": 0,
+    "text": "The synthetic guide warns that retinoids and retinol can cause irritation, including dryness, peeling, and redness, especially when someone first starts using them. However, the guide says this irritation often lessens as skin adjusts, and it advises stopping and asking a dermatologist if irritation is severe.",
+    "start_char": 564,
+    "end_char": 875,
+    "content_hash": "sha256:848e5cd0b4c4742c2a33225019d58da15a9cfdadf4aec208b4845f2abf257882",
+    "token_estimate": 62,
+    "overlaps_previous": false,
+    "qualifier_continuation": false
+  },
+  {
+    "schema_version": 1,
+    "chunk_id": "chk_syn_q3_retinoid_guide_ed39070d_synthetic_guide_to_retinoids_and_retinol_sun_pro_00_cafd6590",
+    "source_id": "syn_q3_retinoid_guide_ed39070d",
+    "document_id": "doc_syn_q3_retinoid_guide_ed39070d_07972265",
+    "document_hash": "sha256:07972265db1eba340776fafffbd4344f0b9b2681056129d3964b21fa8d26cb6f",
+    "publisher": "Synthetic Test Publisher",
+    "title": "Synthetic guide to retinoids and retinol",
+    "canonical_url": "https://q3.fixture.invalid/retinoid-guide",
+    "retrieved_at": "2026-10-31T00:00:00Z",
+    "question_classes": [
+      "Q3"
+    ],
+    "section_path": [
+      "Synthetic guide to retinoids and retinol",
+      "Sun protection while using retinoids"
+    ],
+    "ordinal": 0,
+    "text": "The synthetic guide also recommends daily sunscreen while using retinoids, because it reports that skin may be more sensitive to the sun during use.",
+    "start_char": 918,
+    "end_char": 1066,
+    "content_hash": "sha256:cafd6590448f5f37beaa5221cd4db376b005a3a8369eff07dfdc09aed5279a27",
+    "token_estimate": 32,
+    "overlaps_previous": false,
+    "qualifier_continuation": false
+  },
+  {
+    "schema_version": 1,
+    "chunk_id": "chk_syn_q4_cosmetic_regulation_63ffaefd_synthetic_note_on_cosmetic_ingredient_regulation_00_8fa37119",
+    "source_id": "syn_q4_cosmetic_regulation_63ffaefd",
+    "document_id": "doc_syn_q4_cosmetic_regulation_63ffaefd_ac4518f6",
+    "document_hash": "sha256:ac4518f6254bf52783ceb879729c37d216ec6f7e7b5d3832b276caf9b1f8ae50",
+    "publisher": "Synthetic Test Publisher",
+    "title": "Synthetic note on cosmetic ingredient regulation",
+    "canonical_url": "https://q4.fixture.invalid/cosmetic-regulation",
+    "retrieved_at": "2026-10-31T00:00:00Z",
+    "question_classes": [
+      "Q4"
+    ],
+    "section_path": [
+      "Synthetic note on cosmetic ingredient regulation",
+      "Premarket approval"
+    ],
+    "ordinal": 0,
+    "text": "In this synthetic note, the fictional regulator does not require premarket approval for cosmetic products or their ingredients before they are sold. Except for color additives, the note says the fictional regulator does not pre-clear ordinary cosmetic ingredients.",
+    "start_char": 75,
+    "end_char": 339,
+    "content_hash": "sha256:8fa3711943db8394bd9c2b1f5c8177cb0d2b0313d460292a9e83d2807dfda033",
+    "token_estimate": 51,
+    "overlaps_previous": false,
+    "qualifier_continuation": false
+  },
+  {
+    "schema_version": 1,
+    "chunk_id": "chk_syn_q4_cosmetic_regulation_63ffaefd_synthetic_note_on_cosmetic_ingredient_regulation_00_52cf63b9",
+    "source_id": "syn_q4_cosmetic_regulation_63ffaefd",
+    "document_id": "doc_syn_q4_cosmetic_regulation_63ffaefd_ac4518f6",
+    "document_hash": "sha256:ac4518f6254bf52783ceb879729c37d216ec6f7e7b5d3832b276caf9b1f8ae50",
+    "publisher": "Synthetic Test Publisher",
+    "title": "Synthetic note on cosmetic ingredient regulation",
+    "canonical_url": "https://q4.fixture.invalid/cosmetic-regulation",
+    "retrieved_at": "2026-10-31T00:00:00Z",
+    "question_classes": [
+      "Q4"
+    ],
+    "section_path": [
+      "Synthetic note on cosmetic ingredient regulation",
+      "Color additive exception"
+    ],
+    "ordinal": 0,
+    "text": "The synthetic note explains that color additives are the exception: they must be approved by the fictional regulator for their intended use before they appear in a cosmetic, unless a listed exemption applies.",
+    "start_char": 370,
+    "end_char": 578,
+    "content_hash": "sha256:52cf63b977abd13cc14e7d277818b1b1f35e7182d18f6c45c9629dba9c0b91b9",
+    "token_estimate": 44,
+    "overlaps_previous": false,
+    "qualifier_continuation": false
+  },
+  {
+    "schema_version": 1,
+    "chunk_id": "chk_syn_q4_cosmetic_regulation_63ffaefd_synthetic_note_on_cosmetic_ingredient_regulation_00_25dc41e8",
+    "source_id": "syn_q4_cosmetic_regulation_63ffaefd",
+    "document_id": "doc_syn_q4_cosmetic_regulation_63ffaefd_ac4518f6",
+    "document_hash": "sha256:ac4518f6254bf52783ceb879729c37d216ec6f7e7b5d3832b276caf9b1f8ae50",
+    "publisher": "Synthetic Test Publisher",
+    "title": "Synthetic note on cosmetic ingredient regulation",
+    "canonical_url": "https://q4.fixture.invalid/cosmetic-regulation",
+    "retrieved_at": "2026-10-31T00:00:00Z",
+    "question_classes": [
+      "Q4"
+    ],
+    "section_path": [
+      "Synthetic note on cosmetic ingredient regulation",
+      "The regulator's role"
+    ],
+    "ordinal": 0,
+    "text": "According to the synthetic note, the fictional regulator can take enforcement action against cosmetics on the market that are unsafe or mislabeled. The note says companies are responsible for making sure their products are safe before sale.",
+    "start_char": 605,
+    "end_char": 845,
+    "content_hash": "sha256:25dc41e8b3a8bf558504283383f861bc937d8328a5a9fbaaf17757c68376f048",
+    "token_estimate": 50,
+    "overlaps_previous": false,
+    "qualifier_continuation": false
+  },
+  {
+    "schema_version": 1,
+    "chunk_id": "chk_syn_q4_cosmetic_regulation_63ffaefd_synthetic_note_on_cosmetic_ingredient_regulation_00_d755f68a",
+    "source_id": "syn_q4_cosmetic_regulation_63ffaefd",
+    "document_id": "doc_syn_q4_cosmetic_regulation_63ffaefd_ac4518f6",
+    "document_hash": "sha256:ac4518f6254bf52783ceb879729c37d216ec6f7e7b5d3832b276caf9b1f8ae50",
+    "publisher": "Synthetic Test Publisher",
+    "title": "Synthetic note on cosmetic ingredient regulation",
+    "canonical_url": "https://q4.fixture.invalid/cosmetic-regulation",
+    "retrieved_at": "2026-10-31T00:00:00Z",
+    "question_classes": [
+      "Q4"
+    ],
+    "section_path": [
+      "Synthetic note on cosmetic ingredient regulation",
+      "Market availability is not approval"
+    ],
+    "ordinal": 0,
+    "text": "The synthetic note warns that being sold in stores does not mean a cosmetic or ingredient received premarket approval.",
+    "start_char": 887,
+    "end_char": 1005,
+    "content_hash": "sha256:d755f68ac575bedc33a9ac556ee4b93514a0819496d40fc423c941dee600ed77",
+    "token_estimate": 26,
+    "overlaps_previous": false,
+    "qualifier_continuation": false
+  },
+  {
+    "schema_version": 1,
+    "chunk_id": "chk_syn_q5_pregnancy_guide_19e672b9_synthetic_guide_to_skin_care_during_pregnancy_ge_00_797493b9",
+    "source_id": "syn_q5_pregnancy_guide_19e672b9",
+    "document_id": "doc_syn_q5_pregnancy_guide_19e672b9_00591b9e",
+    "document_hash": "sha256:00591b9ec8a4b393af31028b6bac8a77e03f439a2417538c905866961b8f8b11",
+    "publisher": "Synthetic Test Publisher",
+    "title": "Synthetic guide to skin care during pregnancy",
+    "canonical_url": "https://q5.fixture.invalid/pregnancy-skin-care",
+    "retrieved_at": "2026-10-31T00:00:00Z",
+    "question_classes": [
+      "Q5"
+    ],
+    "section_path": [
+      "Synthetic guide to skin care during pregnancy",
+      "General scope"
+    ],
+    "ordinal": 0,
+    "text": "This synthetic guide offers general educational information about skin care routines during pregnancy and breastfeeding. It notes that many people change their routine during pregnancy and that individual needs differ.",
+    "start_char": 67,
+    "end_char": 285,
+    "content_hash": "sha256:797493b9c193bdbb068ead0203adcbd067dd9812cc3d1fc7ce86aa0172afca07",
+    "token_estimate": 40,
+    "overlaps_previous": false,
+    "qualifier_continuation": false
+  },
+  {
+    "schema_version": 1,
+    "chunk_id": "chk_syn_q5_pregnancy_guide_19e672b9_synthetic_guide_to_skin_care_during_pregnancy_ta_00_39e92f6d",
+    "source_id": "syn_q5_pregnancy_guide_19e672b9",
+    "document_id": "doc_syn_q5_pregnancy_guide_19e672b9_00591b9e",
+    "document_hash": "sha256:00591b9ec8a4b393af31028b6bac8a77e03f439a2417538c905866961b8f8b11",
+    "publisher": "Synthetic Test Publisher",
+    "title": "Synthetic guide to skin care during pregnancy",
+    "canonical_url": "https://q5.fixture.invalid/pregnancy-skin-care",
+    "retrieved_at": "2026-10-31T00:00:00Z",
+    "question_classes": [
+      "Q5"
+    ],
+    "section_path": [
+      "Synthetic guide to skin care during pregnancy",
+      "Talk with a clinician"
+    ],
+    "ordinal": 0,
+    "text": "The synthetic guide advises anyone who is pregnant or breastfeeding to talk with a clinician, such as an obstetrician or dermatologist, before starting or stopping skin care ingredients.",
+    "start_char": 313,
+    "end_char": 499,
+    "content_hash": "sha256:39e92f6d36c657079e1fcaf5437302639651ce9869cf73ada7939d11db1fdbd4",
+    "token_estimate": 38,
+    "overlaps_previous": false,
+    "qualifier_continuation": false
+  },
+  {
+    "schema_version": 1,
+    "chunk_id": "chk_syn_q5_pregnancy_guide_19e672b9_synthetic_guide_to_skin_care_during_pregnancy_in_00_f97c6626",
+    "source_id": "syn_q5_pregnancy_guide_19e672b9",
+    "document_id": "doc_syn_q5_pregnancy_guide_19e672b9_00591b9e",
+    "document_hash": "sha256:00591b9ec8a4b393af31028b6bac8a77e03f439a2417538c905866961b8f8b11",
+    "publisher": "Synthetic Test Publisher",
+    "title": "Synthetic guide to skin care during pregnancy",
+    "canonical_url": "https://q5.fixture.invalid/pregnancy-skin-care",
+    "retrieved_at": "2026-10-31T00:00:00Z",
+    "question_classes": [
+      "Q5"
+    ],
+    "section_path": [
+      "Synthetic guide to skin care during pregnancy",
+      "Ingredients to discuss"
+    ],
+    "ordinal": 0,
+    "text": "According to the synthetic guide, retinoids are among the ingredients people are commonly advised to avoid during pregnancy, and products with salicylic acid are ones to discuss with a clinician. The guide does not list every ingredient and does not say any product is safe for a specific person.",
+    "start_char": 528,
+    "end_char": 824,
+    "content_hash": "sha256:f97c6626b355c83ade22d1b7d90ba7e6dc32b99d67b65d9231c5a3f8407f276d",
+    "token_estimate": 66,
+    "overlaps_previous": false,
+    "qualifier_continuation": false
+  }
+]
