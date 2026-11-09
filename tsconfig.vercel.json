@@ -1,0 +1,18 @@
+{
+  "extends": "./tsconfig.json",
+  "exclude": [
+    "node_modules",
+    "db",
+    "worker",
+    "build",
+    "dist",
+    "drizzle",
+    "drizzle.config.ts",
+    "vite.config.ts",
+    "vercel-api",
+    "scripts",
+    "tests",
+    "evals",
+    "examples"
+  ]
+}

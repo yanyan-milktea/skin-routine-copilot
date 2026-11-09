@@ -24,10 +24,29 @@ const clean = (value: unknown, max: number, empty = false): string | null => {
   return result || empty ? result : null;
 };
 
+/**
+ * Exact browser origins allowed to call the API: the original Sites origin plus
+ * any comma-separated `https://` origins in ALLOWED_ORIGINS (for example the
+ * public Vercel frontend). Anything that is not a bare https origin is ignored.
+ */
+export function allowedOrigins(configured = process.env.ALLOWED_ORIGINS): Set<string> {
+  const origins = new Set([LIVE_SITE_ORIGIN]);
+  for (const entry of (configured ?? "").split(",")) {
+    const candidate = entry.trim().replace(/\/+$/, "");
+    if (!candidate) continue;
+    try {
+      const url = new URL(candidate);
+      if (url.protocol === "https:" && url.origin === candidate) origins.add(candidate);
+    } catch { /* ignore malformed entries */ }
+  }
+  return origins;
+}
+
 export function corsHeaders(request: Request, preflightRequest = false): Headers {
   const headers = new Headers({ Vary: "Origin" });
-  if (request.headers.get("origin") !== LIVE_SITE_ORIGIN) return headers;
-  headers.set("Access-Control-Allow-Origin", LIVE_SITE_ORIGIN);
+  const origin = request.headers.get("origin");
+  if (!origin || !allowedOrigins().has(origin)) return headers;
+  headers.set("Access-Control-Allow-Origin", origin);
   if (preflightRequest) { headers.set("Access-Control-Allow-Methods", "POST,OPTIONS"); headers.set("Access-Control-Allow-Headers", "Content-Type"); headers.set("Access-Control-Max-Age", "86400"); }
   return headers;
 }
