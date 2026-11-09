@@ -6,7 +6,7 @@ A safety-first applied-AI skincare planner that turns a short daily check-in
 into a practical morning and evening routine using only products the user
 already owns.
 
-[Live demo](https://skin-routine-copilot.gogogoyan.chatgpt.site)
+**[Live demo → skin-routine-copilot.vercel.app](https://skin-routine-copilot.vercel.app)** (public, no sign-in)
 
 ## The user problem
 
