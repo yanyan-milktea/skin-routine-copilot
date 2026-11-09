@@ -5,7 +5,7 @@
   "scope": "Milestone 1 keyless retrieval evals. Answer, citation, grounding, CORS and provider evals are added in Milestones 2-4.",
   "corpus_version": "synthetic-retrieval-v1",
   "index_version": "ingredient-rag-index-synthetic-retrieval-v1",
-  "retrieval_config_sha256": "sha256:651f5ad17cc0e316826a47d0db6107621994fe006ffe47551196e48bae059201",
+  "retrieval_config_sha256": "sha256:0037da4e08ef17f5216d0f9a81a589a97e9404d622fa9774315ce190c05589cb",
   "aliases_version": "ingredient-aliases-v1",
   "tokenizer_version": "ingredient-tokenizer-v1",
   "bm25_implementation": "ingredient-bm25-v1",

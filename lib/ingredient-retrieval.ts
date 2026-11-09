@@ -23,6 +23,7 @@ export const PHASE1_RETRIEVAL_CONFIG = Object.freeze({
   tie_breakers: Object.freeze(["rrf_desc", "cosine_desc", "lexical_desc", "chunk_id_asc"]),
   eligibility_mode: "any",
   vector_answer_min_cosine: 0.62,
+  vector_anchor_required: true,
   lexical_answer_min_bm25: 6.0,
   lexical_anchor_required: true,
   vector_discovery_min_cosine: 0.52,
@@ -45,6 +46,7 @@ export type RetrievalConfig = {
   tie_breakers: readonly string[];
   eligibility_mode: "any";
   vector_answer_min_cosine: number;
+  vector_anchor_required: true;
   lexical_answer_min_bm25: number;
   lexical_anchor_required: true;
   vector_discovery_min_cosine: number;
@@ -236,13 +238,18 @@ export function eligibilityState(vector: boolean, lexical: boolean): Eligibility
   return "neither";
 }
 
-/** Component answer gates (Section 5.2). ANY mode; the anchor is required for the lexical gate only. */
-export function componentGates(cosineScore: number, bm25: number, anchor: boolean, config: Pick<RetrievalConfig, "vector_answer_min_cosine" | "lexical_answer_min_bm25" | "lexical_anchor_required">) {
-  const vectorEligible = cosineScore >= config.vector_answer_min_cosine;
+/**
+ * Component answer gates (Section 5.2), ANY mode. Both gates require the
+ * reviewed class + intent anchor: a chunk that is only semantically "close"
+ * (for example a keyword-stuffed navigation page) cannot reach model evidence.
+ */
+export function componentGates(cosineScore: number, bm25: number, anchor: boolean, config: Pick<RetrievalConfig, "vector_answer_min_cosine" | "vector_anchor_required" | "lexical_answer_min_bm25" | "lexical_anchor_required">) {
+  const vectorScorePass = cosineScore >= config.vector_answer_min_cosine;
+  const vectorEligible = vectorScorePass && (!config.vector_anchor_required || anchor);
   const lexicalScorePass = bm25 >= config.lexical_answer_min_bm25;
   const lexicalEligible = lexicalScorePass && (!config.lexical_anchor_required || anchor);
   const gateCodes = [
-    vectorEligible ? "VECTOR_GATE_PASS" : "VECTOR_GATE_FAIL",
+    vectorEligible ? "VECTOR_GATE_PASS" : vectorScorePass ? "VECTOR_ANCHOR_MISSING" : "VECTOR_GATE_FAIL",
     lexicalEligible ? "LEXICAL_GATE_PASS" : lexicalScorePass ? "LEXICAL_ANCHOR_MISSING" : "LEXICAL_SCORE_FAIL",
   ];
   return { vector_eligible: vectorEligible, lexical_eligible: lexicalEligible, state: eligibilityState(vectorEligible, lexicalEligible), gate_codes: gateCodes };

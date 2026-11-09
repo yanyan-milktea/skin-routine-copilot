@@ -8,11 +8,11 @@
     "Q4": 0.9286,
     "Q5": 0.8462
   },
-  "mrr": 0.8836,
+  "mrr": 0.8904,
   "critical_false_eligible": 0,
   "false_eligible_rate": 0.0132,
   "out_of_scope_abstention": 1,
-  "cases_with_irrelevant_evidence": 3,
+  "cases_with_irrelevant_evidence": 0,
   "failing_case_ids": [
     "q2_supported_005",
     "q2_supported_011",

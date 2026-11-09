@@ -651,6 +651,7 @@ The versioned retrieval configuration has no weights and must match this schema:
   "tie_breakers": ["rrf_desc", "cosine_desc", "lexical_desc", "chunk_id_asc"],
   "eligibility_mode": "any",
   "vector_answer_min_cosine": 0.62,
+  "vector_anchor_required": true,
   "lexical_answer_min_bm25": 6.0,
   "lexical_anchor_required": true,
   "vector_discovery_min_cosine": 0.52,
@@ -665,8 +666,11 @@ The versioned retrieval configuration has no weights and must match this schema:
 
 These are the fixed Phase 1 constants. Milestone 1 confirms them against the
 locked dataset by a predeclared grid report: maximize Recall@5 subject to zero
-critical false-eligible cases, at least 0.95 out-of-scope abstention, and at most
-0.02 overall false-eligible rate. If the fixed constants fail, Milestone 1 stops
+critical false-eligible cases, at least 0.95 out-of-scope abstention, at most
+0.02 overall false-eligible rate, and at most 0.02 of evidence-bearing cases
+containing a reviewer-labelled irrelevant in-class chunk (evidence precision;
+added 2026-11-08, see Section 19). Both answer gates require the reviewed
+class/intent anchor (`vector_anchor_required`, added 2026-11-08). If the fixed constants fail, Milestone 1 stops
 and this design/config version must be explicitly revised; production code may
 not silently tune them. BM25 thresholds are valid only for the pinned tokenizer
 and scorer versions. Tests cover each component gate, exact RRF formula, a
@@ -1680,20 +1684,22 @@ task; a real index requires the Section 16 step 1 reviews first.
    adapter exists but has never been run; its request shape must be re-verified
    against current documentation in the first authorized embedding run.
 
-### Findings that need a design decision
+### Findings and decisions
 
-1. **Vector-only eligibility admits keyword-stuffed in-class pages.** On the
-   fixture, a Q1 "keyword index" page passes the 0.62 cosine gate for 3/81
-   evidence-bearing cases. No claim unit cites it, so it cannot become a claim,
-   but it does reach model evidence. Options: require the class anchor (not the
-   intent anchor) for vector-only eligibility, or exclude navigation/boilerplate
-   sections at ingestion.
-2. **The predeclared calibration objective has no precision constraint.** The
-   grid's best admissible cell is the loosest one (0.52 / 3.5): Recall@5 rises
-   from 0.89 to 0.96 while irrelevant-evidence cases rise from 3 to 12. Because
-   abstention is enforced mainly by the deterministic classifier, the false-
-   eligible constraints barely move. Add an evidence-precision constraint before
-   calibrating real thresholds.
+1. **Vector-only eligibility admitted keyword-stuffed in-class pages.
+   Resolved 2026-11-08.** A Q1 "keyword index" page passed the 0.62 cosine gate
+   and reached model evidence in 3/81 evidence-bearing cases. It contains the
+   class term ("AHA") but not the intent term ("sun sensitivity"), so requiring
+   only the class anchor would not have excluded it. Decision: the vector gate
+   now requires the same reviewed class + intent anchor as the lexical gate
+   (`vector_anchor_required: true`, trace code `VECTOR_ANCHOR_MISSING`).
+   Result on the fixture: irrelevant-evidence cases 3 → 0, Recall@5 and the set
+   of failing cases unchanged. Locked by a regression test.
+2. **Calibration objective lacked a precision constraint. Resolved
+   2026-11-08.** The grid objective now also requires at most 2% of
+   evidence-bearing cases to contain a reviewer-labelled irrelevant chunk. After
+   decision 1 every grid cell has zero such cases on the fixture, so the
+   constraint is not yet binding here; it exists for real-corpus calibration.
 3. **BM25 thresholds depend on corpus statistics.** With 26 chunks, IDF is low
    and 6.0 is rarely reached; most answerable cases pass through the vector gate.
    The real corpus must be calibrated on its own statistics.

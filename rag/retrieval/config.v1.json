@@ -9,6 +9,7 @@
   "tie_breakers": ["rrf_desc", "cosine_desc", "lexical_desc", "chunk_id_asc"],
   "eligibility_mode": "any",
   "vector_answer_min_cosine": 0.62,
+  "vector_anchor_required": true,
   "lexical_answer_min_bm25": 6.0,
   "lexical_anchor_required": true,
   "vector_discovery_min_cosine": 0.52,

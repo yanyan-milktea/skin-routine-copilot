@@ -130,11 +130,15 @@ test("reviewed precedence resolves pregnancy and approval questions deterministi
 
 // --- Gates and RRF -------------------------------------------------------------
 
-test("component gates use inclusive thresholds and require the anchor for the lexical gate only", () => {
-  assert.equal(componentGates(0.62, 0, false, config).state, "vector_only");
+test("component gates use inclusive thresholds and require the reviewed anchor for both gates", () => {
+  assert.equal(componentGates(0.62, 0, true, config).state, "vector_only");
+  assert.equal(componentGates(0.95, 0, false, config).state, "neither", "a high cosine alone is not enough");
+  assert.deepEqual(componentGates(0.95, 9, false, config).gate_codes, ["VECTOR_ANCHOR_MISSING", "LEXICAL_ANCHOR_MISSING"]);
   assert.equal(componentGates(0.6199999, 0, true, config).state, "neither");
   assert.equal(componentGates(0, 6.0, true, config).state, "lexical_only");
   assert.deepEqual(componentGates(0, 9, false, config).gate_codes, ["VECTOR_GATE_FAIL", "LEXICAL_ANCHOR_MISSING"]);
+  const legacy = { ...config, vector_anchor_required: false };
+  assert.equal(componentGates(0.62, 0, false, legacy).state, "vector_only", "control: without the anchor rule a high cosine alone would pass");
   assert.equal(componentGates(0.9, 9, true, config).state, "both");
   assert.equal(lexicalOnlyDiscoveryEligible(4.999, true, config), false);
   assert.equal(lexicalOnlyDiscoveryEligible(5.0, true, config), true);
@@ -202,7 +206,7 @@ test("an irrelevant chunk that would win RRF without pre-fusion gates never ente
 
 test("vector-only, lexical-only, both and neither candidates are classified from component gates", async () => {
   const documents = [
-    doc("syn_v", ["Q1"], "# Vee\n\n## Overview\n\nGlycolic acid is mentioned once here.", "Vee"),
+    doc("syn_v", ["Q1"], "# Vee\n\n## Overview\n\nGlycolic acid may affect sun sensitivity.", "Vee"),
     doc("syn_l", ["Q1"], "# Ell\n\n## Sun sensitivity\n\nAlpha hydroxy acids, alpha hydroxy acids: may increase sun sensitivity, increase sun sensitivity, and sunburn.", "Ell"),
     doc("syn_b", ["Q1"], "# Bee\n\n## Sun sensitivity\n\nAlpha hydroxy acids alpha hydroxy acids may increase sun sensitivity; increase sun sensitivity; sunburn may be more likely.", "Bee"),
     doc("syn_n", ["Q1"], "# Enn\n\n## Other\n\nA placeholder newsletter page.", "Enn"),
@@ -339,4 +343,17 @@ test("the retrieval trace never contains the raw question", async () => {
   assert.ok(!serialized.includes("Example Person"));
   assert.ok(!serialized.includes(question));
   assert.ok(!("query_tokens" in result.trace.classification));
+});
+
+test("a keyword-stuffed page that is semantically close but lacks the intent anchor never reaches evidence", async () => {
+  for (const question of ["Does glycolic acid affect how skin reacts to sunlight?", "alpha-hydroxy acids and UV exposure", "Do AHA labels carry a sunburn alert?"]) {
+    const result = await stack.retriever.retrieve(question);
+    const keywordPage = stack.index.chunks.find((chunk) => chunk.source_id.startsWith("syn_q1_aha_keyword_index_"));
+    const candidate = result.trace.candidates.find((item) => item.chunk_id === keywordPage.chunk_id);
+    assert.ok(candidate.cosine >= config.vector_answer_min_cosine, `${question}: cosine passes the vector threshold`);
+    assert.ok(candidate.gate_codes.includes("VECTOR_ANCHOR_MISSING"), question);
+    assert.equal(candidate.state, "neither", question);
+    assert.ok(!result.evidence.some((chunk) => chunk.chunk_id === keywordPage.chunk_id), question);
+    assert.equal(result.status, "eligible", `${question}: the relevant chunks still answer`);
+  }
 });
