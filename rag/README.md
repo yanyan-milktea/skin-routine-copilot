@@ -183,3 +183,12 @@ gates (Recall@5, MRR, irrelevant evidence). Quality is regression-locked to
 `reports/baseline.json`; it is not threshold-calibration evidence for
 `gemini-embedding-2`. See `reports/retrieval-eval.md` and
 `reports/threshold-grid.md`.
+
+## Milestone 2a: strict answer path (disabled)
+
+`lib/ingredient-answer/` turns retrieval into a grounded answer without any
+model-authored prose: Gemini may only select reviewed claim-unit IDs, the server
+verifies each one, renders canonical text, and hydrates citations from the index.
+Failures return exact excerpts and zero claims. `POST /api/ingredient-answer` is
+404 unless `INGREDIENT_ANSWER_ENABLED=1` and 503 until a production index and
+durable rate limiting exist. Tests: `node --test tests/ingredient-answer.test.mjs`.

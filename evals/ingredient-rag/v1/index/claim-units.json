@@ -17,6 +17,12 @@
       }
     ],
     "content_hash": "sha256:b8f83810e261cad4639de7f2a251fd869462b453fc4a025d24b5db0c9a1425e6",
+    "required_terms": [
+      "glycolic acid",
+      "lactic acid"
+    ],
+    "negation_terms": [],
+    "review_binding_hash": "sha256:95b67d4355916591bfe495b10aa98189670beb5e68dfa7c23adc67ac44a41ce7",
     "enabled": true,
     "review": {
       "decision": "approved_for_synthetic_tests",
@@ -43,6 +49,13 @@
       }
     ],
     "content_hash": "sha256:2bde9081e34a80257265a0ae093bcb2f63302ec424b9a266a44658a7f8bd0c8b",
+    "required_terms": [
+      "alpha hydroxy acids",
+      "may increase",
+      "sensitivity to the sun"
+    ],
+    "negation_terms": [],
+    "review_binding_hash": "sha256:136b52bb5dabcd818a67b26261ecf2cadbb1e0c380ad9372348b4bb355be2fa8",
     "enabled": true,
     "review": {
       "decision": "approved_for_synthetic_tests",
@@ -69,6 +82,12 @@
       }
     ],
     "content_hash": "sha256:b04beebb87f3b8e2fdc20b20a12794a7bf7566fc25a8c795ef0ddbb0d116dd18",
+    "required_terms": [
+      "sensitivity to the sun",
+      "sunburn"
+    ],
+    "negation_terms": [],
+    "review_binding_hash": "sha256:1aac8f75f160c41869307defedab70d8a3c01696022843440b1df02e026c8e5c",
     "enabled": false,
     "review": {
       "decision": "approved_for_synthetic_tests",
@@ -95,6 +114,14 @@
       }
     ],
     "content_hash": "sha256:82e1bb3d5b8330deca085c969c6d5fc7b44b4150dbc8a729c6b3456f36384605",
+    "required_terms": [
+      "alpha hydroxy acid",
+      "for a week afterward",
+      "protective clothing",
+      "sunscreen"
+    ],
+    "negation_terms": [],
+    "review_binding_hash": "sha256:0491ab86cbfce373dfb39827cc7c5987915c36274c9ee7f55482c63405fe8ca2",
     "enabled": true,
     "review": {
       "decision": "approved_for_synthetic_tests",
@@ -121,6 +148,14 @@
       }
     ],
     "content_hash": "sha256:1b6ce0d060d3e67ccf0055ea646e52616cf3e95f0192f789c4862b5621ad9f70",
+    "required_terms": [
+      "alpha hydroxy acids",
+      "sun sensitivity"
+    ],
+    "negation_terms": [
+      "never"
+    ],
+    "review_binding_hash": "sha256:7c3b44e030d5efbb0313f4dbbb1e65077500ca28dff2d91e424c80d291674557",
     "enabled": true,
     "review": {
       "decision": "approved_for_synthetic_tests",
@@ -147,6 +182,15 @@
       }
     ],
     "content_hash": "sha256:074291b0f918edb34766e428abc8778954004ff2c1b588058c1ee9a10899e8b5",
+    "required_terms": [
+      "cosmetic",
+      "drug",
+      "intended to treat acne"
+    ],
+    "negation_terms": [
+      "only"
+    ],
+    "review_binding_hash": "sha256:c876dda2e87b48c4140c95f3800ae4067afdeb648bd185542474e3d967dc8dd8",
     "enabled": true,
     "review": {
       "decision": "approved_for_synthetic_tests",
@@ -173,6 +217,13 @@
       }
     ],
     "content_hash": "sha256:c525582cedb3a5a125d52d3e821312c29d8d09ad1ac3e26145bb26d32a4057d8",
+    "required_terms": [
+      "beta hydroxy acid",
+      "irritation",
+      "sun sensitivity"
+    ],
+    "negation_terms": [],
+    "review_binding_hash": "sha256:2dfebe48bc505bcb462f141e2bebf6f40a35321e3ca9a5b9082fe7919855519d",
     "enabled": true,
     "review": {
       "decision": "approved_for_synthetic_tests",
@@ -199,6 +250,12 @@
       }
     ],
     "content_hash": "sha256:9dfce4afc0f6bb02b260cb36170845b23fd1bb85e48313462b1acdb076d903f3",
+    "required_terms": [
+      "beta hydroxy acid",
+      "salicylic acid"
+    ],
+    "negation_terms": [],
+    "review_binding_hash": "sha256:5e20d5fc9ef53b1156ebf55852fbabf08ab742f5c7119954b2f9e5338076a68f",
     "enabled": true,
     "review": {
       "decision": "approved_for_synthetic_tests",
@@ -225,6 +282,15 @@
       }
     ],
     "content_hash": "sha256:9f229503be0fb384e0e5bac5d2e5df505664d8d348afeb5c8cc0985ccc713a24",
+    "required_terms": [
+      "prescription retinoids",
+      "retinol",
+      "stronger"
+    ],
+    "negation_terms": [
+      "without a prescription"
+    ],
+    "review_binding_hash": "sha256:c11b9d4cbe8bc72c7dbec6bc5a6210d647b56eb2493c223e714f9dfde6f9eb05",
     "enabled": true,
     "review": {
       "decision": "approved_for_synthetic_tests",
@@ -251,6 +317,16 @@
       }
     ],
     "content_hash": "sha256:75394211e67789d199c8676436cc5689e2a2d3c9a325e1dc62c6938c051b024f",
+    "required_terms": [
+      "gradually",
+      "retinoid",
+      "retinol",
+      "some nights"
+    ],
+    "negation_terms": [
+      "only"
+    ],
+    "review_binding_hash": "sha256:4bede4f43dd67ddd344a2a47cef4de68206d37451c496eb5d436f07ba8c3c27c",
     "enabled": true,
     "review": {
       "decision": "approved_for_synthetic_tests",
@@ -277,6 +353,16 @@
       }
     ],
     "content_hash": "sha256:65326cc9d834c71d61b1bdd1832517a643f957005f53fefbd4fde036b54abb27",
+    "required_terms": [
+      "dryness",
+      "irritation",
+      "peeling",
+      "redness",
+      "retinoids",
+      "retinol"
+    ],
+    "negation_terms": [],
+    "review_binding_hash": "sha256:edf6a959967e03de0aecd1db42c3d9bba163f7d4e1c6e2025b1f729aca5c07b2",
     "enabled": true,
     "review": {
       "decision": "approved_for_synthetic_tests",
@@ -303,6 +389,13 @@
       }
     ],
     "content_hash": "sha256:2ecd0177b2ef5cbffabcb7fbbe155d34cd565d73999e4e63326fda17fbc9b175",
+    "required_terms": [
+      "enforcement action",
+      "mislabeled",
+      "unsafe"
+    ],
+    "negation_terms": [],
+    "review_binding_hash": "sha256:5d4dbeffb00e979284582be8e849d1144e9f964295594112ce153c6e74ffd43b",
     "enabled": true,
     "review": {
       "decision": "approved_for_synthetic_tests",
@@ -329,6 +422,15 @@
       }
     ],
     "content_hash": "sha256:e7468692f625d6e275ce0c0c70bb5440ba3b70c24204f871089c5d442c41af7d",
+    "required_terms": [
+      "cosmetic products",
+      "ingredients",
+      "premarket approval"
+    ],
+    "negation_terms": [
+      "does not require"
+    ],
+    "review_binding_hash": "sha256:7d78d1d32c14bf9257ac24f8b01ad9dfdd91ccc644b9bbbd594ec8c77199e38c",
     "enabled": true,
     "review": {
       "decision": "approved_for_synthetic_tests",
@@ -355,6 +457,16 @@
       }
     ],
     "content_hash": "sha256:52cf63b977abd13cc14e7d277818b1b1f35e7182d18f6c45c9629dba9c0b91b9",
+    "required_terms": [
+      "approved",
+      "color additives",
+      "intended use"
+    ],
+    "negation_terms": [
+      "exception",
+      "unless a listed exemption applies"
+    ],
+    "review_binding_hash": "sha256:a13ad9e152766aadc685779f1df476482d2053a09f159f5d9abd8744556f5696",
     "enabled": true,
     "review": {
       "decision": "approved_for_synthetic_tests",
@@ -381,6 +493,14 @@
       }
     ],
     "content_hash": "sha256:d755f68ac575bedc33a9ac556ee4b93514a0819496d40fc423c941dee600ed77",
+    "required_terms": [
+      "premarket approval",
+      "sold in stores"
+    ],
+    "negation_terms": [
+      "does not mean"
+    ],
+    "review_binding_hash": "sha256:d3b4c79b545cae7b7788818d04bc1cb36ecc78b790766de85ba8565aa0c10a1b",
     "enabled": true,
     "review": {
       "decision": "approved_for_synthetic_tests",
@@ -407,6 +527,14 @@
       }
     ],
     "content_hash": "sha256:151ed1fc0c4be8ce033b53af5d4c4b7e5351c94db00613b2d75de29d34671240",
+    "required_terms": [
+      "avoid during pregnancy",
+      "discuss with a clinician",
+      "retinoids",
+      "salicylic acid"
+    ],
+    "negation_terms": [],
+    "review_binding_hash": "sha256:3b9a681dabe59037522b4f1226d875f14885cfd6e69696b563de489b4a87da12",
     "enabled": true,
     "review": {
       "decision": "approved_for_synthetic_tests",
@@ -433,6 +561,12 @@
       }
     ],
     "content_hash": "sha256:afc28c62c14a84a95b040fca466694371c56032a155ae81a223775b8b58ed014",
+    "required_terms": [
+      "individual needs differ",
+      "pregnancy"
+    ],
+    "negation_terms": [],
+    "review_binding_hash": "sha256:3e751822ab8a5080b1d46fe44d845d33fdb30eb63736d866fdc79caf86110084",
     "enabled": true,
     "review": {
       "decision": "approved_for_synthetic_tests",
@@ -459,6 +593,13 @@
       }
     ],
     "content_hash": "sha256:39e92f6d36c657079e1fcaf5437302639651ce9869cf73ada7939d11db1fdbd4",
+    "required_terms": [
+      "breastfeeding",
+      "clinician",
+      "pregnant"
+    ],
+    "negation_terms": [],
+    "review_binding_hash": "sha256:a24b6cf48e7a5ef7a162b422d181d8f49a88786cc7cfe5e3417a9cfed78fd4a8",
     "enabled": true,
     "review": {
       "decision": "approved_for_synthetic_tests",

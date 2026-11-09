@@ -99,6 +99,8 @@ export function loadSyntheticCorpus(): { documents: CorpusDocument[]; claimUnits
     question_class: unit.question_class,
     supported_intent_ids: unit.supported_intent_ids,
     canonical_claim_text: unit.canonical_claim_text,
+    required_terms: unit.required_terms,
+    negation_terms: unit.negation_terms,
     enabled: unit.enabled,
     review: raw.review,
     support: unit.support.map((reference) => {

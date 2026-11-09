@@ -13,7 +13,7 @@
   "claim_unit_count": 18,
   "chunks_sha256": "sha256:81242bf85530a7ae24d53b57283919f97f7135d4196ae06d13d7e9a005364d72",
   "vectors_sha256": "sha256:03512fc8b74440c5c3914e8e51b7aaa4015123ba1c4003c2243b31c507fc45b8",
-  "claim_units_sha256": "sha256:6ee6f30dc7b5e8b474ebb4c8ccfa8c1a4798b68f3d07c46e0b73b8074536c2b2",
+  "claim_units_sha256": "sha256:5b7b1f74300f925c64b5c50e325ef2221c0488e944ee99ba79bde20dfa87a1d5",
   "chunker_version": "ingredient-chunker-v1",
   "token_estimator_version": "ingredient-token-estimator-v1",
   "tokenizer_version": "ingredient-tokenizer-v1",
