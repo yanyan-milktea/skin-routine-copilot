@@ -81,6 +81,22 @@ textarea::placeholder { color:#b1b2ab; }
 .product-form input:not([type="checkbox"]),.product-form select,.product-form textarea { width:100%; border:1px solid #dfe1d9; border-radius:8px; background:white; padding:8px; color:#3f423d; font-size:10px; outline:none; }
 .product-form input:focus,.product-form select:focus,.product-form textarea:focus,.product-actions button:focus-visible,.shelf-heading button:focus-visible,.manage:focus-visible,.save-product:focus-visible { border-color:#75866d; box-shadow:0 0 0 3px #dfe8da; outline:none; }
 .product-form textarea { height:58px; }
+.autofill-row { display:flex; align-items:center; gap:10px; margin:6px 0 4px; }
+.autofill-row small { color:#94978f; font-size:8px; line-height:1.45; }
+.autofill-button { flex:none; border:1px solid #c9d3c3; border-radius:999px; background:white; color:#4f5f49; padding:6px 11px; font-size:9px; font-weight:600; cursor:pointer; }
+.autofill-button:hover:not(:disabled) { background:#eef3ea; }
+.autofill-button:disabled { cursor:default; opacity:.55; }
+.autofill-button:focus-visible { border-color:#75866d; box-shadow:0 0 0 3px #dfe8da; outline:none; }
+.autofill-error { margin:4px 0 6px; color:#865f52; font-size:9px; }
+.autofill-result { margin:6px 0 8px; padding:9px 10px; border:1px solid #dfe3da; border-radius:10px; background:white; color:#5d6258; font-size:9px; line-height:1.5; }
+.autofill-source a { color:#4f5f49; font-weight:600; }
+.autofill-source span { color:#9c9f97; }
+.autofill-actives { display:flex; flex-wrap:wrap; gap:5px; margin:7px 0 2px; }
+.autofill-actives span { border-radius:999px; background:#f5ece6; color:#865f52; padding:2px 8px; font-size:8px; font-weight:600; }
+.autofill-result ul { margin:6px 0 0; padding-left:15px; }
+.autofill-result details { margin-top:6px; }
+.autofill-result summary { cursor:pointer; color:#686d63; font-weight:600; }
+.autofill-result details p { margin:5px 0 0; max-height:110px; overflow:auto; color:#7a7e74; font-size:8px; }
 .form-helper { display:block; margin:-4px 0 6px; color:#94978f; font-size:8px; line-height:1.45; }
 .form-checks { display:grid; gap:7px; margin-top:10px; }
 .form-checks label { display:flex; align-items:center; gap:5px; font-weight:400; }
