@@ -70,6 +70,10 @@ stable production proxy at `https://skin-routine-ai-api.vercel.app`. Configured
 URLs are trimmed and trailing slashes are removed. API keys never belong in
 browser-visible variables.
 
+The API answers CORS requests only from exact allowlisted origins: the original
+Sites origin plus any comma-separated `https://` origins in the API project's
+`ALLOWED_ORIGINS` environment variable.
+
 ## Applied-AI safety design
 
 ### Structured output
@@ -189,6 +193,26 @@ NEXT_PUBLIC_AI_API_URL=http://localhost:5173
 To test a live provider through the local API route, add a key only to the
 ignored `.env.local` file—never commit it or paste it into client-side
 configuration.
+
+## Deploy a public frontend on Vercel
+
+The repository root is also a standard Next.js app, so Vercel can host a public
+copy of the frontend next to the existing API project. `vercel.json` makes
+Vercel run native `next build` (not the Cloudflare/vinext build), and
+`tsconfig.vercel.json` keeps the Cloudflare-only `db/` and `worker/` folders out
+of that type check.
+
+1. In Vercel, **Add New → Project**, import this repository, keep the **Root
+   Directory** as the repository root, and deploy. No environment variables are
+   needed; the browser calls the existing API.
+2. In the existing API project (root directory `vercel-api`), set
+   `ALLOWED_ORIGINS` to the new production URL, for example
+   `https://skin-routine-copilot.vercel.app`, and redeploy the API.
+3. Open the production URL in a private window to confirm it loads without a
+   sign-in and that a check-in returns an AI plan rather than the local fallback.
+
+Vercel's default Deployment Protection covers preview URLs only; the production
+domain is public.
 
 ## Development commands
 
