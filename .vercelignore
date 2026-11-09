@@ -1,4 +1,5 @@
-vercel-api
+# Repo-root .vercelignore applies to every Vercel project built from this repo,
+# including skin-routine-ai-api (root directory vercel-api). Never list vercel-api here.
 evals
 rag
 docs
