@@ -38,6 +38,12 @@ export type IndexClaimUnit = {
   supporting_chunk_ids: string[];
   source_document_hashes: { source_id: string; document_hash: string }[];
   content_hash: string;
+  /** Reviewed entities/qualifiers that must appear verbatim (case-insensitive) in the claim and its support. */
+  required_terms: string[];
+  /** Reviewed negation/exception tokens whose presence must be preserved. */
+  negation_terms: string[];
+  /** SHA-256 of the reviewed semantics: text, terms, intents, supporting chunks, and source document hashes. */
+  review_binding_hash: string;
   enabled: boolean;
   review: { decision: string; reviewed_by: string; reviewed_at: string; review_version: string };
 };
@@ -83,9 +89,42 @@ export type ClaimUnitSource = {
   canonical_claim_text: string;
   /** Each support reference names a source and the last heading of the section that contains the exact claim text. */
   support: { source_id: string; section: string }[];
+  required_terms: string[];
+  negation_terms: string[];
   enabled: boolean;
   review: IndexClaimUnit["review"];
 };
+
+/** Case-insensitive, whitespace-normalized containment used by claim-unit integrity checks. */
+export function containsTerm(text: string, term: string): boolean {
+  const norm = (value: string) => value.normalize("NFKC").toLowerCase().replace(/\s+/g, " ");
+  return norm(text).includes(norm(term));
+}
+
+export function claimUnitReviewBindingHash(unit: Pick<IndexClaimUnit, "question_class" | "canonical_claim_text" | "required_terms" | "negation_terms" | "supported_intent_ids" | "supporting_chunk_ids" | "source_document_hashes">): string {
+  return `sha256:${sha256Hex(stableStringify({
+    question_class: unit.question_class,
+    canonical_claim_text: unit.canonical_claim_text,
+    required_terms: [...unit.required_terms].sort(),
+    negation_terms: [...unit.negation_terms].sort(),
+    supported_intent_ids: [...unit.supported_intent_ids].sort(),
+    supporting_chunk_ids: [...unit.supporting_chunk_ids].sort(),
+    source_document_hashes: [...unit.source_document_hashes].sort((a, b) => a.source_id.localeCompare(b.source_id)),
+  }))}`;
+}
+
+/** Integrity gates 6-8 (Section 7.2): every reviewed term and negation appears in the claim and in each supporting text. */
+export function claimTermFailures(unit: Pick<IndexClaimUnit, "canonical_claim_text" | "required_terms" | "negation_terms">, supportingTexts: readonly string[]): string[] {
+  const failures: string[] = [];
+  if (unit.required_terms.length === 0) failures.push("CLAIM_UNIT_TERMS_MISSING");
+  for (const term of unit.required_terms) {
+    if (!containsTerm(unit.canonical_claim_text, term) || !supportingTexts.every((text) => containsTerm(text, term))) failures.push("CLAIM_UNIT_ENTITY_INTEGRITY");
+  }
+  for (const term of unit.negation_terms) {
+    if (!containsTerm(unit.canonical_claim_text, term) || !supportingTexts.every((text) => containsTerm(text, term))) failures.push("CLAIM_UNIT_NEGATION_INTEGRITY");
+  }
+  return [...new Set(failures)];
+}
 
 function sha(text: string | Uint8Array): string {
   if (typeof text === "string") return `sha256:${sha256Hex(text)}`;
@@ -205,12 +244,17 @@ export async function buildIndex(options: BuildOptions): Promise<IndexFiles> {
       canonical_claim_text: spec.canonical_claim_text,
       supporting_chunk_ids: supportingIds,
     };
+    const terms = { required_terms: [...spec.required_terms].sort(), negation_terms: [...spec.negation_terms].sort() };
+    const termFailures = claimTermFailures({ canonical_claim_text: spec.canonical_claim_text, ...terms }, supporting.map((chunk) => chunk.text));
+    if (termFailures.length) throw new Error(`${termFailures[0]}: "${spec.canonical_claim_text.slice(0, 60)}"`);
     return {
       schema_version: 1 as const,
       claim_unit_id: createIndexClaimUnitId(base),
       ...base,
       source_document_hashes: sourceHashes,
       content_hash: createChunkContentHash(spec.canonical_claim_text),
+      ...terms,
+      review_binding_hash: claimUnitReviewBindingHash({ ...base, ...terms, source_document_hashes: sourceHashes }),
       enabled: spec.enabled,
       review: spec.review,
     };
@@ -366,6 +410,10 @@ export function verifyIndex(files: IndexFiles, expectations: VerifyExpectations 
       const binding = unit.source_document_hashes.find((item) => item.source_id === chunk.source_id);
       if (!binding || binding.document_hash !== chunk.document_hash) fail("INDEX_CLAIM_UNIT_DOCUMENT_HASH_MISMATCH", unit.claim_unit_id);
     }
+    if (!Array.isArray(unit.required_terms) || !Array.isArray(unit.negation_terms)) fail("INDEX_CLAIM_UNIT_TERMS_INVALID", unit.claim_unit_id);
+    if (claimUnitReviewBindingHash(unit) !== unit.review_binding_hash) fail("INDEX_CLAIM_UNIT_REVIEW_BINDING_MISMATCH", unit.claim_unit_id);
+    const termFailures = claimTermFailures(unit, unit.supporting_chunk_ids.map((chunkId) => chunkById.get(chunkId)!.text));
+    if (termFailures.length) fail(termFailures[0], unit.claim_unit_id);
   }
   return Object.freeze({ manifest, chunks: Object.freeze(chunks), vectors: Object.freeze(vectors), claimUnits: Object.freeze(claimUnits) });
 }

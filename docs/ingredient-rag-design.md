@@ -1,7 +1,7 @@
 # Ingredient Intelligence: Retrieval-Augmented Generation Design
 
-Status: Milestone 0 governance and Milestone 1 keyless retrieval implemented on a synthetic corpus; no production index
-Last reviewed: 2026-10-31
+Status: Milestones 0, 1, and 2a implemented on a synthetic corpus; answer endpoint disabled; no production index
+Last reviewed: 2026-11-08
 Audience: product, applied-AI, frontend, backend, safety, and evaluation reviewers
 
 ## Executive summary
@@ -1707,3 +1707,55 @@ task; a real index requires the Section 16 step 1 reviews first.
    Q2 is 10/15 and Q5 11/13. Safety gates all pass. Per Section 5.2, the fixed
    constants are not revised from synthetic evidence; real calibration waits for
    an eligible corpus and `gemini-embedding-2` vectors.
+
+## 20. Milestone 2a implementation record (2026-11-08)
+
+### What was built
+
+- `lib/ingredient-answer/contract.ts`: strict request (exactly `schema_version`
+  and `question`; shelf/product/history fields rejected), model-output selection
+  schema, public response schema validator, and reviewed limitation/care templates.
+- `lib/ingredient-answer/ground.ts`: Section 7.2 gates 1–10 with stable rule
+  codes, server-owned citation hydration (smallest exact covering excerpt,
+  numbering by first appearance, allow-listed publisher, https URL), and the
+  deterministic `answer` string built only from canonical text.
+- `lib/ingredient-answer/safety.ts`: deterministic care triage (urgent >
+  pregnancy > reaction/condition), FDA-approved, pairwise-compatibility, and
+  diagnostic policy gates.
+- `lib/ingredient-answer/generate.ts`: fixed four-section prompt and a Gemini
+  selection adapter (strict JSON schema, temperature 0, redacted errors).
+- `lib/ingredient-answer/abuse.ts`: exact-Origin 403 before any body read,
+  method/content-type/compression checks, 8 KiB streamed ceiling, HMAC
+  anonymous identifier, 10/min and 60/day limiter behind a `RateLimitStore`
+  interface, four-slot semaphore with 250 ms acquire, and abortable timeouts.
+- `lib/ingredient-answer/handler.ts`: framework-agnostic `(Request) => Response`
+  with privacy-safe structured events (no question, prompt, answer text, or IP).
+- `app/api/ingredient-answer/route.ts`: 404 unless
+  `INGREDIENT_ANSWER_ENABLED=1`, then 503 until a production index, provider key,
+  rate-limit secret, and durable rate-limit store exist. No UI calls it.
+- Claim units now carry reviewed `required_terms` and `negation_terms` plus a
+  `review_binding_hash`; build and verify enforce entity/negation integrity
+  (gates 6–8).
+
+### Decisions made during implementation (for review)
+
+1. **Model codes are advisory only.** The server always derives limitations and
+   care guidance; model-proposed codes are recorded but never shown.
+2. **Offered units require supplied support.** A retriever-available unit is
+   offered to the model only if every supporting chunk is in the six evidence
+   blocks (not merely eligible), so gate 5 can be satisfied.
+3. **Blocked personal-medical questions get care guidance** even when the care
+   phrase set does not match, defaulting to `CONSULT_DERMATOLOGIST`.
+4. **Lexical reclassification is conservative by construction.** Injected text
+   that contains a reviewed term (for example "FDA approved") can move the
+   question to another class under precedence, which can only remove claims.
+
+### Deferred to Milestone 2b
+
+- `vercel-api/api/ingredient-answer.ts` adapter, a synced copy of the shared
+  modules with a parity test, and moving the production index under
+  `vercel-api/`.
+- A distributed `RateLimitStore` and a rotating `INGREDIENT_RATE_LIMIT_SECRET`;
+  both need infrastructure authorization (Section 10.2). Until then the loader
+  refuses to start (`RATE_LIMIT_STORE_NOT_CONFIGURED`).
+- Vercel firewall rule for volumetric protection.
