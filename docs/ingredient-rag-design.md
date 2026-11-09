@@ -1,7 +1,7 @@
 # Ingredient Intelligence: Retrieval-Augmented Generation Design
 
-Status: proposed, not implemented
-Last reviewed: 2026-08-14
+Status: Milestone 0 governance and Milestone 1 keyless retrieval implemented on a synthetic corpus; no production index
+Last reviewed: 2026-10-31
 Audience: product, applied-AI, frontend, backend, safety, and evaluation reviewers
 
 ## Executive summary
@@ -651,6 +651,7 @@ The versioned retrieval configuration has no weights and must match this schema:
   "tie_breakers": ["rrf_desc", "cosine_desc", "lexical_desc", "chunk_id_asc"],
   "eligibility_mode": "any",
   "vector_answer_min_cosine": 0.62,
+  "vector_anchor_required": true,
   "lexical_answer_min_bm25": 6.0,
   "lexical_anchor_required": true,
   "vector_discovery_min_cosine": 0.52,
@@ -665,8 +666,11 @@ The versioned retrieval configuration has no weights and must match this schema:
 
 These are the fixed Phase 1 constants. Milestone 1 confirms them against the
 locked dataset by a predeclared grid report: maximize Recall@5 subject to zero
-critical false-eligible cases, at least 0.95 out-of-scope abstention, and at most
-0.02 overall false-eligible rate. If the fixed constants fail, Milestone 1 stops
+critical false-eligible cases, at least 0.95 out-of-scope abstention, at most
+0.02 overall false-eligible rate, and at most 0.02 of evidence-bearing cases
+containing a reviewer-labelled irrelevant in-class chunk (evidence precision;
+added 2026-11-08, see Section 19). Both answer gates require the reviewed
+class/intent anchor (`vector_anchor_required`, added 2026-11-08). If the fixed constants fail, Milestone 1 stops
 and this design/config version must be explicitly revised; production code may
 not silently tune them. BM25 thresholds are valid only for the pinned tokenizer
 and scorer versions. Tests cover each component gate, exact RRF formula, a
@@ -1632,15 +1636,74 @@ should remain unchanged.
 
 ## 18. Implementation-readiness verdict
 
-**Milestone 0 governance foundation ready for checkpoint; Milestone 1 is not
-authorized.** Ranking and eligibility, lexical-only
-discovery, immutable canonical claim units, deterministic runtime validation,
-schemas, Q1–Q5 scope, privacy, corpus governance, abuse controls, operational
-budgets, eval minimums, deployment authorization, and rollback boundaries are
-now implementation-specific and internally consistent. Milestone 0 may establish
-the named reviewers, permissions, manifests, snapshots, claim-unit schema,
-reviewed fixtures, and ingestion/review tests described in Section 12. FDA
-Q1/Q2/Q4 still require exact-page review and snapshot generation; AAD Q3/Q5 are
-`blocked_pending_permission`. No API,
-provider runtime, frontend feature, dependency, Preview, Production, or Sites
-work is authorized by this verdict; Milestones 1–5 require later explicit tasks.
+**Milestone 1 implemented against a synthetic corpus; production retrieval is
+not authorized.** The deterministic chunker, fail-closed index verifier, frozen
+retrieval config, reviewed alias/intent table, BM25 v1, component gates, exact
+`k = 60` RRF, deny list, discovery, lexical-only fallback, claim-unit
+availability, traces, budgets, and a 167-case keyless retrieval eval are in the
+repository (Section 19). No source is build eligible, so no production index or
+real embedding exists, and the 0.62 / 6.0 thresholds remain uncalibrated for
+`gemini-embedding-2`. Milestone 2 (server answer path) requires a later explicit
+task; a real index requires the Section 16 step 1 reviews first.
+
+## 19. Milestone 1 implementation record (2026-10-31)
+
+### What was built
+
+- `ingredient-tokenizer-v1`, reviewed alias table, deterministic Q1–Q5 classifier.
+- `ingredient-chunker-v1`: heading breadcrumbs, 350–500 target / 650 max
+  tokens (pinned `ceil(words × 4/3)` estimate), 60–80 token whole-sentence
+  overlap within a section, qualifier paragraphs glued to the statement they
+  qualify, exact offsets into the normalized document.
+- Index artifacts (`manifest.json`, `chunks.json`, `vectors.f32`,
+  `claim-units.json`) with SHA-256 bindings, model/corpus-kind policy, and
+  Section 10.4 count/byte budgets. Builds are byte-reproducible.
+- Retriever behind a storage-agnostic `Retriever` interface; config must equal
+  the frozen constants at runtime (an offline-only override exists for the grid
+  report).
+- Keyless evals: 167 synthetic cases, retrieval metrics (Section 9.3), safety
+  vs quality gates, regression baseline, and the predeclared threshold grid.
+
+### Decisions made during implementation (for review)
+
+1. **Class precedence.** Questions that match several classes abstain, except
+   that Q5 (pregnancy/breastfeeding) and then Q4 (approval/regulation) take
+   precedence. Without this, nearly every Q5 question ("avoid retinoids while
+   pregnant?") is ambiguous with Q3 or Q2.
+2. **No default intent.** A question that matches a class but no reviewed intent
+   trigger is not answerable (`INTENT_UNMATCHED`). A default "definition" intent
+   made unanswerable in-class questions ("Does AHA expire?") look answerable.
+3. **Retrieval-level blocks.** Pairwise compatibility, named/personal product
+   composition, and personal medical language are blocked before retrieval with
+   reviewed patterns. Milestone 2 safety triage still owns care escalation copy.
+4. **Claim coverage downgrade.** Answer-eligible evidence with no available
+   claim unit for a requested intent is returned only as discovery
+   (`NO_CLAIM_UNIT_FOR_INTENT`), never as answer evidence.
+5. **Fixture embedder.** `synthetic-concept-embedding-v1` is a deterministic
+   concept/hash embedder used only so CI can exercise vector search. The Gemini
+   adapter exists but has never been run; its request shape must be re-verified
+   against current documentation in the first authorized embedding run.
+
+### Findings and decisions
+
+1. **Vector-only eligibility admitted keyword-stuffed in-class pages.
+   Resolved 2026-11-08.** A Q1 "keyword index" page passed the 0.62 cosine gate
+   and reached model evidence in 3/81 evidence-bearing cases. It contains the
+   class term ("AHA") but not the intent term ("sun sensitivity"), so requiring
+   only the class anchor would not have excluded it. Decision: the vector gate
+   now requires the same reviewed class + intent anchor as the lexical gate
+   (`vector_anchor_required: true`, trace code `VECTOR_ANCHOR_MISSING`).
+   Result on the fixture: irrelevant-evidence cases 3 → 0, Recall@5 and the set
+   of failing cases unchanged. Locked by a regression test.
+2. **Calibration objective lacked a precision constraint. Resolved
+   2026-11-08.** The grid objective now also requires at most 2% of
+   evidence-bearing cases to contain a reviewer-labelled irrelevant chunk. After
+   decision 1 every grid cell has zero such cases on the fixture, so the
+   constraint is not yet binding here; it exists for real-corpus calibration.
+3. **BM25 thresholds depend on corpus statistics.** With 26 chunks, IDF is low
+   and 6.0 is rarely reached; most answerable cases pass through the vector gate.
+   The real corpus must be calibrated on its own statistics.
+4. **Quality gates do not pass on the fixture.** Recall@5 is 0.89 (gate 0.90);
+   Q2 is 10/15 and Q5 11/13. Safety gates all pass. Per Section 5.2, the fixed
+   constants are not revised from synthetic evidence; real calibration waits for
+   an eligible corpus and `gemini-embedding-2` vectors.

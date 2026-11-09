@@ -1,0 +1,162 @@
+{
+  "schema_version": 1,
+  "index_version": "ingredient-rag-index-synthetic-retrieval-v1",
+  "corpus_version": "synthetic-retrieval-v1",
+  "corpus_kind": "synthetic_only",
+  "embedding_model": "synthetic-concept-embedding-v1",
+  "embedding_dimensions": 768,
+  "embedding_fixture_only": true,
+  "distance": "cosine",
+  "normalized": true,
+  "vector_encoding": "float32-le",
+  "chunk_count": 26,
+  "claim_unit_count": 18,
+  "chunks_sha256": "sha256:81242bf85530a7ae24d53b57283919f97f7135d4196ae06d13d7e9a005364d72",
+  "vectors_sha256": "sha256:03512fc8b74440c5c3914e8e51b7aaa4015123ba1c4003c2243b31c507fc45b8",
+  "claim_units_sha256": "sha256:6ee6f30dc7b5e8b474ebb4c8ccfa8c1a4798b68f3d07c46e0b73b8074536c2b2",
+  "chunker_version": "ingredient-chunker-v1",
+  "token_estimator_version": "ingredient-token-estimator-v1",
+  "tokenizer_version": "ingredient-tokenizer-v1",
+  "built_at": "2026-10-31T00:00:00Z",
+  "builder_version": "rag-build-v1",
+  "sources": [
+    {
+      "source_id": "syn_dx_hair_dye_240e26f5",
+      "document_id": "doc_syn_dx_hair_dye_240e26f5_18f2c3d5",
+      "document_hash": "sha256:18f2c3d50da2973058115d879295428f673ddcb8abadc19a496b627a9514d114",
+      "publisher": "Synthetic Test Publisher",
+      "title": "Synthetic hair dye note",
+      "canonical_url": "https://dx.fixture.invalid/hair-dye",
+      "retrieved_at": "2026-10-31T00:00:00Z",
+      "question_classes": []
+    },
+    {
+      "source_id": "syn_dx_niacinamide_e25cb14e",
+      "document_id": "doc_syn_dx_niacinamide_e25cb14e_6dd788bc",
+      "document_hash": "sha256:6dd788bcc6aa5c2703657aacbe3dcd53811b4f9c8b3e6a5905eea522c48f4b19",
+      "publisher": "Synthetic Test Publisher",
+      "title": "Synthetic niacinamide note",
+      "canonical_url": "https://dx.fixture.invalid/niacinamide",
+      "retrieved_at": "2026-10-31T00:00:00Z",
+      "question_classes": []
+    },
+    {
+      "source_id": "syn_dx_sunscreen_basics_4acea0d1",
+      "document_id": "doc_syn_dx_sunscreen_basics_4acea0d1_1f241343",
+      "document_hash": "sha256:1f2413438ebf2cb82b9ffe5393af5230fa25b863282e4467e8ef0a6c1f3cdb3e",
+      "publisher": "Synthetic Test Publisher",
+      "title": "Synthetic sunscreen basics",
+      "canonical_url": "https://dx.fixture.invalid/sunscreen-basics",
+      "retrieved_at": "2026-10-31T00:00:00Z",
+      "question_classes": []
+    },
+    {
+      "source_id": "syn_q1_aha_guide_0179a997",
+      "document_id": "doc_syn_q1_aha_guide_0179a997_e64a0d87",
+      "document_hash": "sha256:e64a0d873f2ee7948601356e49aaad307440337dd95d61002e7aa894c829f830",
+      "publisher": "Synthetic Test Publisher",
+      "title": "Synthetic guide to alpha hydroxy acids",
+      "canonical_url": "https://q1.fixture.invalid/aha-guide",
+      "retrieved_at": "2026-10-31T00:00:00Z",
+      "question_classes": [
+        "Q1"
+      ]
+    },
+    {
+      "source_id": "syn_q1_aha_keyword_index_2205bbb9",
+      "document_id": "doc_syn_q1_aha_keyword_index_2205bbb9_07653c1e",
+      "document_hash": "sha256:07653c1e254a8670d7fd7748c5053a15ab713834f82ddcd9e9c23def4e54cd4b",
+      "publisher": "Synthetic Test Publisher",
+      "title": "Synthetic site keyword index",
+      "canonical_url": "https://q1.fixture.invalid/keyword-index",
+      "retrieved_at": "2026-10-31T00:00:00Z",
+      "question_classes": [
+        "Q1"
+      ]
+    },
+    {
+      "source_id": "syn_q1_aha_labeling_9519e0d7",
+      "document_id": "doc_syn_q1_aha_labeling_9519e0d7_b6dad71f",
+      "document_hash": "sha256:b6dad71f439455959d46d03f6eea78de6a5fe0bfc6f43c207339cf7171aef894",
+      "publisher": "Synthetic Test Publisher",
+      "title": "Synthetic AHA labeling note",
+      "canonical_url": "https://q1.fixture.invalid/aha-labeling",
+      "retrieved_at": "2026-10-31T00:00:00Z",
+      "question_classes": [
+        "Q1"
+      ]
+    },
+    {
+      "source_id": "syn_q1_aha_retracted_9b322801",
+      "document_id": "doc_syn_q1_aha_retracted_9b322801_525e862a",
+      "document_hash": "sha256:525e862a09b302be12234a2f52e710b4fb2a50edde2afa2ebfeafc610adbcd89",
+      "publisher": "Synthetic Test Publisher",
+      "title": "Retracted synthetic AHA claim",
+      "canonical_url": "https://q1.fixture.invalid/aha-retracted",
+      "retrieved_at": "2026-10-31T00:00:00Z",
+      "question_classes": [
+        "Q1"
+      ]
+    },
+    {
+      "source_id": "syn_q2_bha_guide_26856373",
+      "document_id": "doc_syn_q2_bha_guide_26856373_8385445d",
+      "document_hash": "sha256:8385445d6044cf6ea6b457886e346164036f15dac88350a920b1533e8fbfe0dd",
+      "publisher": "Synthetic Test Publisher",
+      "title": "Synthetic guide to beta hydroxy acids",
+      "canonical_url": "https://q2.fixture.invalid/bha-guide",
+      "retrieved_at": "2026-10-31T00:00:00Z",
+      "question_classes": [
+        "Q2"
+      ]
+    },
+    {
+      "source_id": "syn_q2_bha_label_reading_9a49bcf1",
+      "document_id": "doc_syn_q2_bha_label_reading_9a49bcf1_cbc280c6",
+      "document_hash": "sha256:cbc280c68fa2ae6616c899b0d5c58d209125aadfb74dfce46b1156ebe9496cc9",
+      "publisher": "Synthetic Test Publisher",
+      "title": "Synthetic BHA label reading note",
+      "canonical_url": "https://q2.fixture.invalid/bha-label-reading",
+      "retrieved_at": "2026-10-31T00:00:00Z",
+      "question_classes": [
+        "Q2"
+      ]
+    },
+    {
+      "source_id": "syn_q3_retinoid_guide_ed39070d",
+      "document_id": "doc_syn_q3_retinoid_guide_ed39070d_07972265",
+      "document_hash": "sha256:07972265db1eba340776fafffbd4344f0b9b2681056129d3964b21fa8d26cb6f",
+      "publisher": "Synthetic Test Publisher",
+      "title": "Synthetic guide to retinoids and retinol",
+      "canonical_url": "https://q3.fixture.invalid/retinoid-guide",
+      "retrieved_at": "2026-10-31T00:00:00Z",
+      "question_classes": [
+        "Q3"
+      ]
+    },
+    {
+      "source_id": "syn_q4_cosmetic_regulation_63ffaefd",
+      "document_id": "doc_syn_q4_cosmetic_regulation_63ffaefd_ac4518f6",
+      "document_hash": "sha256:ac4518f6254bf52783ceb879729c37d216ec6f7e7b5d3832b276caf9b1f8ae50",
+      "publisher": "Synthetic Test Publisher",
+      "title": "Synthetic note on cosmetic ingredient regulation",
+      "canonical_url": "https://q4.fixture.invalid/cosmetic-regulation",
+      "retrieved_at": "2026-10-31T00:00:00Z",
+      "question_classes": [
+        "Q4"
+      ]
+    },
+    {
+      "source_id": "syn_q5_pregnancy_guide_19e672b9",
+      "document_id": "doc_syn_q5_pregnancy_guide_19e672b9_00591b9e",
+      "document_hash": "sha256:00591b9ec8a4b393af31028b6bac8a77e03f439a2417538c905866961b8f8b11",
+      "publisher": "Synthetic Test Publisher",
+      "title": "Synthetic guide to skin care during pregnancy",
+      "canonical_url": "https://q5.fixture.invalid/pregnancy-skin-care",
+      "retrieved_at": "2026-10-31T00:00:00Z",
+      "question_classes": [
+        "Q5"
+      ]
+    }
+  ]
+}

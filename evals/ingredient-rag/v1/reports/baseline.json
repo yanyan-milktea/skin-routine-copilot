@@ -1,0 +1,27 @@
+{
+  "dataset_cases": 167,
+  "recall_at_5": 0.8904,
+  "recall_at_5_by_class": {
+    "Q1": 1,
+    "Q2": 0.6667,
+    "Q3": 1,
+    "Q4": 0.9286,
+    "Q5": 0.8462
+  },
+  "mrr": 0.8904,
+  "critical_false_eligible": 0,
+  "false_eligible_rate": 0.0132,
+  "out_of_scope_abstention": 1,
+  "cases_with_irrelevant_evidence": 0,
+  "failing_case_ids": [
+    "q2_supported_005",
+    "q2_supported_011",
+    "q2_supported_013",
+    "q2_supported_014",
+    "q2_supported_015",
+    "q4_supported_007",
+    "q5_supported_006",
+    "q5_supported_008",
+    "in_class_no_answer_008"
+  ]
+}
