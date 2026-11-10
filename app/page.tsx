@@ -16,6 +16,7 @@ import {
 } from "../lib/history";
 import { Concern, enforceGuardrails, generateFallbackPlan, normalizePlanToEnglish, RoutinePlan, RoutineResponse } from "../lib/routine";
 import { resolveAiApiBaseUrl } from "../lib/api-base";
+import { localDateKey, MAX_PER_WEEK, parseUsageStore, scheduleStatus, serializeUsageStore, setUsed, shelfDueToday, USAGE_STORAGE_KEY, type UsageLog } from "../lib/schedule";
 import type { IdentifyResult } from "../lib/product-identify";
 import {
   addShelfProduct,
@@ -47,7 +48,7 @@ const concerns: { id: Concern; emoji: string; label: string }[] = [
 ];
 
 const categoryLabels: Record<ShelfProduct["category"], string> = {
-  cleanser: "Cleanser", "toner-essence": "Toner / essence", spray: "Face mist / spray", serum: "Serum",
+  cleanser: "Cleanser", "toner-essence": "Toner / essence", spray: "Face mist / spray", mask: "Sheet / hydrating mask", serum: "Serum",
   treatment: "Treatment", moisturizer: "Moisturizer", sunscreen: "Sunscreen", other: "Other",
 };
 const timeLabels: Record<ShelfProduct["allowed_time"], string> = {
@@ -75,6 +76,9 @@ export default function Home() {
   const [summaryLoading, setSummaryLoading] = useState(false);
   const [shelf, setShelf] = useState<ShelfProduct[]>(() => createDefaultShelfStore().products);
   const [shelfReady, setShelfReady] = useState(false);
+  const [usageLog, setUsageLog] = useState<UsageLog>({});
+  const [today, setToday] = useState("");
+  const [doneSteps, setDoneSteps] = useState<Set<string>>(new Set());
   const [editingProduct, setEditingProduct] = useState<ShelfProduct | null>(null);
   const [shelfMessage, setShelfMessage] = useState("");
   const [identifying, setIdentifying] = useState(false);
@@ -82,7 +86,10 @@ export default function Home() {
   const [identifyError, setIdentifyError] = useState("");
   const [identifyLookupFailed, setIdentifyLookupFailed] = useState(false);
 
-  const localRoutine = useMemo(() => generateFallbackPlan(selected, sleep, notes, shelf), [selected, sleep, notes, shelf]);
+  // Products on a weekly schedule (e.g. a mask 3×/week) join the routine only on days they are due.
+  const shelfToday = useMemo(() => today ? shelfDueToday(shelf, usageLog, today) : shelf.filter((product) => !product.per_week), [shelf, usageLog, today]);
+  const restingToday = useMemo(() => today ? shelf.filter((product) => product.enabled && product.per_week).map((product) => ({ product, status: scheduleStatus(product, usageLog, today) })).filter(({ status }) => !status.due) : [], [shelf, usageLog, today]);
+  const localRoutine = useMemo(() => generateFallbackPlan(selected, sleep, notes, shelfToday), [selected, sleep, notes, shelfToday]);
   const routine = generatedPlan ?? localRoutine;
   const steps = tab === "morning" ? routine.morning : routine.evening;
   const visibleHistory = useMemo(() => recentHistory(history), [history]);
@@ -91,6 +98,8 @@ export default function Home() {
     const frame = window.requestAnimationFrame(() => {
       setHistory(parseHistoryStore(window.localStorage.getItem(HISTORY_STORAGE_KEY)).entries);
       setShelf(parseShelfStore(window.localStorage.getItem(SHELF_STORAGE_KEY)).products);
+      setUsageLog(parseUsageStore(window.localStorage.getItem(USAGE_STORAGE_KEY)));
+      setToday(localDateKey(new Date()));
       setHistoryReady(true);
       setShelfReady(true);
     });
@@ -104,6 +113,11 @@ export default function Home() {
 
   useEffect(() => {
     if (!shelfReady) return;
+    window.localStorage.setItem(USAGE_STORAGE_KEY, serializeUsageStore(usageLog));
+  }, [usageLog, shelfReady]);
+
+  useEffect(() => {
+    if (!shelfReady) return;
     window.localStorage.setItem(SHELF_STORAGE_KEY, JSON.stringify({ version: SHELF_SCHEMA_VERSION, products: shelf }));
   }, [shelf, shelfReady]);
 
@@ -111,6 +125,16 @@ export default function Home() {
     setSelected((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id]);
     setGenerated(false);
     setGeneratedPlan(null);
+  }
+
+  /** Ticks a step off. For a product on a weekly schedule this also records today's use. */
+  function toggleStep(step: { product_id?: string }, key: string) {
+    const product = step.product_id ? shelf.find((item) => item.id === step.product_id) : undefined;
+    if (product?.per_week && today) {
+      setUsageLog((log) => setUsed(log, product.id, today, !scheduleStatus(product, log, today).usedToday));
+      return;
+    }
+    setDoneSteps((current) => { const next = new Set(current); if (next.has(key)) next.delete(key); else next.add(key); return next; });
   }
 
   async function generate() {
@@ -121,18 +145,19 @@ export default function Home() {
       const response = await fetch(`${AI_API_URL}/api/generate-routine`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ concerns: selected, sleep, notes, products: shelf }),
+        body: JSON.stringify({ concerns: selected, sleep, notes, products: shelfToday }),
       });
       if (!response.ok) throw new Error("Routine request failed");
       const result = await response.json() as RoutineResponse;
-      const englishPlan = normalizePlanToEnglish(result.plan, selected, sleep, notes, shelf);
-      completedPlan = enforceGuardrails(englishPlan, selected, notes, shelf);
+      const englishPlan = normalizePlanToEnglish(result.plan, selected, sleep, notes, shelfToday);
+      completedPlan = enforceGuardrails(englishPlan, selected, notes, shelfToday);
       completedMeta = result.meta;
     } catch {
       completedPlan = localRoutine;
     } finally {
       setGeneratedPlan(completedPlan);
       setEngine(completedMeta);
+      setDoneSteps(new Set());
       const entry: HistoryEntry = {
         id: globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(16).slice(2)}`,
         created_at: new Date().toISOString(),
@@ -263,7 +288,7 @@ export default function Home() {
     setGeneratedPlan(null);
   }
 
-  const today = new Intl.DateTimeFormat("en-US", { month: "long", day: "numeric", weekday: "short" }).format(new Date());
+  const todayLabel = new Intl.DateTimeFormat("en-US", { month: "long", day: "numeric", weekday: "short" }).format(new Date());
 
   const productForm = editingProduct && <form className={`product-form${editingProduct.id ? " inline" : ""}`} id="product-form" onSubmit={saveProduct}>
             <div className="form-topline"><b>{editingProduct.id ? "Edit product" : "Add product"}</b><button type="button" onClick={() => { setEditingProduct(null); setIdentifyResult(null); setIdentifyError(""); }} aria-label="Close product form">×</button></div>
@@ -277,6 +302,7 @@ export default function Home() {
               {identifyResult.suggestion.ingredients_text && <details><summary>Ingredient list from the database</summary><p>{identifyResult.suggestion.ingredients_text}</p></details>}
             </div>}
             <div className="form-grid"><div className="form-field"><label htmlFor="product-category">Category</label><select id="product-category" value={editingProduct.category} onChange={(event) => setEditingProduct({ ...editingProduct, category: event.target.value as ShelfProduct["category"] })}>{PRODUCT_CATEGORIES.map((category) => <option key={category} value={category}>{categoryLabels[category]}</option>)}</select></div><div className="form-field"><label htmlFor="product-time">Use in routine</label><select id="product-time" value={editingProduct.allowed_time} onChange={(event) => setEditingProduct({ ...editingProduct, allowed_time: event.target.value as ShelfProduct["allowed_time"] })}>{PRODUCT_TIMES.map((time) => <option key={time} value={time}>{timeLabels[time]}</option>)}</select></div></div>
+            <div className="form-field"><label htmlFor="product-frequency">How often</label><select id="product-frequency" aria-describedby="product-frequency-help" value={editingProduct.per_week ?? ""} onChange={(event) => { const value = Number(event.target.value); const { per_week: _previous, ...rest } = editingProduct; void _previous; setEditingProduct(value ? { ...rest, per_week: value } : rest); }}><option value="">Every routine</option>{Array.from({ length: MAX_PER_WEEK }, (_, index) => index + 1).map((count) => <option key={count} value={count}>{count}× per week</option>)}</select><small id="product-frequency-help">For masks and other weekly steps. The routine adds it on days it is due; tick it off to log the day.</small></div>
             <label htmlFor="product-note">Short usage note</label><small className="form-helper" id="product-note-help">Optional — for example, use 2–3 nights per week.</small><textarea id="product-note" aria-describedby="product-note-help" maxLength={180} value={editingProduct.usage_note} onChange={(event) => setEditingProduct({ ...editingProduct, usage_note: event.target.value })} />
             <div className="form-checks"><div className="check-field"><label htmlFor="product-active"><input id="product-active" type="checkbox" aria-describedby="product-active-help" checked={editingProduct.is_active} onChange={(event) => setEditingProduct({ ...editingProduct, is_active: event.target.checked })} /> Potentially irritating active</label><small id="product-active-help">Examples: exfoliants, retinoids, or azelaic acid. Automatically skipped on sensitive days.</small></div><div className="check-field"><label htmlFor="product-enabled"><input id="product-enabled" type="checkbox" checked={editingProduct.enabled} onChange={(event) => setEditingProduct({ ...editingProduct, enabled: event.target.checked })} /> Include in routines</label></div></div>
             <button className="save-product" type="submit" disabled={!editingProduct.name.trim()}>Save product</button>
@@ -299,7 +325,7 @@ export default function Home() {
         <div className="eyebrow">YOUR DAILY SKIN CHECK-IN</div>
         <h1>What is your skin <em>telling you today?</em></h1>
         <p className="hero-copy">Take one minute to check in. Copilot will build a simple, gentle routine using only products you already own.</p>
-        <div className="date-line" suppressHydrationWarning><span /> {today}<span /></div>
+        <div className="date-line" suppressHydrationWarning><span /> {todayLabel}<span /></div>
       </section>
 
       <section className="workspace shell">
@@ -339,7 +365,7 @@ export default function Home() {
           <div className="shelf-heading"><div><span className="step-kicker">MY PRODUCT SHELF</span><h2>My products</h2></div><button onClick={startAddingProduct} aria-label="Add a product">+</button></div>
           <p><b>Private to this browser.</b> Copilot only plans with enabled products saved locally on this device.</p>
           <div className="product-list">
-            {sortShelfByRoutineStep(shelf).map(({ product, storedIndex }) => <Fragment key={product.id}><div className={`product ${product.enabled ? "" : "paused"}${editingProduct?.id === product.id ? " editing" : ""}`}><span className={`product-icon tone-${storedIndex % 6}`} /><div className="product-copy"><div className="product-name-row"><b>{productDisplayName(product)}</b>{!product.enabled && <span className="paused-badge">Paused</span>}</div><small>{categoryLabels[product.category]} · {timeLabels[product.allowed_time]}{product.is_active ? " · Potentially irritating active" : ""}</small></div><div className="product-actions"><button onClick={() => toggleProduct(product)}>{product.enabled ? "Pause" : "Resume"}</button><button onClick={() => openProductForm({ ...product })} aria-expanded={editingProduct?.id === product.id}>Edit</button><button className="delete-product" onClick={() => removeProduct(product)}>Delete</button></div></div>{editingProduct?.id === product.id && productForm}</Fragment>)}
+            {sortShelfByRoutineStep(shelf).map(({ product, storedIndex }) => <Fragment key={product.id}><div className={`product ${product.enabled ? "" : "paused"}${editingProduct?.id === product.id ? " editing" : ""}`}><span className={`product-icon tone-${storedIndex % 6}`} /><div className="product-copy"><div className="product-name-row"><b>{productDisplayName(product)}</b>{!product.enabled && <span className="paused-badge">Paused</span>}</div><small>{categoryLabels[product.category]} · {timeLabels[product.allowed_time]}{product.per_week ? ` · ${product.per_week}×/week` : ""}{product.is_active ? " · Potentially irritating active" : ""}</small></div><div className="product-actions"><button onClick={() => toggleProduct(product)}>{product.enabled ? "Pause" : "Resume"}</button><button onClick={() => openProductForm({ ...product })} aria-expanded={editingProduct?.id === product.id}>Edit</button><button className="delete-product" onClick={() => removeProduct(product)}>Delete</button></div></div>{editingProduct?.id === product.id && productForm}</Fragment>)}
             {shelf.length === 0 && <div className="empty-shelf">No products yet. Add what you already own.</div>}
           </div>
           {editingProduct && !editingProduct.id && productForm}
@@ -365,7 +391,13 @@ export default function Home() {
                   <button role="tab" aria-selected={tab === "evening"} className={tab === "evening" ? "active" : ""} onClick={() => setTab("evening")}><span>☾</span> Evening <small>{routine.evening.length} steps</small></button>
                 </div>
                 <div className="steps">
-                  {steps.map((step) => <article className="routine-step" key={`${tab}-${step.time}`}><span className="step-number">{step.time}</span><div><div className="step-title"><h3>{step.name}</h3>{step.tag && <small>{step.tag}</small>}</div><p>{step.detail}</p></div><button aria-label={`Mark ${step.name} complete`}>○</button></article>)}
+                  {steps.map((step) => {
+                    const key = `${tab}-${step.product_id ?? step.time}`;
+                    const scheduled = step.product_id ? shelf.find((item) => item.id === step.product_id && item.per_week) : undefined;
+                    const done = scheduled ? Boolean(today) && scheduleStatus(scheduled, usageLog, today).usedToday : doneSteps.has(key);
+                    return <article className={`routine-step${done ? " done" : ""}`} key={key}><span className="step-number">{step.time}</span><div><div className="step-title"><h3>{step.name}</h3>{step.tag && <small>{step.tag}</small>}{scheduled && <small className="schedule-tag">{scheduled.per_week}×/week</small>}</div><p>{step.detail}</p></div><button aria-pressed={done} aria-label={`${done ? "Unmark" : "Mark"} ${step.name} complete`} onClick={() => toggleStep(step, key)}>{done ? "✓" : "○"}</button></article>;
+                  })}
+                  {restingToday.length > 0 && <p className="schedule-note">{restingToday.map(({ product, status }) => `${productDisplayName(product)} rests today (${product.per_week}×/week${status.nextDue ? `, next ${new Intl.DateTimeFormat("en-US", { weekday: "short", timeZone: "UTC" }).format(new Date(`${status.nextDue}T00:00:00Z`))}` : ""})`).join(" · ")}.</p>}
                 </div>
               </div>
               <p className="plan-footnote">If stinging persists, swelling appears, or a rash worsens, stop the relevant products and seek professional care.</p>

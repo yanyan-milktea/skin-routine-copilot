@@ -9,6 +9,7 @@ export const PRODUCT_CATEGORIES = [
   "cleanser",
   "toner-essence",
   "spray",
+  "mask",
   "serum",
   "treatment",
   "moisturizer",
@@ -42,6 +43,8 @@ export type ShelfProduct = {
   is_active: boolean;
   usage_note: string;
   enabled: boolean;
+  /** Times per week (1–6) for products not used every day, such as a sheet mask. Absent = every routine. */
+  per_week?: number;
 };
 
 export type ShelfStore = {
@@ -98,6 +101,7 @@ export function parseShelfProduct(value: unknown): ShelfProduct | null {
     is_active: value.is_active,
     usage_note: usageNote,
     enabled: value.enabled,
+    ...(Number.isInteger(value.per_week) && Number(value.per_week) >= 1 && Number(value.per_week) <= 6 ? { per_week: Number(value.per_week) } : {}),
   };
 }
 

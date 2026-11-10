@@ -74,3 +74,9 @@ test("a face mist / spray is its own step: after cleanser and toner, before seru
   assert.equal(validateProducts(shelf).length, 5, "spray is an accepted category");
   assert.deepEqual(fallbackRoutine(["sensitive"], 3, "", shelf).evening.map((step) => step.product_id), ["wash", "toner", "mist", "serum", "cream"]);
 });
+
+test("a sheet mask sits after the spray and before serum", () => {
+  const p = (id, category) => ({ id, brand: "", name: id, category, allowed_time: "both", is_active: false, usage_note: "", enabled: true });
+  const plan = generateFallbackPlan([], 3, "", [p("cream", "moisturizer"), p("mask", "mask"), p("serum", "serum"), p("mist", "spray"), p("wash", "cleanser")]);
+  assert.deepEqual(plan.evening.map((step) => step.product_id), ["wash", "mist", "mask", "serum", "cream"]);
+});
