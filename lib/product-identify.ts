@@ -123,13 +123,43 @@ export function cleanProductName(value: unknown): string | null {
 }
 
 const STOP = new Set(["the", "a", "an", "and", "for", "with", "of", "by", "de", "la", "le", "ml", "oz", "g", "fl"]);
-export function nameTokens(value: string): string[] {
+
+/** Words as typed (accents stripped, sizes and filler removed), used to build search queries. */
+function queryWords(value: string): string[] {
   return value
     .normalize("NFKD")
     .replace(/[̀-ͯ]/g, "")
     .toLowerCase()
     .split(/[^a-z0-9%]+/)
     .filter((token) => token.length > 1 && !STOP.has(token) && !/^\d+(ml|g|oz)?$/.test(token));
+}
+
+/**
+ * British and American spellings compare equal (moisturising = moisturizing,
+ * colour = color). Applied to both sides of a comparison, so over-normalizing an
+ * unrelated word is harmless.
+ */
+export function spellingKey(token: string): string {
+  if (token.length >= 6) {
+    const ise = token.replace(/is(e|ed|er|ers|es|ing|ation|ations)$/, "iz$1");
+    if (ise !== token) return ise;
+  }
+  return token.length >= 5 ? token.replace(/our$/, "or") : token;
+}
+
+export function nameTokens(value: string): string[] {
+  return queryWords(value).map(spellingKey);
+}
+
+/**
+ * A shorter query for a second search when the full name finds nothing usable:
+ * the first two words (usually brand + product line, e.g. "CeraVe PM"). The
+ * database search needs every word to match, so an extra word ("Daily") or a
+ * different spelling hides the product. Null when it would not be shorter.
+ */
+export function relaxedQuery(name: string): string | null {
+  const words = queryWords(name);
+  return words.length > 2 ? words.slice(0, 2).join(" ") : null;
 }
 
 /** Share of the query's tokens that appear in the candidate's brand + name. */
@@ -141,6 +171,8 @@ export function matchScore(query: string, candidate: string): number {
 }
 
 export const MIN_MATCH_SCORE = 0.6;
+/** Results of the broader second search must share more of the name (e.g. 4 of 5 words). */
+export const MIN_RELAXED_MATCH_SCORE = 0.75;
 
 export type ObfProduct = { code: string; product_name: string; brands: string; ingredients_text: string; categories_tags: string[] };
 
@@ -160,11 +192,11 @@ export function parseObfSearch(body: unknown): ObfProduct[] {
   });
 }
 
-export function bestObfMatch(query: string, products: readonly ObfProduct[]): ObfProduct | null {
+export function bestObfMatch(query: string, products: readonly ObfProduct[], minScore = MIN_MATCH_SCORE): ObfProduct | null {
   let best: { product: ObfProduct; score: number } | null = null;
   for (const product of products) {
     const score = matchScore(query, `${product.brands} ${product.product_name}`);
-    if (score >= MIN_MATCH_SCORE && (!best || score > best.score)) best = { product, score };
+    if (score >= minScore && (!best || score > best.score)) best = { product, score };
   }
   return best?.product ?? null;
 }
@@ -217,8 +249,8 @@ export function buildSuggestion(name: string, match: ObfProduct | null): Identif
 type FetchLike = (input: string, init: { headers: Record<string, string>; signal?: AbortSignal }) => Promise<{ ok: boolean; status: number; json(): Promise<unknown> }>;
 
 /** Searches Open Beauty Facts; any error, timeout, or non-200 returns [] so name rules still apply. */
-export async function searchObf(name: string, fetchImpl: FetchLike, timeoutMs = OBF_TIMEOUT_MS): Promise<{ products: ObfProduct[]; error: string | null }> {
-  const url = `${OBF_SEARCH_URL}?${new URLSearchParams({ search_terms: name, search_simple: "1", action: "process", json: "1", page_size: "5", fields: "code,product_name,brands,ingredients_text,categories_tags" })}`;
+export async function searchObf(name: string, fetchImpl: FetchLike, timeoutMs = OBF_TIMEOUT_MS, pageSize = 5): Promise<{ products: ObfProduct[]; error: string | null }> {
+  const url = `${OBF_SEARCH_URL}?${new URLSearchParams({ search_terms: name, search_simple: "1", action: "process", json: "1", page_size: String(pageSize), fields: "code,product_name,brands,ingredients_text,categories_tags" })}`;
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
@@ -233,17 +265,33 @@ export async function searchObf(name: string, fetchImpl: FetchLike, timeoutMs = 
 }
 
 /** End to end: validate the name, search the database, and build a deterministic suggestion. */
-export async function identifyProduct(rawName: unknown, fetchImpl: FetchLike): Promise<{ ok: true; result: IdentifyResult; lookup_error: string | null; candidates: number } | { ok: false; error: string }> {
+export type IdentifyOutcome = { result: IdentifyResult; lookup_error: string | null; candidates: number; relaxed: boolean };
+
+/**
+ * At most two database requests: the full name, then (only if that answered but
+ * found nothing usable) the shorter relaxed query, held to a stricter match score.
+ */
+export async function identifyProduct(rawName: unknown, fetchImpl: FetchLike): Promise<({ ok: true } & IdentifyOutcome) | { ok: false; error: string }> {
   const name = cleanProductName(rawName);
   if (!name) return { ok: false, error: "Enter a product name between 2 and 120 characters." };
-  const { products, error } = await searchObf(name, fetchImpl);
-  return { ok: true, result: buildSuggestion(name, bestObfMatch(name, products)), lookup_error: error, candidates: products.length };
+  const first = await searchObf(name, fetchImpl);
+  let match = bestObfMatch(name, first.products);
+  let candidates = first.products.length, error = first.error, relaxed = false;
+  const shorter = relaxedQuery(name);
+  if (!match && !first.error && shorter) {
+    const second = await searchObf(shorter, fetchImpl, OBF_TIMEOUT_MS, 10);
+    relaxed = true;
+    candidates += second.products.length;
+    error = second.error;
+    match = bestObfMatch(name, second.products, MIN_RELAXED_MATCH_SCORE);
+  }
+  return { ok: true, result: buildSuggestion(name, match), lookup_error: error, candidates, relaxed };
 }
 
 /**
  * One diagnostic log line per lookup. Carries only the outcome (error code, how many
  * database results came back, whether one matched, and timing): never the product name.
  */
-export function identifyLogLine(outcome: { result: IdentifyResult; lookup_error: string | null; candidates: number }, elapsedMs: number): string {
-  return JSON.stringify({ event: "identify_product", lookup_error: outcome.lookup_error, candidates: outcome.candidates, matched: outcome.result.source !== null, elapsed_ms: Math.round(elapsedMs) });
+export function identifyLogLine(outcome: IdentifyOutcome, elapsedMs: number): string {
+  return JSON.stringify({ event: "identify_product", lookup_error: outcome.lookup_error, candidates: outcome.candidates, relaxed: outcome.relaxed, matched: outcome.result.source !== null, elapsed_ms: Math.round(elapsedMs) });
 }
