@@ -1,11 +1,11 @@
 import { MAX_PRODUCT_IMAGE_LENGTH } from "./shelf";
 
-const SIZE = 160;
+const SIZE = 256;
 const MAX_INPUT_BYTES = 20 * 1024 * 1024;
 
 /**
  * Turns a photo the user picked into a small square JPEG data URL (center crop,
- * 160×160) so it fits comfortably in localStorage. Runs only in the browser;
+ * 256×256) so it fits comfortably in localStorage. Runs only in the browser;
  * the original file is never stored or uploaded.
  */
 export async function photoToDataUrl(file: File): Promise<string> {

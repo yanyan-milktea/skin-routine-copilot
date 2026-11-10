@@ -178,6 +178,19 @@ export function matchScore(query: string, candidate: string): number {
   return wanted.filter((token) => have.has(token)).length / wanted.length;
 }
 
+/**
+ * Score against a database product using the words that name the product, not
+ * the brand: "First Aid Beauty Face Cleanser" must not match "First Aid Beauty
+ * Deep Cleanser with Red Clay" just because the three brand words agree.
+ */
+export function productMatchScore(query: string, product: Pick<ObfProduct, "brands" | "product_name">): number {
+  const brand = new Set(nameTokens(product.brands));
+  const wanted = [...new Set(nameTokens(query))].filter((token) => !brand.has(token));
+  if (wanted.length === 0) return 0;
+  const have = new Set(nameTokens(product.product_name));
+  return wanted.filter((token) => have.has(token)).length / wanted.length;
+}
+
 export const MIN_MATCH_SCORE = 0.6;
 /** Results of the broader second search must share more of the name (e.g. 4 of 5 words). */
 export const MIN_RELAXED_MATCH_SCORE = 0.75;
@@ -199,7 +212,8 @@ export function parseObfSearch(body: unknown): ObfProduct[] {
     const productName = text(record.product_name, 200);
     if (!/^\d{4,32}$/.test(code) || !productName) return [];
     const tags = Array.isArray(record.categories_tags) ? record.categories_tags.filter((tag): tag is string => typeof tag === "string").slice(0, 50) : [];
-    const image = text(record.image_front_small_url, 300) || text(record.image_small_url, 300);
+    // Prefer the 400px photo (sharp on high-density screens); fall back to the 200px one.
+    const image = [record.image_front_url, record.image_url, record.image_front_small_url, record.image_small_url].map((value) => text(value, 300)).find((value) => OBF_IMAGE_URL.test(value)) ?? "";
     return [{ code, product_name: productName, brands: text(record.brands, 200), ingredients_text: text(record.ingredients_text, 4000), categories_tags: tags, image_url: OBF_IMAGE_URL.test(image) ? image : null }];
   });
 }
@@ -207,7 +221,7 @@ export function parseObfSearch(body: unknown): ObfProduct[] {
 export function bestObfMatch(query: string, products: readonly ObfProduct[], minScore = MIN_MATCH_SCORE): ObfProduct | null {
   let best: { product: ObfProduct; score: number } | null = null;
   for (const product of products) {
-    const score = matchScore(query, `${product.brands} ${product.product_name}`);
+    const score = productMatchScore(query, product);
     if (score >= minScore && (!best || score > best.score)) best = { product, score };
   }
   return best?.product ?? null;
@@ -264,7 +278,7 @@ type FetchLike = (input: string, init: { headers: Record<string, string>; signal
 
 /** Searches Open Beauty Facts; any error, timeout, or non-200 returns [] so name rules still apply. */
 export async function searchObf(name: string, fetchImpl: FetchLike, timeoutMs = OBF_TIMEOUT_MS, pageSize = 5): Promise<{ products: ObfProduct[]; error: string | null }> {
-  const url = `${OBF_SEARCH_URL}?${new URLSearchParams({ search_terms: name, search_simple: "1", action: "process", json: "1", page_size: String(pageSize), fields: "code,product_name,brands,ingredients_text,categories_tags,image_front_small_url,image_small_url" })}`;
+  const url = `${OBF_SEARCH_URL}?${new URLSearchParams({ search_terms: name, search_simple: "1", action: "process", json: "1", page_size: String(pageSize), fields: "code,product_name,brands,ingredients_text,categories_tags,image_front_url,image_url,image_front_small_url,image_small_url" })}`;
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
