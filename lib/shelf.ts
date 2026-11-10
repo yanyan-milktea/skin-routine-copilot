@@ -17,6 +17,18 @@ export const PRODUCT_CATEGORIES = [
 
 export const PRODUCT_TIMES = ["morning", "evening", "both"] as const;
 
+/**
+ * Products in the order they are applied (cleanser, toner/essence, serum,
+ * treatment, moisturizer, sunscreen, then other), for display only. Stable:
+ * products in the same step keep the order they were added. Each item carries
+ * its stored position so per-product styling does not shift when sorting.
+ */
+export function sortShelfByRoutineStep<T extends { category: ProductCategory }>(products: readonly T[]): Array<{ product: T; storedIndex: number }> {
+  return products
+    .map((product, storedIndex) => ({ product, storedIndex }))
+    .sort((a, b) => PRODUCT_CATEGORIES.indexOf(a.product.category) - PRODUCT_CATEGORIES.indexOf(b.product.category) || a.storedIndex - b.storedIndex);
+}
+
 export type ProductCategory = (typeof PRODUCT_CATEGORIES)[number];
 export type ProductTime = (typeof PRODUCT_TIMES)[number];
 
