@@ -1,6 +1,6 @@
 // Local mirror of vercel-api/api/identify-product.ts for development.
 import { corsPreflightResponse, jsonWithCors } from "../../../lib/cors";
-import { identifyProduct } from "../../../lib/product-identify.ts";
+import { identifyLogLine, identifyProduct } from "../../../lib/product-identify.ts";
 
 export const runtime = "nodejs";
 
@@ -14,7 +14,9 @@ export async function POST(request: Request): Promise<Response> {
   if (typeof body !== "object" || body === null || Array.isArray(body) || Object.keys(body).some((key) => key !== "name")) {
     return jsonWithCors(request, { error: "Send only a product name." }, { status: 400 });
   }
+  const started = Date.now();
   const outcome = await identifyProduct((body as { name?: unknown }).name, (input, init) => fetch(input, init));
   if (!outcome.ok) return jsonWithCors(request, { error: outcome.error }, { status: 400 });
+  console.info(identifyLogLine(outcome, Date.now() - started));
   return jsonWithCors(request, { result: outcome.result, lookup_error: outcome.lookup_error });
 }

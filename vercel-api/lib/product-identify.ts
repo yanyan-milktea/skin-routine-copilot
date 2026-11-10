@@ -189,7 +189,7 @@ export function buildSuggestion(name: string, match: ObfProduct | null): Identif
   if (!category && actives.length) { category = "treatment"; reasons.push("Category set to treatment because an active ingredient was found."); }
   if (!category) { category = "other"; notes.push("Could not tell the category from the name. Please choose one."); }
   if (actives.length) reasons.push(`Active ingredients found in the ${ingredients ? "ingredient list" : "product name"}: ${actives.map((active) => active.ingredient).join(", ")}.`);
-  if (!ingredients) notes.push(match ? "The database entry has no ingredient list, so actives were checked from the name only." : "No database match was found, so actives were checked from the name only. Check the label for exfoliating acids, retinoids, or azelaic acid.");
+  if (!ingredients) notes.push(match ? "The database entry has no ingredient list, so actives were checked from the name only." : "Without a database entry, actives were checked from the name only. Check the label for exfoliating acids, retinoids, or azelaic acid.");
   if (ingredients && actives.length) notes.push("Ingredient lists do not show concentration; an acid listed near the end may be a small pH adjuster.");
   const allowedTime = timeFor(category, actives);
   if (allowedTime === "morning") reasons.push("Sunscreen is used in the morning.");
@@ -233,9 +233,17 @@ export async function searchObf(name: string, fetchImpl: FetchLike, timeoutMs = 
 }
 
 /** End to end: validate the name, search the database, and build a deterministic suggestion. */
-export async function identifyProduct(rawName: unknown, fetchImpl: FetchLike): Promise<{ ok: true; result: IdentifyResult; lookup_error: string | null } | { ok: false; error: string }> {
+export async function identifyProduct(rawName: unknown, fetchImpl: FetchLike): Promise<{ ok: true; result: IdentifyResult; lookup_error: string | null; candidates: number } | { ok: false; error: string }> {
   const name = cleanProductName(rawName);
   if (!name) return { ok: false, error: "Enter a product name between 2 and 120 characters." };
   const { products, error } = await searchObf(name, fetchImpl);
-  return { ok: true, result: buildSuggestion(name, bestObfMatch(name, products)), lookup_error: error };
+  return { ok: true, result: buildSuggestion(name, bestObfMatch(name, products)), lookup_error: error, candidates: products.length };
+}
+
+/**
+ * One diagnostic log line per lookup. Carries only the outcome (error code, how many
+ * database results came back, whether one matched, and timing): never the product name.
+ */
+export function identifyLogLine(outcome: { result: IdentifyResult; lookup_error: string | null; candidates: number }, elapsedMs: number): string {
+  return JSON.stringify({ event: "identify_product", lookup_error: outcome.lookup_error, candidates: outcome.candidates, matched: outcome.result.source !== null, elapsed_ms: Math.round(elapsedMs) });
 }
