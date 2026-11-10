@@ -80,3 +80,26 @@ test("a sheet mask sits after the spray and before serum", () => {
   const plan = generateFallbackPlan([], 3, "", [p("cream", "moisturizer"), p("mask", "mask"), p("serum", "serum"), p("mist", "spray"), p("wash", "cleanser")]);
   assert.deepEqual(plan.evening.map((step) => step.product_id), ["wash", "mist", "mask", "serum", "cream"]);
 });
+
+test("an AI plan in the wrong order is put back in application order, in the app and in the API", async () => {
+  const p = (id, category, extra = {}) => ({ id, brand: "", name: id, category, allowed_time: "both", is_active: false, usage_note: "", enabled: true, ...extra });
+  const shelf = [p("wash", "cleanser"), p("mist", "spray"), p("mask", "mask"), p("serum", "serum"), p("cream", "moisturizer"), p("spf", "sunscreen")];
+  const step = (id, detail = "AI wording kept") => ({ time: "01", product_id: id, name: id, detail });
+  // The model returned the steps shuffled (as seen live: spray after serum).
+  const aiPlan = {
+    priority: "Keep it gentle", note: "AI note", warnings: [], need_professional_care: false,
+    morning: [step("spf"), step("cream"), step("serum"), step("wash")],
+    evening: [step("serum"), step("cream"), step("mist"), step("wash"), step("mask", "Mask detail from the model")],
+  };
+  const expectEvening = ["wash", "mist", "mask", "serum", "cream"];
+  const app = enforceGuardrails(aiPlan, [], "", shelf);
+  assert.deepEqual(app.morning.map((s) => s.product_id), ["wash", "serum", "cream", "spf"], "sunscreen stays last");
+  assert.deepEqual(app.evening.map((s) => s.product_id), expectEvening);
+  assert.deepEqual(app.evening.map((s) => s.time), ["01", "02", "03", "04", "05"], "renumbered after sorting");
+  assert.equal(app.evening[2].detail, "Mask detail from the model", "sorting keeps the model's wording");
+
+  const { guardRoutine } = await import("../vercel-api/lib/core.ts");
+  const api = guardRoutine(aiPlan, [], "", shelf);
+  assert.deepEqual(api.evening.map((s) => s.product_id), expectEvening);
+  assert.deepEqual(api.morning.map((s) => s.product_id), ["wash", "serum", "cream", "spf"]);
+});
