@@ -16,6 +16,8 @@ import {
 } from "../lib/history";
 import { Concern, enforceGuardrails, generateFallbackPlan, normalizePlanToEnglish, RoutinePlan, RoutineResponse } from "../lib/routine";
 import { resolveAiApiBaseUrl } from "../lib/api-base";
+import { photoToDataUrl } from "../lib/product-photo";
+import { ProductPhoto } from "./product-photo";
 import { localDateKey, MAX_PER_WEEK, parseUsageStore, scheduleStatus, serializeUsageStore, setUsed, shelfDueToday, USAGE_STORAGE_KEY, type UsageLog } from "../lib/schedule";
 import type { IdentifyResult } from "../lib/product-identify";
 import {
@@ -30,7 +32,10 @@ import {
   SHELF_SCHEMA_VERSION,
   SHELF_STORAGE_KEY,
   ShelfProduct,
+  isDatabasePhoto,
+  isProductImage,
   sortShelfByRoutineStep,
+  withoutPhoto,
   updateShelfProduct,
 } from "../lib/shelf";
 
@@ -81,6 +86,7 @@ export default function Home() {
   const [doneSteps, setDoneSteps] = useState<Set<string>>(new Set());
   const [editingProduct, setEditingProduct] = useState<ShelfProduct | null>(null);
   const [shelfMessage, setShelfMessage] = useState("");
+  const [photoError, setPhotoError] = useState("");
   const [identifying, setIdentifying] = useState(false);
   const [identifyResult, setIdentifyResult] = useState<IdentifyResult | null>(null);
   const [identifyError, setIdentifyError] = useState("");
@@ -118,7 +124,11 @@ export default function Home() {
 
   useEffect(() => {
     if (!shelfReady) return;
-    window.localStorage.setItem(SHELF_STORAGE_KEY, JSON.stringify({ version: SHELF_SCHEMA_VERSION, products: shelf }));
+    try {
+      window.localStorage.setItem(SHELF_STORAGE_KEY, JSON.stringify({ version: SHELF_SCHEMA_VERSION, products: shelf }));
+    } catch {
+      window.setTimeout(() => setShelfMessage("Browser storage is full, so the latest change was not saved. Remove a photo or a product and try again."), 0);
+    }
   }, [shelf, shelfReady]);
 
   function toggleConcern(id: Concern) {
@@ -145,7 +155,7 @@ export default function Home() {
       const response = await fetch(`${AI_API_URL}/api/generate-routine`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ concerns: selected, sleep, notes, products: shelfToday }),
+        body: JSON.stringify({ concerns: selected, sleep, notes, products: shelfToday.map(withoutPhoto) }),
       });
       if (!response.ok) throw new Error("Routine request failed");
       const result = await response.json() as RoutineResponse;
@@ -221,8 +231,30 @@ export default function Home() {
     setIdentifyResult(null);
     setIdentifyError("");
     setShelfMessage("");
+    setPhotoError("");
     setShowShelf(true);
     window.setTimeout(() => document.getElementById("product-form")?.scrollIntoView({ behavior: "smooth", block: "nearest" }), 50);
+  }
+
+  async function choosePhoto(file: File | undefined) {
+    if (!file) return;
+    setPhotoError("");
+    try {
+      const image = await photoToDataUrl(file);
+      setEditingProduct((current) => current && { ...current, image });
+    } catch (error) {
+      setPhotoError(error instanceof Error ? error.message : "Could not use that photo.");
+    }
+  }
+
+  function removePhoto() {
+    setPhotoError("");
+    setEditingProduct((current) => {
+      if (!current) return current;
+      const next = { ...current };
+      delete next.image;
+      return next;
+    });
   }
 
   /** Fills the open form with a deterministic suggestion. Nothing is saved until the user presses Save. */
@@ -245,6 +277,7 @@ export default function Home() {
         category: suggestion.category,
         allowed_time: suggestion.allowed_time,
         is_active: suggestion.is_active,
+        ...(!current.image && suggestion.image_url && isProductImage(suggestion.image_url) ? { image: suggestion.image_url } : {}),
       });
       setIdentifyResult(result);
       setIdentifyLookupFailed(typeof body.lookup_error === "string" && body.lookup_error.length > 0);
@@ -293,6 +326,15 @@ export default function Home() {
   const productForm = editingProduct && <form className={`product-form${editingProduct.id ? " inline" : ""}`} id="product-form" onSubmit={saveProduct}>
             <div className="form-topline"><b>{editingProduct.id ? "Edit product" : "Add product"}</b><button type="button" onClick={() => { setEditingProduct(null); setIdentifyResult(null); setIdentifyError(""); }} aria-label="Close product form">×</button></div>
             <div className="form-grid"><div className="form-field"><label htmlFor="product-brand">Brand <span>Optional</span></label><input id="product-brand" maxLength={60} value={editingProduct.brand} onChange={(event) => setEditingProduct({ ...editingProduct, brand: event.target.value })} /></div><div className="form-field"><label htmlFor="product-name">Product name <span className="required-marker">Required</span></label><input id="product-name" required aria-required="true" maxLength={100} value={editingProduct.name} onChange={(event) => setEditingProduct({ ...editingProduct, name: event.target.value })} /></div></div>
+            <div className="photo-row">
+              <span className="photo-preview">{editingProduct.image ? <ProductPhoto src={editingProduct.image} /> : <span aria-hidden="true">No photo</span>}</span>
+              <div className="photo-actions">
+                <label className="photo-button">{editingProduct.image ? "Change photo" : "Add photo"}<input type="file" accept="image/*" onChange={(event) => { void choosePhoto(event.target.files?.[0]); event.target.value = ""; }} /></label>
+                {editingProduct.image && <button type="button" className="photo-remove" onClick={removePhoto}>Remove</button>}
+                <small>{isDatabasePhoto(editingProduct.image) ? <>Photo from <a href="https://world.openbeautyfacts.org/" target="_blank" rel="noreferrer">Open Beauty Facts</a> (CC BY-SA).</> : "Optional. Resized and kept only in this browser."}</small>
+                {photoError && <small className="photo-error" role="alert">{photoError}</small>}
+              </div>
+            </div>
             <div className="autofill-row"><button type="button" className="autofill-button" onClick={autofillProduct} disabled={identifying || `${editingProduct.brand} ${editingProduct.name}`.trim().length < 2} aria-describedby="autofill-help">{identifying ? "Looking up…" : "Auto-fill from name"}</button><small id="autofill-help">Looks up the ingredient list in Open Beauty Facts, then suggests category, timing, and actives. Review before saving.</small></div>
             {identifyError && <p className="autofill-error" role="alert">{identifyError}</p>}
             {identifyResult && <div className="autofill-result" role="status" aria-live="polite">
@@ -365,12 +407,13 @@ export default function Home() {
           <div className="shelf-heading"><div><span className="step-kicker">MY PRODUCT SHELF</span><h2>My products</h2></div><button onClick={startAddingProduct} aria-label="Add a product">+</button></div>
           <p><b>Private to this browser.</b> Copilot only plans with enabled products saved locally on this device.</p>
           <div className="product-list">
-            {sortShelfByRoutineStep(shelf).map(({ product, storedIndex }) => <Fragment key={product.id}><div className={`product ${product.enabled ? "" : "paused"}${editingProduct?.id === product.id ? " editing" : ""}`}><span className={`product-icon tone-${storedIndex % 6}`} /><div className="product-copy"><div className="product-name-row"><b>{productDisplayName(product)}</b>{!product.enabled && <span className="paused-badge">Paused</span>}</div><small>{categoryLabels[product.category]} · {timeLabels[product.allowed_time]}{product.per_week ? ` · ${product.per_week}×/week` : ""}{product.is_active ? " · Potentially irritating active" : ""}</small></div><div className="product-actions"><button onClick={() => toggleProduct(product)}>{product.enabled ? "Pause" : "Resume"}</button><button onClick={() => openProductForm({ ...product })} aria-expanded={editingProduct?.id === product.id}>Edit</button><button className="delete-product" onClick={() => removeProduct(product)}>Delete</button></div></div>{editingProduct?.id === product.id && productForm}</Fragment>)}
+            {sortShelfByRoutineStep(shelf).map(({ product, storedIndex }) => <Fragment key={product.id}><div className={`product ${product.enabled ? "" : "paused"}${editingProduct?.id === product.id ? " editing" : ""}`}><span className={`product-icon tone-${storedIndex % 6}`}>{product.image && <ProductPhoto src={product.image} lazy />}</span><div className="product-copy"><div className="product-name-row"><b>{productDisplayName(product)}</b>{!product.enabled && <span className="paused-badge">Paused</span>}</div><small>{categoryLabels[product.category]} · {timeLabels[product.allowed_time]}{product.per_week ? ` · ${product.per_week}×/week` : ""}{product.is_active ? " · Potentially irritating active" : ""}</small></div><div className="product-actions"><button onClick={() => toggleProduct(product)}>{product.enabled ? "Pause" : "Resume"}</button><button onClick={() => openProductForm({ ...product })} aria-expanded={editingProduct?.id === product.id}>Edit</button><button className="delete-product" onClick={() => removeProduct(product)}>Delete</button></div></div>{editingProduct?.id === product.id && productForm}</Fragment>)}
             {shelf.length === 0 && <div className="empty-shelf">No products yet. Add what you already own.</div>}
           </div>
           {editingProduct && !editingProduct.id && productForm}
           {shelfMessage && <p className="shelf-message" role="status">{shelfMessage}</p>}
           <button className="manage" onClick={startAddingProduct}>Add another product <span>+</span></button>
+          {shelf.some((product) => isDatabasePhoto(product.image)) && <p className="photo-credit">Some product photos: <a href="https://world.openbeautyfacts.org/" target="_blank" rel="noreferrer">Open Beauty Facts</a>, CC BY-SA.</p>}
         </aside>
       </section>
 

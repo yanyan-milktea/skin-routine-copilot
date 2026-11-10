@@ -45,6 +45,12 @@ export type ShelfProduct = {
   enabled: boolean;
   /** Times per week (1–6) for products not used every day, such as a sheet mask. Absent = every routine. */
   per_week?: number;
+  /**
+   * Optional photo: a small JPEG/PNG/WebP data URL the user added (resized in the
+   * browser), or an Open Beauty Facts product photo URL. Stays in this browser;
+   * never sent with routine requests.
+   */
+  image?: string;
 };
 
 export type ShelfStore = {
@@ -81,6 +87,25 @@ export function productDisplayName(product: ShelfProduct): string {
   return `${brand} ${name}`;
 }
 
+export const MAX_PRODUCT_IMAGE_LENGTH = 60_000;
+const OBF_IMAGE_URL = /^https:\/\/images\.openbeautyfacts\.org\/images\/products\/[A-Za-z0-9/._-]{1,200}\.(?:jpg|jpeg|png|webp)$/;
+const DATA_IMAGE = /^data:image\/(?:jpeg|png|webp);base64,[A-Za-z0-9+/]+={0,2}$/;
+
+export function isProductImage(value: unknown): value is string {
+  return typeof value === "string" && value.length <= MAX_PRODUCT_IMAGE_LENGTH && (OBF_IMAGE_URL.test(value) || DATA_IMAGE.test(value));
+}
+
+export function isDatabasePhoto(image: string | undefined): boolean {
+  return Boolean(image && OBF_IMAGE_URL.test(image));
+}
+
+/** What a routine request carries: the product without its photo. */
+export function withoutPhoto(product: ShelfProduct): Omit<ShelfProduct, "image"> {
+  const copy: ShelfProduct = { ...product };
+  delete copy.image;
+  return copy;
+}
+
 export function parseShelfProduct(value: unknown): ShelfProduct | null {
   if (!isRecord(value)) return null;
   const id = cleanString(value.id, 80);
@@ -101,6 +126,7 @@ export function parseShelfProduct(value: unknown): ShelfProduct | null {
     is_active: value.is_active,
     usage_note: usageNote,
     enabled: value.enabled,
+    ...(isProductImage(value.image) ? { image: value.image } : {}),
     ...(Number.isInteger(value.per_week) && Number(value.per_week) >= 1 && Number(value.per_week) <= 6 ? { per_week: Number(value.per_week) } : {}),
   };
 }

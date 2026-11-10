@@ -223,3 +223,18 @@ textarea::placeholder { color:#b1b2ab; }
 .routine-step.done button { background:#4e6a55; border-color:#4e6a55; color:#fff; }
 .step-title .schedule-tag { background:#e9efe6; color:#4e6a55; }
 .steps .schedule-note { margin:0; padding:16px 0 4px; color:#7a7d72; font-size:13px; line-height:1.5; }
+.product-icon { position:relative; overflow:hidden; }
+.product-icon img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; background:#fff; }
+.photo-row { display:flex; align-items:center; gap:12px; margin:12px 0; }
+.photo-preview { flex:0 0 48px; width:48px; height:48px; border-radius:10px; border:1px solid #dfe1d9; background:#fff; overflow:hidden; display:grid; place-items:center; color:#a3a69b; font-size:8px; text-align:center; }
+.photo-preview img { width:100%; height:100%; object-fit:cover; }
+.photo-actions { display:flex; flex-wrap:wrap; align-items:center; gap:6px 8px; }
+.photo-actions small { flex-basis:100%; color:#94978f; font-size:8px; line-height:1.45; }
+.photo-actions small a, .photo-credit a { color:inherit; text-decoration:underline; }
+.product-form .photo-button, .photo-remove { position:relative; display:inline-block; margin:0; cursor:pointer; border:1px solid #c9d3c3; border-radius:999px; background:#fff; padding:6px 11px; color:#4f5f49; font-size:9px; font-weight:600; }
+.photo-button input { position:absolute; width:1px; height:1px; opacity:0; pointer-events:none; }
+.photo-button:focus-within, .photo-remove:focus-visible { border-color:#75866d; box-shadow:0 0 0 3px #dfe8da; outline:none; }
+.photo-remove { color:#865f52; border-color:#e5d3cb; }
+.photo-actions .photo-error { color:#865f52; }
+.form-field > small { display:block; margin-top:5px; color:#94978f; font-size:8px; line-height:1.45; }
+.photo-credit { margin:10px 0 0; color:#94978f; font-size:8px; }

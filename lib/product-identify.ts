@@ -29,6 +29,8 @@ export type IdentifySuggestion = {
   is_active: boolean;
   key_actives: DetectedActive[];
   ingredients_text: string | null;
+  /** Small front photo from Open Beauty Facts (CC BY-SA), when the match has one. */
+  image_url: string | null;
 };
 
 export type IdentifySource = { provider: "Open Beauty Facts"; product_name: string; url: string; license: "ODbL" };
@@ -180,7 +182,10 @@ export const MIN_MATCH_SCORE = 0.6;
 /** Results of the broader second search must share more of the name (e.g. 4 of 5 words). */
 export const MIN_RELAXED_MATCH_SCORE = 0.75;
 
-export type ObfProduct = { code: string; product_name: string; brands: string; ingredients_text: string; categories_tags: string[] };
+export type ObfProduct = { code: string; product_name: string; brands: string; ingredients_text: string; categories_tags: string[]; image_url?: string | null };
+
+/** Only product photos served from Open Beauty Facts' own image host are accepted. */
+export const OBF_IMAGE_URL = /^https:\/\/images\.openbeautyfacts\.org\/images\/products\/[A-Za-z0-9/._-]{1,200}\.(?:jpg|jpeg|png|webp)$/;
 
 /** Defensive parse of a search.pl JSON body; malformed entries are dropped. */
 export function parseObfSearch(body: unknown): ObfProduct[] {
@@ -194,7 +199,8 @@ export function parseObfSearch(body: unknown): ObfProduct[] {
     const productName = text(record.product_name, 200);
     if (!/^\d{4,32}$/.test(code) || !productName) return [];
     const tags = Array.isArray(record.categories_tags) ? record.categories_tags.filter((tag): tag is string => typeof tag === "string").slice(0, 50) : [];
-    return [{ code, product_name: productName, brands: text(record.brands, 200), ingredients_text: text(record.ingredients_text, 4000), categories_tags: tags }];
+    const image = text(record.image_front_small_url, 300) || text(record.image_small_url, 300);
+    return [{ code, product_name: productName, brands: text(record.brands, 200), ingredients_text: text(record.ingredients_text, 4000), categories_tags: tags, image_url: OBF_IMAGE_URL.test(image) ? image : null }];
   });
 }
 
@@ -246,6 +252,7 @@ export function buildSuggestion(name: string, match: ObfProduct | null): Identif
       is_active: actives.length > 0,
       key_actives: actives,
       ingredients_text: ingredients ? ingredients.slice(0, 1200) : null,
+      image_url: match?.image_url ?? null,
     },
     source: match ? { provider: "Open Beauty Facts", product_name: match.product_name, url: `https://world.openbeautyfacts.org/product/${match.code}`, license: "ODbL" } : null,
     reasons,
@@ -257,7 +264,7 @@ type FetchLike = (input: string, init: { headers: Record<string, string>; signal
 
 /** Searches Open Beauty Facts; any error, timeout, or non-200 returns [] so name rules still apply. */
 export async function searchObf(name: string, fetchImpl: FetchLike, timeoutMs = OBF_TIMEOUT_MS, pageSize = 5): Promise<{ products: ObfProduct[]; error: string | null }> {
-  const url = `${OBF_SEARCH_URL}?${new URLSearchParams({ search_terms: name, search_simple: "1", action: "process", json: "1", page_size: String(pageSize), fields: "code,product_name,brands,ingredients_text,categories_tags" })}`;
+  const url = `${OBF_SEARCH_URL}?${new URLSearchParams({ search_terms: name, search_simple: "1", action: "process", json: "1", page_size: String(pageSize), fields: "code,product_name,brands,ingredients_text,categories_tags,image_front_small_url,image_small_url" })}`;
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
