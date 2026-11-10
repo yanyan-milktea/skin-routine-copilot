@@ -1,6 +1,6 @@
 export type Concern = "breakouts" | "oily" | "sensitive" | "redness" | "dry" | "dull";
 export type ProviderMeta = { source: "ai" | "fallback"; provider: "gemini" | null; model: string | null; latency_ms: number; reason?: string };
-export type ProductCategory = "cleanser" | "toner-essence" | "serum" | "treatment" | "moisturizer" | "sunscreen" | "other";
+export type ProductCategory = "cleanser" | "toner-essence" | "spray" | "serum" | "treatment" | "moisturizer" | "sunscreen" | "other";
 export type ProductTime = "morning" | "evening" | "both";
 export type ShelfProduct = { id: string; brand: string; name: string; category: ProductCategory; allowed_time: ProductTime; is_active: boolean; usage_note: string; enabled: boolean };
 export type RoutineStep = { time: string; name: string; detail: string; tag?: string; product_id?: string };
@@ -11,7 +11,7 @@ export type TrendSummary = { headline: string; overview: string; patterns: strin
 export const LIVE_SITE_ORIGIN = "https://skin-routine-copilot.gogogoyan.chatgpt.site";
 export const MAX_PRODUCTS = 30;
 const concerns = new Set<Concern>(["breakouts", "oily", "sensitive", "redness", "dry", "dull"]);
-const categories = new Set<ProductCategory>(["cleanser", "toner-essence", "serum", "treatment", "moisturizer", "sunscreen", "other"]);
+const categories = new Set<ProductCategory>(["cleanser", "toner-essence", "spray", "serum", "treatment", "moisturizer", "sunscreen", "other"]);
 const times = new Set<ProductTime>(["morning", "evening", "both"]);
 const warningSignals = /persistent(?:ly)?\s+(?:stinging|burning)|(?:skin\s+)?(?:feels?\s+)?hot|damaged\s+skin|swelling|oozing|worsening\s+(?:rash|eczema)/i;
 const medicalClaim = /\b(?:diagnos(?:e|ed|is|tic)|prescrib(?:e|ed|ing)|cure[sd]?|medical condition|disease|disorder|treat(?:s|ed|ment|ing)?|you have|indicates?\s+(?:acne|rosacea|eczema))\b/i;
@@ -81,8 +81,8 @@ export function parseRoutineInput(value: unknown) {
 
 const allowedAt = (product: ShelfProduct, period: "morning" | "evening") => product.allowed_time === "both" || product.allowed_time === period;
 const calmDay = (selected: Concern[], notes: string) => selected.includes("sensitive") || selected.includes("redness") || warningSignals.test(notes);
-const categoryOrder: ProductCategory[] = ["cleanser", "toner-essence", "serum", "treatment", "moisturizer", "other", "sunscreen"];
-const productDetail = (product: ShelfProduct) => product.usage_note || ({ cleanser: "Cleanse gently without scrubbing.", "toner-essence": "Pat on one light layer.", serum: "Apply one thin layer.", treatment: "Use a small amount only on comfortable skin.", moisturizer: "Apply a light layer to seal in moisture.", sunscreen: "Apply generously as the final morning step.", other: "Use according to your saved note." } satisfies Record<ProductCategory, string>)[product.category];
+const categoryOrder: ProductCategory[] = ["cleanser", "toner-essence", "spray", "serum", "treatment", "moisturizer", "other", "sunscreen"];
+const productDetail = (product: ShelfProduct) => product.usage_note || ({ cleanser: "Cleanse gently without scrubbing.", "toner-essence": "Pat on one light layer.", spray: "Mist over clean skin and let it settle before the next step.", serum: "Apply one thin layer.", treatment: "Use a small amount only on comfortable skin.", moisturizer: "Apply a light layer to seal in moisture.", sunscreen: "Apply generously as the final morning step.", other: "Use according to your saved note." } satisfies Record<ProductCategory, string>)[product.category];
 
 function eligible(products: ShelfProduct[], selected: Concern[], notes: string, period: "morning" | "evening") {
   const calm = calmDay(selected, notes);

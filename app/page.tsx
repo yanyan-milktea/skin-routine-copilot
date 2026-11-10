@@ -47,7 +47,7 @@ const concerns: { id: Concern; emoji: string; label: string }[] = [
 ];
 
 const categoryLabels: Record<ShelfProduct["category"], string> = {
-  cleanser: "Cleanser", "toner-essence": "Toner / essence", serum: "Serum",
+  cleanser: "Cleanser", "toner-essence": "Toner / essence", spray: "Face mist / spray", serum: "Serum",
   treatment: "Treatment", moisturizer: "Moisturizer", sunscreen: "Sunscreen", other: "Other",
 };
 const timeLabels: Record<ShelfProduct["allowed_time"], string> = {

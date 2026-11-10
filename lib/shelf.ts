@@ -8,6 +8,7 @@ export const MAX_PRODUCT_NOTE_LENGTH = 180;
 export const PRODUCT_CATEGORIES = [
   "cleanser",
   "toner-essence",
+  "spray",
   "serum",
   "treatment",
   "moisturizer",
