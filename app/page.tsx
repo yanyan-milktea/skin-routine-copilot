@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { Fragment, useEffect, useMemo, useState, type FormEvent } from "react";
 import {
   addHistoryEntry,
   createEmptyHistoryStore,
@@ -186,11 +186,17 @@ export default function Home() {
 
   function startAddingProduct() {
     if (shelf.length >= MAX_SHELF_PRODUCTS) { setShelfMessage(`Your shelf is limited to ${MAX_SHELF_PRODUCTS} products.`); return; }
-    setEditingProduct(emptyProduct());
+    openProductForm(emptyProduct());
+  }
+
+  /** Opens the form (under the product being edited, or at the end for a new one) and brings it into view. */
+  function openProductForm(product: ShelfProduct) {
+    setEditingProduct(product);
     setIdentifyResult(null);
     setIdentifyError("");
     setShelfMessage("");
     setShowShelf(true);
+    window.setTimeout(() => document.getElementById("product-form")?.scrollIntoView({ behavior: "smooth", block: "nearest" }), 50);
   }
 
   /** Fills the open form with a deterministic suggestion. Nothing is saved until the user presses Save. */
@@ -258,6 +264,23 @@ export default function Home() {
 
   const today = new Intl.DateTimeFormat("en-US", { month: "long", day: "numeric", weekday: "short" }).format(new Date());
 
+  const productForm = editingProduct && <form className={`product-form${editingProduct.id ? " inline" : ""}`} id="product-form" onSubmit={saveProduct}>
+            <div className="form-topline"><b>{editingProduct.id ? "Edit product" : "Add product"}</b><button type="button" onClick={() => { setEditingProduct(null); setIdentifyResult(null); setIdentifyError(""); }} aria-label="Close product form">×</button></div>
+            <div className="form-grid"><div className="form-field"><label htmlFor="product-brand">Brand <span>Optional</span></label><input id="product-brand" maxLength={60} value={editingProduct.brand} onChange={(event) => setEditingProduct({ ...editingProduct, brand: event.target.value })} /></div><div className="form-field"><label htmlFor="product-name">Product name <span className="required-marker">Required</span></label><input id="product-name" required aria-required="true" maxLength={100} value={editingProduct.name} onChange={(event) => setEditingProduct({ ...editingProduct, name: event.target.value })} /></div></div>
+            <div className="autofill-row"><button type="button" className="autofill-button" onClick={autofillProduct} disabled={identifying || `${editingProduct.brand} ${editingProduct.name}`.trim().length < 2} aria-describedby="autofill-help">{identifying ? "Looking up…" : "Auto-fill from name"}</button><small id="autofill-help">Looks up the ingredient list in Open Beauty Facts, then suggests category, timing, and actives. Review before saving.</small></div>
+            {identifyError && <p className="autofill-error" role="alert">{identifyError}</p>}
+            {identifyResult && <div className="autofill-result" role="status" aria-live="polite">
+              <div className="autofill-source">{identifyResult.source ? <>Matched <a href={identifyResult.source.url} target="_blank" rel="noopener noreferrer">{identifyResult.source.product_name}</a> in Open Beauty Facts <span>(data under ODbL)</span></> : identifyLookupFailed ? <>The ingredient database didn&apos;t respond, so this is suggested from the product name only. You can try again in a moment.</> : <>Not found in Open Beauty Facts. Suggested from the product name only.</>}</div>
+              {identifyResult.suggestion.key_actives.length > 0 && <div className="autofill-actives">{identifyResult.suggestion.key_actives.map((active) => <span key={active.ingredient}>{active.ingredient} · {active.family}</span>)}</div>}
+              <ul>{[...identifyResult.reasons, ...identifyResult.notes].map((line) => <li key={line}>{line}</li>)}</ul>
+              {identifyResult.suggestion.ingredients_text && <details><summary>Ingredient list from the database</summary><p>{identifyResult.suggestion.ingredients_text}</p></details>}
+            </div>}
+            <div className="form-grid"><div className="form-field"><label htmlFor="product-category">Category</label><select id="product-category" value={editingProduct.category} onChange={(event) => setEditingProduct({ ...editingProduct, category: event.target.value as ShelfProduct["category"] })}>{PRODUCT_CATEGORIES.map((category) => <option key={category} value={category}>{categoryLabels[category]}</option>)}</select></div><div className="form-field"><label htmlFor="product-time">Use in routine</label><select id="product-time" value={editingProduct.allowed_time} onChange={(event) => setEditingProduct({ ...editingProduct, allowed_time: event.target.value as ShelfProduct["allowed_time"] })}>{PRODUCT_TIMES.map((time) => <option key={time} value={time}>{timeLabels[time]}</option>)}</select></div></div>
+            <label htmlFor="product-note">Short usage note</label><small className="form-helper" id="product-note-help">Optional — for example, use 2–3 nights per week.</small><textarea id="product-note" aria-describedby="product-note-help" maxLength={180} value={editingProduct.usage_note} onChange={(event) => setEditingProduct({ ...editingProduct, usage_note: event.target.value })} />
+            <div className="form-checks"><div className="check-field"><label htmlFor="product-active"><input id="product-active" type="checkbox" aria-describedby="product-active-help" checked={editingProduct.is_active} onChange={(event) => setEditingProduct({ ...editingProduct, is_active: event.target.checked })} /> Potentially irritating active</label><small id="product-active-help">Examples: exfoliants, retinoids, or azelaic acid. Automatically skipped on sensitive days.</small></div><div className="check-field"><label htmlFor="product-enabled"><input id="product-enabled" type="checkbox" checked={editingProduct.enabled} onChange={(event) => setEditingProduct({ ...editingProduct, enabled: event.target.checked })} /> Include in routines</label></div></div>
+            <button className="save-product" type="submit" disabled={!editingProduct.name.trim()}>Save product</button>
+          </form>;
+
   return (
     <main>
       <nav className="nav shell">
@@ -315,25 +338,10 @@ export default function Home() {
           <div className="shelf-heading"><div><span className="step-kicker">MY PRODUCT SHELF</span><h2>My products</h2></div><button onClick={startAddingProduct} aria-label="Add a product">+</button></div>
           <p><b>Private to this browser.</b> Copilot only plans with enabled products saved locally on this device.</p>
           <div className="product-list">
-            {shelf.map((product, index) => <div className={`product ${product.enabled ? "" : "paused"}`} key={product.id}><span className={`product-icon tone-${index % 6}`} /><div className="product-copy"><div className="product-name-row"><b>{productDisplayName(product)}</b>{!product.enabled && <span className="paused-badge">Paused</span>}</div><small>{categoryLabels[product.category]} · {timeLabels[product.allowed_time]}{product.is_active ? " · Potentially irritating active" : ""}</small></div><div className="product-actions"><button onClick={() => toggleProduct(product)}>{product.enabled ? "Pause" : "Resume"}</button><button onClick={() => { setEditingProduct({ ...product }); setIdentifyResult(null); setIdentifyError(""); }}>Edit</button><button className="delete-product" onClick={() => removeProduct(product)}>Delete</button></div></div>)}
+            {shelf.map((product, index) => <Fragment key={product.id}><div className={`product ${product.enabled ? "" : "paused"}${editingProduct?.id === product.id ? " editing" : ""}`}><span className={`product-icon tone-${index % 6}`} /><div className="product-copy"><div className="product-name-row"><b>{productDisplayName(product)}</b>{!product.enabled && <span className="paused-badge">Paused</span>}</div><small>{categoryLabels[product.category]} · {timeLabels[product.allowed_time]}{product.is_active ? " · Potentially irritating active" : ""}</small></div><div className="product-actions"><button onClick={() => toggleProduct(product)}>{product.enabled ? "Pause" : "Resume"}</button><button onClick={() => openProductForm({ ...product })} aria-expanded={editingProduct?.id === product.id}>Edit</button><button className="delete-product" onClick={() => removeProduct(product)}>Delete</button></div></div>{editingProduct?.id === product.id && productForm}</Fragment>)}
             {shelf.length === 0 && <div className="empty-shelf">No products yet. Add what you already own.</div>}
           </div>
-          {editingProduct && <form className="product-form" onSubmit={saveProduct}>
-            <div className="form-topline"><b>{editingProduct.id ? "Edit product" : "Add product"}</b><button type="button" onClick={() => { setEditingProduct(null); setIdentifyResult(null); setIdentifyError(""); }} aria-label="Close product form">×</button></div>
-            <div className="form-grid"><div className="form-field"><label htmlFor="product-brand">Brand <span>Optional</span></label><input id="product-brand" maxLength={60} value={editingProduct.brand} onChange={(event) => setEditingProduct({ ...editingProduct, brand: event.target.value })} /></div><div className="form-field"><label htmlFor="product-name">Product name <span className="required-marker">Required</span></label><input id="product-name" required aria-required="true" maxLength={100} value={editingProduct.name} onChange={(event) => setEditingProduct({ ...editingProduct, name: event.target.value })} /></div></div>
-            <div className="autofill-row"><button type="button" className="autofill-button" onClick={autofillProduct} disabled={identifying || `${editingProduct.brand} ${editingProduct.name}`.trim().length < 2} aria-describedby="autofill-help">{identifying ? "Looking up…" : "Auto-fill from name"}</button><small id="autofill-help">Looks up the ingredient list in Open Beauty Facts, then suggests category, timing, and actives. Review before saving.</small></div>
-            {identifyError && <p className="autofill-error" role="alert">{identifyError}</p>}
-            {identifyResult && <div className="autofill-result" role="status" aria-live="polite">
-              <div className="autofill-source">{identifyResult.source ? <>Matched <a href={identifyResult.source.url} target="_blank" rel="noopener noreferrer">{identifyResult.source.product_name}</a> in Open Beauty Facts <span>(data under ODbL)</span></> : identifyLookupFailed ? <>The ingredient database didn&apos;t respond, so this is suggested from the product name only. You can try again in a moment.</> : <>Not found in Open Beauty Facts. Suggested from the product name only.</>}</div>
-              {identifyResult.suggestion.key_actives.length > 0 && <div className="autofill-actives">{identifyResult.suggestion.key_actives.map((active) => <span key={active.ingredient}>{active.ingredient} · {active.family}</span>)}</div>}
-              <ul>{[...identifyResult.reasons, ...identifyResult.notes].map((line) => <li key={line}>{line}</li>)}</ul>
-              {identifyResult.suggestion.ingredients_text && <details><summary>Ingredient list from the database</summary><p>{identifyResult.suggestion.ingredients_text}</p></details>}
-            </div>}
-            <div className="form-grid"><div className="form-field"><label htmlFor="product-category">Category</label><select id="product-category" value={editingProduct.category} onChange={(event) => setEditingProduct({ ...editingProduct, category: event.target.value as ShelfProduct["category"] })}>{PRODUCT_CATEGORIES.map((category) => <option key={category} value={category}>{categoryLabels[category]}</option>)}</select></div><div className="form-field"><label htmlFor="product-time">Use in routine</label><select id="product-time" value={editingProduct.allowed_time} onChange={(event) => setEditingProduct({ ...editingProduct, allowed_time: event.target.value as ShelfProduct["allowed_time"] })}>{PRODUCT_TIMES.map((time) => <option key={time} value={time}>{timeLabels[time]}</option>)}</select></div></div>
-            <label htmlFor="product-note">Short usage note</label><small className="form-helper" id="product-note-help">Optional — for example, use 2–3 nights per week.</small><textarea id="product-note" aria-describedby="product-note-help" maxLength={180} value={editingProduct.usage_note} onChange={(event) => setEditingProduct({ ...editingProduct, usage_note: event.target.value })} />
-            <div className="form-checks"><div className="check-field"><label htmlFor="product-active"><input id="product-active" type="checkbox" aria-describedby="product-active-help" checked={editingProduct.is_active} onChange={(event) => setEditingProduct({ ...editingProduct, is_active: event.target.checked })} /> Potentially irritating active</label><small id="product-active-help">Examples: exfoliants, retinoids, or azelaic acid. Automatically skipped on sensitive days.</small></div><div className="check-field"><label htmlFor="product-enabled"><input id="product-enabled" type="checkbox" checked={editingProduct.enabled} onChange={(event) => setEditingProduct({ ...editingProduct, enabled: event.target.checked })} /> Include in routines</label></div></div>
-            <button className="save-product" type="submit" disabled={!editingProduct.name.trim()}>Save product</button>
-          </form>}
+          {editingProduct && !editingProduct.id && productForm}
           {shelfMessage && <p className="shelf-message" role="status">{shelfMessage}</p>}
           <button className="manage" onClick={startAddingProduct}>Add another product <span>+</span></button>
         </aside>
