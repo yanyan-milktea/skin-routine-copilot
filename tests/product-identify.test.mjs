@@ -11,8 +11,11 @@ import {
   detectActives,
   identifyLogLine,
   identifyProduct,
+  matchScore,
   parseObfSearch,
+  relaxedQuery,
   searchObf,
+  spellingKey,
   timeFor,
 } from "../lib/product-identify.ts";
 import identifyApi from "../vercel-api/api/identify-product.ts";
@@ -150,11 +153,11 @@ test("search sends an identifying User-Agent, encodes the name, and degrades to 
 test("the diagnostic log line records the lookup outcome but never the product name", async () => {
   const found = await identifyProduct("Torriden Dive-In Serum", okFetch({ products: [obfProduct(), obfProduct({ code: "123456", product_name: "Other" })] }));
   const line = JSON.parse(identifyLogLine(found, 812.4));
-  assert.deepEqual(line, { event: "identify_product", lookup_error: null, candidates: 2, matched: true, elapsed_ms: 812 });
+  assert.deepEqual(line, { event: "identify_product", lookup_error: null, candidates: 2, relaxed: false, matched: true, elapsed_ms: 812 });
 
   const timedOut = await identifyProduct("Secret Brand Retinol Night Serum", async () => { throw Object.assign(new Error("aborted"), { name: "AbortError" }); });
   const text = identifyLogLine(timedOut, 4001);
-  assert.deepEqual(JSON.parse(text), { event: "identify_product", lookup_error: "OBF_TIMEOUT", candidates: 0, matched: false, elapsed_ms: 4001 });
+  assert.deepEqual(JSON.parse(text), { event: "identify_product", lookup_error: "OBF_TIMEOUT", candidates: 0, relaxed: false, matched: false, elapsed_ms: 4001 });
   for (const word of ["Secret", "Retinol", "Night", "Serum"]) assert.ok(!text.includes(word), `log must not contain "${word}"`);
 });
 
@@ -188,4 +191,64 @@ test("API endpoint: CORS, method and body validation, and a full suggestion", as
   } finally {
     globalThis.fetch = realFetch;
   }
+});
+
+test("British and American spellings compare equal; short words are left alone", () => {
+  assert.equal(spellingKey("moisturising"), "moisturizing");
+  assert.equal(spellingKey("moisturiser"), "moisturizer");
+  assert.equal(spellingKey("colour"), "color");
+  assert.equal(spellingKey("rise"), "rise");
+  assert.equal(spellingKey("pm"), "pm");
+  assert.equal(matchScore("CeraVe PM Facial Moisturizing Lotion", "CeraVe PM Facial Moisturising Lotion"), 1);
+});
+
+test("relaxed query keeps the first two words, and only when that is shorter", () => {
+  assert.equal(relaxedQuery("CeraVe PM Daily Facial Moisturizing Lotion 52ml"), "cerave pm");
+  assert.equal(relaxedQuery("Beplain Cleanser"), null);
+  assert.equal(relaxedQuery("Retinol"), null);
+});
+
+const cerave = (code, product_name) => obfProduct({ code, product_name, brands: "CeraVe", ingredients_text: ingredients("Aqua", "Glycerin", "Niacinamide", "Ceramide NP"), categories_tags: ["en:face-moisturizers"] });
+const scripted = (...responses) => {
+  const calls = [];
+  const fetchImpl = async (url) => { calls.push(new URL(url)); const next = responses[calls.length - 1]; if (next instanceof Error) throw next; return { ok: true, status: 200, json: async () => ({ products: next ?? [] }) }; };
+  return { calls, fetchImpl };
+};
+
+test("an extra word or other spelling no longer hides a product: one relaxed retry finds it", async () => {
+  const { calls, fetchImpl } = scripted([], [cerave("3337875597180", "Facial Moisturising Lotion AM SPF 30"), cerave("3337875597197", "PM Facial Moisturising Lotion")]);
+  const outcome = await identifyProduct("CeraVe PM Daily Facial Moisturizing", fetchImpl);
+  assert.equal(calls.length, 2);
+  assert.equal(calls[1].searchParams.get("search_terms"), "cerave pm");
+  assert.equal(calls[1].searchParams.get("page_size"), "10");
+  assert.equal(outcome.relaxed, true);
+  assert.equal(outcome.candidates, 2);
+  assert.equal(outcome.result.status, "database_match");
+  assert.equal(outcome.result.source.product_name, "PM Facial Moisturising Lotion", "the PM lotion, not the AM sunscreen lotion");
+  assert.equal(outcome.result.suggestion.category, "moisturizer");
+  assert.equal(outcome.result.suggestion.is_active, false);
+});
+
+test("the relaxed retry is held to a stricter match, so a sibling product is not accepted", async () => {
+  // Only the AM lotion comes back: it shares 3 of 5 words (0.6), enough for the first search but not the retry.
+  const { calls, fetchImpl } = scripted([], [cerave("3337875597180", "Facial Moisturising Lotion AM SPF 30")]);
+  const outcome = await identifyProduct("CeraVe PM Daily Facial Moisturizing", fetchImpl);
+  assert.equal(calls.length, 2);
+  assert.equal(outcome.result.status, "name_rules");
+  assert.equal(outcome.result.suggestion.category, "moisturizer");
+});
+
+test("no retry when the first search matched, failed, or the name is already short", async () => {
+  const matched = scripted([obfProduct()]);
+  assert.equal((await identifyProduct("Torriden Dive-In Low Molecular Serum", matched.fetchImpl)).relaxed, false);
+  assert.equal(matched.calls.length, 1);
+
+  const failed = scripted(new TypeError("network"));
+  const outcome = await identifyProduct("CeraVe PM Daily Facial Moisturizing", failed.fetchImpl);
+  assert.equal(failed.calls.length, 1, "a database that is down is not asked twice");
+  assert.equal(outcome.lookup_error, "OBF_UNAVAILABLE");
+
+  const short = scripted([]);
+  await identifyProduct("Beplain Cleanser", short.fetchImpl);
+  assert.equal(short.calls.length, 1);
 });
