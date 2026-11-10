@@ -9,6 +9,7 @@ import {
   categoryFromTags,
   cleanProductName,
   detectActives,
+  identifyLogLine,
   identifyProduct,
   parseObfSearch,
   searchObf,
@@ -84,7 +85,7 @@ test("name-only suggestions mark actives deterministically and always ask the us
   assert.equal(retinol.suggestion.allowed_time, "evening");
   assert.equal(retinol.suggestion.category, "treatment", "a % strength in the name reads as a treatment");
   assert.ok(retinol.notes[0].includes("Check it against your product's label"));
-  assert.ok(retinol.notes.some((note) => note.includes("No database match")));
+  assert.ok(retinol.notes.some((note) => note.includes("Without a database entry")));
 
   const unknown = buildSuggestion("Torriden Dive-In", null);
   assert.equal(unknown.suggestion.category, "other");
@@ -143,6 +144,18 @@ test("search sends an identifying User-Agent, encodes the name, and degrades to 
   assert.equal(degraded.result.status, "name_rules");
   assert.equal(degraded.result.suggestion.is_active, true);
   assert.equal(degraded.lookup_error, "OBF_HTTP_503");
+  assert.equal(degraded.candidates, 0);
+});
+
+test("the diagnostic log line records the lookup outcome but never the product name", async () => {
+  const found = await identifyProduct("Torriden Dive-In Serum", okFetch({ products: [obfProduct(), obfProduct({ code: "123456", product_name: "Other" })] }));
+  const line = JSON.parse(identifyLogLine(found, 812.4));
+  assert.deepEqual(line, { event: "identify_product", lookup_error: null, candidates: 2, matched: true, elapsed_ms: 812 });
+
+  const timedOut = await identifyProduct("Secret Brand Retinol Night Serum", async () => { throw Object.assign(new Error("aborted"), { name: "AbortError" }); });
+  const text = identifyLogLine(timedOut, 4001);
+  assert.deepEqual(JSON.parse(text), { event: "identify_product", lookup_error: "OBF_TIMEOUT", candidates: 0, matched: false, elapsed_ms: 4001 });
+  for (const word of ["Secret", "Retinol", "Night", "Serum"]) assert.ok(!text.includes(word), `log must not contain "${word}"`);
 });
 
 test("names are bounded and cleaned", () => {

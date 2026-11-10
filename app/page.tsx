@@ -79,6 +79,7 @@ export default function Home() {
   const [identifying, setIdentifying] = useState(false);
   const [identifyResult, setIdentifyResult] = useState<IdentifyResult | null>(null);
   const [identifyError, setIdentifyError] = useState("");
+  const [identifyLookupFailed, setIdentifyLookupFailed] = useState(false);
 
   const localRoutine = useMemo(() => generateFallbackPlan(selected, sleep, notes, shelf), [selected, sleep, notes, shelf]);
   const routine = generatedPlan ?? localRoutine;
@@ -214,6 +215,7 @@ export default function Home() {
         is_active: suggestion.is_active,
       });
       setIdentifyResult(result);
+      setIdentifyLookupFailed(typeof body.lookup_error === "string" && body.lookup_error.length > 0);
     } catch {
       setIdentifyError("Auto-fill is unavailable right now. Fill the fields manually.");
     } finally {
@@ -322,7 +324,7 @@ export default function Home() {
             <div className="autofill-row"><button type="button" className="autofill-button" onClick={autofillProduct} disabled={identifying || `${editingProduct.brand} ${editingProduct.name}`.trim().length < 2} aria-describedby="autofill-help">{identifying ? "Looking up…" : "Auto-fill from name"}</button><small id="autofill-help">Looks up the ingredient list in Open Beauty Facts, then suggests category, timing, and actives. Review before saving.</small></div>
             {identifyError && <p className="autofill-error" role="alert">{identifyError}</p>}
             {identifyResult && <div className="autofill-result" role="status" aria-live="polite">
-              <div className="autofill-source">{identifyResult.source ? <>Matched <a href={identifyResult.source.url} target="_blank" rel="noopener noreferrer">{identifyResult.source.product_name}</a> in Open Beauty Facts <span>(data under ODbL)</span></> : <>No database match. Suggested from the product name only.</>}</div>
+              <div className="autofill-source">{identifyResult.source ? <>Matched <a href={identifyResult.source.url} target="_blank" rel="noopener noreferrer">{identifyResult.source.product_name}</a> in Open Beauty Facts <span>(data under ODbL)</span></> : identifyLookupFailed ? <>The ingredient database didn&apos;t respond, so this is suggested from the product name only. You can try again in a moment.</> : <>Not found in Open Beauty Facts. Suggested from the product name only.</>}</div>
               {identifyResult.suggestion.key_actives.length > 0 && <div className="autofill-actives">{identifyResult.suggestion.key_actives.map((active) => <span key={active.ingredient}>{active.ingredient} · {active.family}</span>)}</div>}
               <ul>{[...identifyResult.reasons, ...identifyResult.notes].map((line) => <li key={line}>{line}</li>)}</ul>
               {identifyResult.suggestion.ingredients_text && <details><summary>Ingredient list from the database</summary><p>{identifyResult.suggestion.ingredients_text}</p></details>}
