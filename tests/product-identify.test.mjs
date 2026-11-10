@@ -12,6 +12,7 @@ import {
   identifyLogLine,
   identifyProduct,
   matchScore,
+  productMatchScore,
   parseObfSearch,
   relaxedQuery,
   searchObf,
@@ -258,4 +259,30 @@ test("no retry when the first search matched, failed, or the name is already sho
   const short = scripted([]);
   await identifyProduct("Beplain Cleanser", short.fetchImpl);
   assert.equal(short.calls.length, 1);
+});
+
+test("brand words alone never make a match: the product-name words must agree", () => {
+  const fab = (code, product_name) => obfProduct({ code, product_name, brands: "First Aid Beauty" });
+  const deep = fab("851939000001", "Deep Cleanser with Red Clay");
+  const pure = fab("851939000002", "Pure Skin Face Cleanser");
+  assert.ok(productMatchScore("First Aid Beauty Face Cleanser Face Cleanser", deep) < 0.6, "only 'cleanser' of face/cleanser agrees");
+  assert.equal(bestObfMatch("First Aid Beauty Face Cleanser", [deep]), null);
+  assert.equal(bestObfMatch("First Aid Beauty Face Cleanser", [deep, pure])?.code, "851939000002");
+  assert.equal(bestObfMatch("First Aid Beauty", [deep, pure]), null, "a brand alone identifies nothing");
+  const cerave = obfProduct({ code: "3337875597197", product_name: "PM Facial Moisturising Lotion", brands: "CeraVe" });
+  assert.equal(productMatchScore("cerave pm", cerave), 1);
+  assert.equal(productMatchScore("CeraVe PM Daily Facial Moisturizing", cerave), 0.75);
+});
+
+test("the sharper 400px database photo is preferred over the 200px one", () => {
+  const big = "https://images.openbeautyfacts.org/images/products/851/939/000/0002/front_en.7.400.jpg";
+  const small = "https://images.openbeautyfacts.org/images/products/851/939/000/0002/front_en.7.200.jpg";
+  const [both, onlySmall, badBig] = parseObfSearch({ products: [
+    { code: "1111", product_name: "A", image_front_url: big, image_front_small_url: small },
+    { code: "2222", product_name: "B", image_front_small_url: small },
+    { code: "3333", product_name: "C", image_front_url: "https://evil.example/a.jpg", image_front_small_url: small },
+  ] });
+  assert.equal(both.image_url, big);
+  assert.equal(onlySmall.image_url, small);
+  assert.equal(badBig.image_url, small, "an off-host URL is skipped, not trusted");
 });
