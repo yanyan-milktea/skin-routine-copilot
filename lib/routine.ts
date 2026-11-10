@@ -144,7 +144,12 @@ export function enforceGuardrails(plan: RoutinePlan, selected: Concern[], notes:
         detail: typeof step.detail === "string" ? step.detail.slice(0, 500) : detailFor(product, period),
         ...(step.tag ? { tag: step.tag.slice(0, 80) } : {}),
       }];
-    }).slice(0, 6);
+    })
+      .slice(0, 6)
+      // Application order is a rule, not a model choice: cleanser → toner → spray → mask → serum → treatment → moisturizer → sunscreen.
+      .map((step, index) => ({ step, index, rank: categoryOrder.indexOf(byId.get(step.product_id ?? "")?.category ?? "other") }))
+      .sort((a, b) => a.rank - b.rank || a.index - b.index)
+      .map(({ step }) => step);
   };
 
   let morning = clean(plan.morning, "morning");
