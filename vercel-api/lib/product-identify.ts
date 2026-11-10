@@ -14,7 +14,7 @@ export const OBF_SEARCH_URL = "https://world.openbeautyfacts.org/cgi/search.pl";
 export const OBF_USER_AGENT = "SkinRoutineCopilot/1.0 (+https://github.com/yanyan-milktea/skin-routine-copilot)";
 export const OBF_TIMEOUT_MS = 4000;
 
-export type IdentifyCategory = "cleanser" | "toner-essence" | "serum" | "treatment" | "moisturizer" | "sunscreen" | "other";
+export type IdentifyCategory = "cleanser" | "toner-essence" | "spray" | "serum" | "treatment" | "moisturizer" | "sunscreen" | "other";
 export type IdentifyTime = "morning" | "evening" | "both";
 
 export type ActiveFamily = "AHA" | "BHA" | "PHA" | "Retinoid" | "Azelaic acid" | "Benzoyl peroxide" | "Vitamin C (L-ascorbic acid)";
@@ -83,7 +83,8 @@ export function detectActives(text: string): DetectedActive[] {
 const NAME_CATEGORY_RULES: readonly { category: IdentifyCategory; pattern: RegExp }[] = [
   { category: "sunscreen", pattern: /\b(?:spf\s*\d*|sunscreen|sun\s*screen|sun\s*cream|sunblock|sun\s*block|sun\s*fluid|sun\s*stick|uv\s*(?:protect\w*|shield|defen[cs]e))\b/i },
   { category: "cleanser", pattern: /\b(?:cleanser|cleansing|face\s*wash|facial\s*wash|wash|foam|micellar|cleansing\s*(?:oil|balm))\b/i },
-  { category: "toner-essence", pattern: /\b(?:toner|essence|tonic|lotion\s*toner|skin\s*softener|first\s*treatment\s*essence|mist)\b/i },
+  { category: "toner-essence", pattern: /\b(?:toner|essence|tonic|lotion\s*toner|skin\s*softener|first\s*treatment\s*essence)\b/i },
+  { category: "spray", pattern: /\b(?:spray|mist|facial\s*mist|face\s*mist)\b/i },
   { category: "serum", pattern: /\b(?:serum|ampoule|ampule|booster|concentrate)\b/i },
   { category: "treatment", pattern: /\b(?:treatment|spot|peel(?:ing)?|exfoliant|exfoliator)\b|\b\d+(?:\.\d+)?\s?%/i },
   { category: "moisturizer", pattern: /\b(?:moisturi[sz]er|moisturi[sz]ing|cream|creme|crème|lotion|emulsion|gel[-\s]?cream|balm|sleeping\s*(?:mask|pack))\b/i },
@@ -93,6 +94,7 @@ const OBF_CATEGORY_RULES: readonly { category: IdentifyCategory; tags: readonly 
   { category: "sunscreen", tags: ["en:sunscreens", "en:sun-care", "en:sun-protection", "en:sunscreen"] },
   { category: "cleanser", tags: ["en:face-cleansers", "en:cleansers", "en:facial-cleansers", "en:makeup-removers", "en:micellar-waters"] },
   { category: "toner-essence", tags: ["en:toners", "en:facial-toners", "en:essences"] },
+  { category: "spray", tags: ["en:facial-mists", "en:face-mists", "en:facial-sprays"] },
   { category: "serum", tags: ["en:serums", "en:face-serums", "en:facial-serums"] },
   { category: "moisturizer", tags: ["en:moisturizers", "en:face-creams", "en:moisturising-creams", "en:day-creams", "en:night-creams", "en:facial-creams"] },
 ];

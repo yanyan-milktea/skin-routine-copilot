@@ -35,7 +35,7 @@ export const PRODUCT_NAMES = Object.fromEntries(DEFAULT_SHELF.map((product) => [
 export type ProductId = string;
 
 const warningSignals = /persistent(?:ly)?\s+(?:stinging|burning)|(?:skin\s+)?(?:feels?\s+)?hot|damaged\s+skin|swelling|oozing|worsening\s+(?:rash|eczema)|持续.{0,3}(?:刺痛|发热)|明显(?:肿胀|渗液)|破损|加重.{0,3}(?:皮疹|湿疹)/i;
-const categoryOrder = ["cleanser", "toner-essence", "serum", "treatment", "moisturizer", "other", "sunscreen"];
+const categoryOrder = ["cleanser", "toner-essence", "spray", "serum", "treatment", "moisturizer", "other", "sunscreen"];
 
 function isCalmDay(selected: Concern[], notes: string): boolean {
   return selected.includes("sensitive") || selected.includes("redness") || warningSignals.test(notes);
@@ -50,6 +50,7 @@ function detailFor(product: ShelfProduct, period: "morning" | "evening"): string
   const copy: Record<ShelfProduct["category"], string> = {
     cleanser: "Cleanse gently without scrubbing or aiming for a squeaky finish.",
     "toner-essence": "Pat on one light layer.",
+    spray: "Mist over clean skin and let it settle before the next step.",
     serum: "Apply one thin layer.",
     treatment: "Use a small amount only on comfortable skin.",
     moisturizer: "Apply a light layer to seal in moisture.",

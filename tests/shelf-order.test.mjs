@@ -5,10 +5,10 @@ import { sortShelfByRoutineStep } from "../lib/shelf.ts";
 const item = (id, category) => ({ id, category });
 
 test("products are listed in application order, without changing what is stored", () => {
-  const stored = [item("spf", "sunscreen"), item("cream", "moisturizer"), item("misc", "other"), item("serum-a", "serum"), item("wash", "cleanser"), item("azelaic", "treatment"), item("toner", "toner-essence"), item("serum-b", "serum")];
+  const stored = [item("spf", "sunscreen"), item("cream", "moisturizer"), item("misc", "other"), item("serum-a", "serum"), item("wash", "cleanser"), item("azelaic", "treatment"), item("toner", "toner-essence"), item("serum-b", "serum"), item("mist", "spray")];
   const snapshot = JSON.stringify(stored);
   const sorted = sortShelfByRoutineStep(stored);
-  assert.deepEqual(sorted.map(({ product }) => product.id), ["wash", "toner", "serum-a", "serum-b", "azelaic", "cream", "spf", "misc"]);
+  assert.deepEqual(sorted.map(({ product }) => product.id), ["wash", "toner", "mist", "serum-a", "serum-b", "azelaic", "cream", "spf", "misc"]);
   assert.equal(JSON.stringify(stored), snapshot, "the stored shelf is not reordered");
 });
 

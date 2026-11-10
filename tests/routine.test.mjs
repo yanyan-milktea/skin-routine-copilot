@@ -61,3 +61,16 @@ test("prompt injection in user notes cannot add a product", () => {
   assert.ok([...plan.morning, ...plan.evening].every((step) => DEFAULT_SHELF.some((product) => product.id === step.product_id)));
   assert.equal([...plan.morning, ...plan.evening].some((step) => /salicylic/i.test(step.name)), false);
 });
+
+test("a face mist / spray is its own step: after cleanser and toner, before serum", async () => {
+  const p = (id, name, category) => ({ id, brand: "", name, category, allowed_time: "both", is_active: false, usage_note: "", enabled: true });
+  const shelf = [p("cream", "Night Cream", "moisturizer"), p("serum", "Hydrating Serum", "serum"), p("mist", "Soothing Face Spray", "spray"), p("wash", "Gentle Cleanser", "cleanser"), p("toner", "Toner", "toner-essence")];
+  const plan = generateFallbackPlan(["sensitive"], 3, "", shelf);
+  assert.deepEqual(plan.evening.map((step) => step.product_id), ["wash", "toner", "mist", "serum", "cream"]);
+  assert.ok(plan.evening[2].detail.includes("Mist"));
+
+  // The deployed API package validates and orders the new category the same way.
+  const { validateProducts, fallbackRoutine } = await import("../vercel-api/lib/core.ts");
+  assert.equal(validateProducts(shelf).length, 5, "spray is an accepted category");
+  assert.deepEqual(fallbackRoutine(["sensitive"], 3, "", shelf).evening.map((step) => step.product_id), ["wash", "toner", "mist", "serum", "cream"]);
+});
