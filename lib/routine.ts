@@ -35,13 +35,13 @@ export const PRODUCT_NAMES = Object.fromEntries(DEFAULT_SHELF.map((product) => [
 export type ProductId = string;
 
 const warningSignals = /persistent(?:ly)?\s+(?:stinging|burning)|(?:skin\s+)?(?:feels?\s+)?hot|damaged\s+skin|swelling|oozing|worsening\s+(?:rash|eczema)|持续.{0,3}(?:刺痛|发热)|明显(?:肿胀|渗液)|破损|加重.{0,3}(?:皮疹|湿疹)/i;
-const categoryOrder = ["cleanser", "toner-essence", "spray", "mask", "serum", "treatment", "moisturizer", "other", "sunscreen"];
+export const categoryOrder = ["cleanser", "toner-essence", "spray", "mask", "serum", "treatment", "moisturizer", "other", "sunscreen"];
 
-function isCalmDay(selected: Concern[], notes: string): boolean {
+export function isCalmDay(selected: Concern[], notes: string): boolean {
   return selected.includes("sensitive") || selected.includes("redness") || warningSignals.test(notes);
 }
 
-function allowedAt(product: ShelfProduct, period: "morning" | "evening"): boolean {
+export function allowedAt(product: ShelfProduct, period: "morning" | "evening"): boolean {
   return product.allowed_time === "both" || product.allowed_time === period;
 }
 

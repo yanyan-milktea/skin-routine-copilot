@@ -51,7 +51,15 @@ export type ShelfProduct = {
    * never sent with routine requests.
    */
   image?: string;
+  /**
+   * Active-ingredient groups, used to keep clashing products on different
+   * nights. Absent = detected from the product name.
+   */
+  actives?: ActiveGroup[];
 };
+
+export const ACTIVE_GROUPS = ["retinoid", "acid", "vitamin-c", "benzoyl-peroxide", "azelaic"] as const;
+export type ActiveGroup = (typeof ACTIVE_GROUPS)[number];
 
 export type ShelfStore = {
   version: typeof SHELF_SCHEMA_VERSION;
@@ -127,6 +135,7 @@ export function parseShelfProduct(value: unknown): ShelfProduct | null {
     usage_note: usageNote,
     enabled: value.enabled,
     ...(isProductImage(value.image) ? { image: value.image } : {}),
+    ...(Array.isArray(value.actives) && value.actives.every((group) => (ACTIVE_GROUPS as readonly unknown[]).includes(group)) ? { actives: [...new Set(value.actives as ActiveGroup[])] } : {}),
     ...(Number.isInteger(value.per_week) && Number(value.per_week) >= 1 && Number(value.per_week) <= 6 ? { per_week: Number(value.per_week) } : {}),
   };
 }

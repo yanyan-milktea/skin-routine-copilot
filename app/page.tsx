@@ -14,7 +14,8 @@ import {
   TrendSummary,
   TrendSummaryResponse,
 } from "../lib/history";
-import { Concern, enforceGuardrails, generateFallbackPlan, normalizePlanToEnglish, RoutinePlan, RoutineResponse } from "../lib/routine";
+import { Concern, enforceGuardrails, generateFallbackPlan, isCalmDay, normalizePlanToEnglish, RoutinePlan, RoutineResponse } from "../lib/routine";
+import { ACTIVE_GROUP_LABELS, groupsFromFamilies, productGroups, separateConflicts } from "../lib/conflicts";
 import { resolveAiApiBaseUrl } from "../lib/api-base";
 import { photoToDataUrl } from "../lib/product-photo";
 import { ProductPhoto } from "./product-photo";
@@ -35,6 +36,7 @@ import {
   isDatabasePhoto,
   isProductImage,
   sortShelfByRoutineStep,
+  ACTIVE_GROUPS,
   withoutPhoto,
   updateShelfProduct,
 } from "../lib/shelf";
@@ -93,7 +95,10 @@ export default function Home() {
   const [identifyLookupFailed, setIdentifyLookupFailed] = useState(false);
 
   // Products on a weekly schedule (e.g. a mask 3×/week) join the routine only on days they are due.
-  const shelfToday = useMemo(() => today ? shelfDueToday(shelf, usageLog, today) : shelf.filter((product) => !product.per_week), [shelf, usageLog, today]);
+  const dueShelf = useMemo(() => today ? shelfDueToday(shelf, usageLog, today) : shelf.filter((product) => !product.per_week), [shelf, usageLog, today]);
+  // Actives that clash (e.g. a retinoid and an exfoliating acid) take turns on different days.
+  const separated = useMemo(() => separateConflicts(dueShelf, today, isCalmDay(selected, notes)), [dueShelf, today, selected, notes]);
+  const shelfToday = separated.shelf;
   const restingToday = useMemo(() => today ? shelf.filter((product) => product.enabled && product.per_week).map((product) => ({ product, status: scheduleStatus(product, usageLog, today) })).filter(({ status }) => !status.due) : [], [shelf, usageLog, today]);
   const localRoutine = useMemo(() => generateFallbackPlan(selected, sleep, notes, shelfToday), [selected, sleep, notes, shelfToday]);
   const routine = generatedPlan ?? localRoutine;
@@ -277,6 +282,7 @@ export default function Home() {
         category: suggestion.category,
         allowed_time: suggestion.allowed_time,
         is_active: suggestion.is_active,
+        actives: groupsFromFamilies(suggestion.key_actives.map((active) => active.family)),
         ...(!current.image && suggestion.image_url && isProductImage(suggestion.image_url) ? { image: suggestion.image_url } : {}),
       });
       setIdentifyResult(result);
@@ -346,6 +352,7 @@ export default function Home() {
             <div className="form-grid"><div className="form-field"><label htmlFor="product-category">Category</label><select id="product-category" value={editingProduct.category} onChange={(event) => setEditingProduct({ ...editingProduct, category: event.target.value as ShelfProduct["category"] })}>{PRODUCT_CATEGORIES.map((category) => <option key={category} value={category}>{categoryLabels[category]}</option>)}</select></div><div className="form-field"><label htmlFor="product-time">Use in routine</label><select id="product-time" value={editingProduct.allowed_time} onChange={(event) => setEditingProduct({ ...editingProduct, allowed_time: event.target.value as ShelfProduct["allowed_time"] })}>{PRODUCT_TIMES.map((time) => <option key={time} value={time}>{timeLabels[time]}</option>)}</select></div></div>
             <div className="form-field"><label htmlFor="product-frequency">How often</label><select id="product-frequency" aria-describedby="product-frequency-help" value={editingProduct.per_week ?? ""} onChange={(event) => { const value = Number(event.target.value); const { per_week: _previous, ...rest } = editingProduct; void _previous; setEditingProduct(value ? { ...rest, per_week: value } : rest); }}><option value="">Every routine</option>{Array.from({ length: MAX_PER_WEEK }, (_, index) => index + 1).map((count) => <option key={count} value={count}>{count}× per week</option>)}</select><small id="product-frequency-help">For masks and other weekly steps. The routine adds it on days it is due; tick it off to log the day.</small></div>
             <label htmlFor="product-note">Short usage note</label><small className="form-helper" id="product-note-help">Optional — for example, use 2–3 nights per week.</small><textarea id="product-note" aria-describedby="product-note-help" maxLength={180} value={editingProduct.usage_note} onChange={(event) => setEditingProduct({ ...editingProduct, usage_note: event.target.value })} />
+            <fieldset className="form-field contains-field"><legend>Contains</legend><div className="contains-options">{ACTIVE_GROUPS.map((group) => { const current = productGroups(editingProduct); return <label key={group}><input type="checkbox" checked={current.includes(group)} onChange={(event) => setEditingProduct({ ...editingProduct, actives: event.target.checked ? [...current.filter((item) => item !== group), group] : current.filter((item) => item !== group) })} /> {ACTIVE_GROUP_LABELS[group]}</label>; })}</div><small>Products whose ingredients clash take turns on different days. Filled from the name or auto-fill; correct it if needed.</small></fieldset>
             <div className="form-checks"><div className="check-field"><label htmlFor="product-active"><input id="product-active" type="checkbox" aria-describedby="product-active-help" checked={editingProduct.is_active} onChange={(event) => setEditingProduct({ ...editingProduct, is_active: event.target.checked })} /> Potentially irritating active</label><small id="product-active-help">Examples: exfoliants, retinoids, or azelaic acid. Automatically skipped on sensitive days.</small></div><div className="check-field"><label htmlFor="product-enabled"><input id="product-enabled" type="checkbox" checked={editingProduct.enabled} onChange={(event) => setEditingProduct({ ...editingProduct, enabled: event.target.checked })} /> Include in routines</label></div></div>
             <button className="save-product" type="submit" disabled={!editingProduct.name.trim()}>Save product</button>
           </form>;
@@ -440,6 +447,7 @@ export default function Home() {
                     const done = scheduled ? Boolean(today) && scheduleStatus(scheduled, usageLog, today).usedToday : doneSteps.has(key);
                     return <article className={`routine-step${done ? " done" : ""}`} key={key}><span className="step-number">{step.time}</span><div><div className="step-title"><h3>{step.name}</h3>{step.tag && <small>{step.tag}</small>}{scheduled && <small className="schedule-tag">{scheduled.per_week}×/week</small>}</div><p>{step.detail}</p></div><button aria-pressed={done} aria-label={`${done ? "Unmark" : "Mark"} ${step.name} complete`} onClick={() => toggleStep(step, key)}>{done ? "✓" : "○"}</button></article>;
                   })}
+                  {separated.notes.filter((note) => note.period === tab).map((note) => <p className="schedule-note" key={`${note.product.id}-${note.period}`}>{note.movedToMorning ? `${productDisplayName(note.product)} is morning-only today: ${note.reason} (with ${note.partners.join(", ")}).` : `${productDisplayName(note.product)} takes turns with ${note.partners.join(", ")}: ${note.reason}. Its next turn: ${note.next ? new Intl.DateTimeFormat("en-US", { weekday: "short", timeZone: "UTC" }).format(new Date(`${note.next}T00:00:00Z`)) : "soon"}.`}</p>)}
                   {restingToday.length > 0 && <p className="schedule-note">{restingToday.map(({ product, status }) => `${productDisplayName(product)} rests today (${product.per_week}×/week${status.nextDue ? `, next ${new Intl.DateTimeFormat("en-US", { weekday: "short", timeZone: "UTC" }).format(new Date(`${status.nextDue}T00:00:00Z`))}` : ""})`).join(" · ")}.</p>}
                 </div>
               </div>

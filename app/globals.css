@@ -238,3 +238,9 @@ textarea::placeholder { color:#b1b2ab; }
 .photo-actions .photo-error { color:#865f52; }
 .form-field > small { display:block; margin-top:5px; color:#94978f; font-size:8px; line-height:1.45; }
 .photo-credit { margin:10px 0 0; color:#94978f; font-size:8px; }
+.contains-field { border:0; padding:0; margin:0 0 12px; }
+.contains-field legend { padding:0; margin:9px 0; color:#686d63; font-size:9px; font-weight:600; }
+.contains-options { display:flex; flex-wrap:wrap; gap:6px; }
+.product-form .contains-options label { display:inline-flex; align-items:center; gap:5px; margin:0; padding:5px 9px; color:#565b52; border:1px solid #dfe1d9; border-radius:999px; background:#fff; font-size:9px; font-weight:500; cursor:pointer; }
+.contains-options label:has(input:checked) { border-color:#9fb196; background:#eef3ea; color:#3f5239; }
+.contains-options input { margin:0; accent-color:#4e6a55; }

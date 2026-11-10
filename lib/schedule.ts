@@ -21,12 +21,12 @@ export function localDateKey(date: Date): string {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 }
 
-function dayNumber(day: string): number {
+export function dayNumber(day: string): number {
   const [y, m, d] = day.split("-").map(Number);
   return Math.round(Date.UTC(y, m - 1, d) / 86_400_000);
 }
 
-function dayFromNumber(n: number): string {
+export function dayFromNumber(n: number): string {
   return new Date(n * 86_400_000).toISOString().slice(0, 10);
 }
 
