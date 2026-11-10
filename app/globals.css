@@ -217,3 +217,5 @@ textarea::placeholder { color:#b1b2ab; }
   .history-content>b { white-space:normal; }
 }
 @media (prefers-reduced-motion:reduce) { * { scroll-behavior:auto!important; transition:none!important; } }
+.product.editing { border-bottom:0; }
+.product-form.inline { margin:0 0 12px; }
