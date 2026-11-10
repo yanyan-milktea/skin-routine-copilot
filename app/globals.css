@@ -219,3 +219,7 @@ textarea::placeholder { color:#b1b2ab; }
 @media (prefers-reduced-motion:reduce) { * { scroll-behavior:auto!important; transition:none!important; } }
 .product.editing { border-bottom:0; }
 .product-form.inline { margin:0 0 12px; }
+.routine-step.done h3, .routine-step.done p { opacity:.55; }
+.routine-step.done button { background:#4e6a55; border-color:#4e6a55; color:#fff; }
+.step-title .schedule-tag { background:#e9efe6; color:#4e6a55; }
+.steps .schedule-note { margin:0; padding:16px 0 4px; color:#7a7d72; font-size:13px; line-height:1.5; }

@@ -14,7 +14,7 @@ export const OBF_SEARCH_URL = "https://world.openbeautyfacts.org/cgi/search.pl";
 export const OBF_USER_AGENT = "SkinRoutineCopilot/1.0 (+https://github.com/yanyan-milktea/skin-routine-copilot)";
 export const OBF_TIMEOUT_MS = 4000;
 
-export type IdentifyCategory = "cleanser" | "toner-essence" | "spray" | "serum" | "treatment" | "moisturizer" | "sunscreen" | "other";
+export type IdentifyCategory = "cleanser" | "toner-essence" | "spray" | "mask" | "serum" | "treatment" | "moisturizer" | "sunscreen" | "other";
 export type IdentifyTime = "morning" | "evening" | "both";
 
 export type ActiveFamily = "AHA" | "BHA" | "PHA" | "Retinoid" | "Azelaic acid" | "Benzoyl peroxide" | "Vitamin C (L-ascorbic acid)";
@@ -85,6 +85,8 @@ const NAME_CATEGORY_RULES: readonly { category: IdentifyCategory; pattern: RegEx
   { category: "cleanser", pattern: /\b(?:cleanser|cleansing|face\s*wash|facial\s*wash|wash|foam|micellar|cleansing\s*(?:oil|balm))\b/i },
   { category: "toner-essence", pattern: /\b(?:toner|essence|tonic|lotion\s*toner|skin\s*softener|first\s*treatment\s*essence)\b/i },
   { category: "spray", pattern: /\b(?:spray|mist|facial\s*mist|face\s*mist)\b/i },
+  // Sheet and other masks; sleeping/overnight masks are left-on moisturizers.
+  { category: "mask", pattern: /(?<!\b(?:sleeping|overnight)\s)\b(?:sheet\s*)?(?:masks?|masques?|mask\s*packs?)\b/i },
   { category: "serum", pattern: /\b(?:serum|ampoule|ampule|booster|concentrate)\b/i },
   { category: "treatment", pattern: /\b(?:treatment|spot|peel(?:ing)?|exfoliant|exfoliator)\b|\b\d+(?:\.\d+)?\s?%/i },
   { category: "moisturizer", pattern: /\b(?:moisturi[sz]er|moisturi[sz]ing|cream|creme|crème|lotion|emulsion|gel[-\s]?cream|balm|sleeping\s*(?:mask|pack))\b/i },
@@ -95,6 +97,7 @@ const OBF_CATEGORY_RULES: readonly { category: IdentifyCategory; tags: readonly 
   { category: "cleanser", tags: ["en:face-cleansers", "en:cleansers", "en:facial-cleansers", "en:makeup-removers", "en:micellar-waters"] },
   { category: "toner-essence", tags: ["en:toners", "en:facial-toners", "en:essences"] },
   { category: "spray", tags: ["en:facial-mists", "en:face-mists", "en:facial-sprays"] },
+  { category: "mask", tags: ["en:face-masks", "en:facial-masks", "en:sheet-masks"] },
   { category: "serum", tags: ["en:serums", "en:face-serums", "en:facial-serums"] },
   { category: "moisturizer", tags: ["en:moisturizers", "en:face-creams", "en:moisturising-creams", "en:day-creams", "en:night-creams", "en:facial-creams"] },
 ];
@@ -112,6 +115,7 @@ export function categoryFromTags(tags: readonly string[]): IdentifyCategory | nu
 /** Sunscreen is morning-only; retinoids, acids, azelaic acid, and benzoyl peroxide default to evening. */
 export function timeFor(category: IdentifyCategory, actives: readonly DetectedActive[]): IdentifyTime {
   if (category === "sunscreen") return "morning";
+  if (category === "mask") return "evening";
   if (actives.some((active) => active.family !== "Vitamin C (L-ascorbic acid)")) return "evening";
   return "both";
 }
@@ -224,6 +228,7 @@ export function buildSuggestion(name: string, match: ObfProduct | null): Identif
   if (!category) { category = "other"; notes.push("Could not tell the category from the name. Please choose one."); }
   if (actives.length) reasons.push(`Active ingredients found in the ${ingredients ? "ingredient list" : "product name"}: ${actives.map((active) => active.ingredient).join(", ")}.`);
   if (!ingredients) notes.push(match ? "The database entry has no ingredient list, so actives were checked from the name only." : "Without a database entry, actives were checked from the name only. Check the label for exfoliating acids, retinoids, or azelaic acid.");
+  if (category === "mask") notes.push("Masks are usually used a few times a week. Set How often so the routine schedules it.");
   if (ingredients && actives.length) notes.push("Ingredient lists do not show concentration; an acid listed near the end may be a small pH adjuster.");
   const allowedTime = timeFor(category, actives);
   if (allowedTime === "morning") reasons.push("Sunscreen is used in the morning.");
