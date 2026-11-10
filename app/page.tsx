@@ -29,6 +29,7 @@ import {
   SHELF_SCHEMA_VERSION,
   SHELF_STORAGE_KEY,
   ShelfProduct,
+  sortShelfByRoutineStep,
   updateShelfProduct,
 } from "../lib/shelf";
 
@@ -338,7 +339,7 @@ export default function Home() {
           <div className="shelf-heading"><div><span className="step-kicker">MY PRODUCT SHELF</span><h2>My products</h2></div><button onClick={startAddingProduct} aria-label="Add a product">+</button></div>
           <p><b>Private to this browser.</b> Copilot only plans with enabled products saved locally on this device.</p>
           <div className="product-list">
-            {shelf.map((product, index) => <Fragment key={product.id}><div className={`product ${product.enabled ? "" : "paused"}${editingProduct?.id === product.id ? " editing" : ""}`}><span className={`product-icon tone-${index % 6}`} /><div className="product-copy"><div className="product-name-row"><b>{productDisplayName(product)}</b>{!product.enabled && <span className="paused-badge">Paused</span>}</div><small>{categoryLabels[product.category]} · {timeLabels[product.allowed_time]}{product.is_active ? " · Potentially irritating active" : ""}</small></div><div className="product-actions"><button onClick={() => toggleProduct(product)}>{product.enabled ? "Pause" : "Resume"}</button><button onClick={() => openProductForm({ ...product })} aria-expanded={editingProduct?.id === product.id}>Edit</button><button className="delete-product" onClick={() => removeProduct(product)}>Delete</button></div></div>{editingProduct?.id === product.id && productForm}</Fragment>)}
+            {sortShelfByRoutineStep(shelf).map(({ product, storedIndex }) => <Fragment key={product.id}><div className={`product ${product.enabled ? "" : "paused"}${editingProduct?.id === product.id ? " editing" : ""}`}><span className={`product-icon tone-${storedIndex % 6}`} /><div className="product-copy"><div className="product-name-row"><b>{productDisplayName(product)}</b>{!product.enabled && <span className="paused-badge">Paused</span>}</div><small>{categoryLabels[product.category]} · {timeLabels[product.allowed_time]}{product.is_active ? " · Potentially irritating active" : ""}</small></div><div className="product-actions"><button onClick={() => toggleProduct(product)}>{product.enabled ? "Pause" : "Resume"}</button><button onClick={() => openProductForm({ ...product })} aria-expanded={editingProduct?.id === product.id}>Edit</button><button className="delete-product" onClick={() => removeProduct(product)}>Delete</button></div></div>{editingProduct?.id === product.id && productForm}</Fragment>)}
             {shelf.length === 0 && <div className="empty-shelf">No products yet. Add what you already own.</div>}
           </div>
           {editingProduct && !editingProduct.id && productForm}
