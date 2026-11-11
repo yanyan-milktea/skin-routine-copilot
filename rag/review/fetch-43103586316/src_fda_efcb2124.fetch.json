@@ -1,0 +1,16 @@
+{
+  "fetcher_version": "ingredient-fetcher-v1",
+  "source_id": "src_fda_efcb2124",
+  "publisher": "FDA",
+  "canonical_url": "https://www.fda.gov/cosmetics/cosmetic-ingredients/beta-hydroxy-acids",
+  "retrieved_at": "2026-11-11T21:30:21Z",
+  "http_status": 200,
+  "envelope": {
+    "content_type": "text/html; charset=UTF-8",
+    "content_length": 35248,
+    "redirect_chain": [],
+    "final_url": "https://www.fda.gov/cosmetics/cosmetic-ingredients/beta-hydroxy-acids"
+  },
+  "raw_sha256": "sha256:d6f437937941fb13d420dec9330c0b0a36c57354b9500f7f0d56ae02ceca1058",
+  "notice_candidates": []
+}

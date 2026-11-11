@@ -1,0 +1,16 @@
+{
+  "fetcher_version": "ingredient-fetcher-v1",
+  "source_id": "src_fda_fe655552",
+  "publisher": "FDA",
+  "canonical_url": "https://www.fda.gov/cosmetics/cosmetic-ingredients/alpha-hydroxy-acids",
+  "retrieved_at": "2026-11-11T21:30:20Z",
+  "http_status": 200,
+  "envelope": {
+    "content_type": "text/html; charset=UTF-8",
+    "content_length": 41765,
+    "redirect_chain": [],
+    "final_url": "https://www.fda.gov/cosmetics/cosmetic-ingredients/alpha-hydroxy-acids"
+  },
+  "raw_sha256": "sha256:01690c0bdb7ed1cd24ce8e04b29d4ce5584fde9be5cf69b8a1e949ebea648309",
+  "notice_candidates": []
+}

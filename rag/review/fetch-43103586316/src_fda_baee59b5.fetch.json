@@ -1,0 +1,16 @@
+{
+  "fetcher_version": "ingredient-fetcher-v1",
+  "source_id": "src_fda_baee59b5",
+  "publisher": "FDA",
+  "canonical_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/guidance-industry-labeling-cosmetics-containing-alpha-hydroxy-acids",
+  "retrieved_at": "2026-11-11T21:30:20Z",
+  "http_status": 200,
+  "envelope": {
+    "content_type": "text/html; charset=UTF-8",
+    "content_length": 70771,
+    "redirect_chain": [],
+    "final_url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/guidance-industry-labeling-cosmetics-containing-alpha-hydroxy-acids"
+  },
+  "raw_sha256": "sha256:6b594a2de13b644fbe90b97025aef75d3873226d077e96c66414523410a261b0",
+  "notice_candidates": []
+}

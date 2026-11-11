@@ -1,0 +1,16 @@
+{
+  "fetcher_version": "ingredient-fetcher-v1",
+  "source_id": "src_fda_90bf6651",
+  "publisher": "FDA",
+  "canonical_url": "https://www.fda.gov/cosmetics/cosmetic-products-ingredients/cosmetic-ingredients",
+  "retrieved_at": "2026-11-11T21:30:21Z",
+  "http_status": 200,
+  "envelope": {
+    "content_type": "text/html; charset=UTF-8",
+    "content_length": 34791,
+    "redirect_chain": [],
+    "final_url": "https://www.fda.gov/cosmetics/cosmetic-products-ingredients/cosmetic-ingredients"
+  },
+  "raw_sha256": "sha256:83b375fa4595f5b3c7479fb186feeedb21c1fd970cfc96683f96850664c08535",
+  "notice_candidates": []
+}
