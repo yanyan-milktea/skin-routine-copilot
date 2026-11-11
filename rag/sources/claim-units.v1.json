@@ -1,0 +1,183 @@
+{
+  "schema_version": 1,
+  "corpus_kind": "production_fda",
+  "review": {
+    "decision": "approved",
+    "reviewed_by": "yanyan-milktea",
+    "reviewed_at": "2026-11-11",
+    "review_version": "claim-review-v1"
+  },
+  "claim_units": [
+    {
+      "question_class": "Q1",
+      "supported_intent_ids": ["q1_aha_definition"],
+      "canonical_claim_text": "The most common AHAs in cosmetic products are glycolic acid and lactic acid.",
+      "support": [{ "doc": "src_fda_fe655552", "section": "How can I know if a cosmetic product contains AHAs?" }],
+      "enabled": true,
+      "required_terms": ["glycolic acid", "lactic acid", "cosmetic products"],
+      "negation_terms": []
+    },
+    {
+      "question_class": "Q1",
+      "supported_intent_ids": ["q1_aha_definition"],
+      "canonical_claim_text": "AHA-containing products cause exfoliation, or shedding of the surface skin.",
+      "support": [{ "doc": "src_fda_fe655552", "section": "How do AHAs work?" }],
+      "enabled": true,
+      "required_terms": ["exfoliation", "surface skin"],
+      "negation_terms": []
+    },
+    {
+      "question_class": "Q1",
+      "supported_intent_ids": ["q1_aha_definition"],
+      "canonical_claim_text": "The extent of exfoliation depends on the type and concentration of the AHA, its pH, and other ingredients in the product.",
+      "support": [{ "doc": "src_fda_fe655552", "section": "How do AHAs work?" }],
+      "enabled": true,
+      "required_terms": ["concentration", "pH", "other ingredients"],
+      "negation_terms": []
+    },
+    {
+      "question_class": "Q1",
+      "supported_intent_ids": ["q1_sun_sensitivity_relationship"],
+      "canonical_claim_text": "These studies confirmed previous industry studies indicating that applying AHAs to the skin results in increased UV sensitivity.",
+      "support": [{ "doc": "src_fda_fe655552", "section": "Has FDA conducted research on the safety of AHAs?" }],
+      "enabled": true,
+      "required_terms": ["applying AHAs to the skin", "increased UV sensitivity"],
+      "negation_terms": []
+    },
+    {
+      "question_class": "Q1",
+      "supported_intent_ids": ["q1_sun_sensitivity_relationship"],
+      "canonical_claim_text": "However, the studies also indicated that this increase in sensitivity is reversible and does not last long after discontinuing use of the AHA cream.",
+      "support": [{ "doc": "src_fda_fe655552", "section": "Has FDA conducted research on the safety of AHAs?" }],
+      "enabled": true,
+      "required_terms": ["reversible", "after discontinuing use"],
+      "negation_terms": ["does not last long"]
+    },
+    {
+      "question_class": "Q1",
+      "supported_intent_ids": ["q1_sun_protection_caution"],
+      "canonical_claim_text": "If you are using AHAs, it is advisable to use sun protection.",
+      "support": [{ "doc": "src_fda_fe655552", "section": "How can AHAs be used safely?" }],
+      "enabled": true,
+      "required_terms": ["sun protection"],
+      "negation_terms": []
+    },
+    {
+      "question_class": "Q1",
+      "supported_intent_ids": ["q1_sun_protection_caution"],
+      "canonical_claim_text": "It is important to follow directions carefully and heed any warning statements on the label when using any cosmetic product.",
+      "support": [{ "doc": "src_fda_fe655552", "section": "How can AHAs be used safely?" }],
+      "enabled": true,
+      "required_terms": ["follow directions", "warning statements on the label"],
+      "negation_terms": []
+    },
+    {
+      "question_class": "Q1",
+      "supported_intent_ids": ["q1_sun_sensitivity_relationship", "q1_sun_protection_caution"],
+      "canonical_claim_text": "Sunburn Alert: This product contains an alpha hydroxy acid (AHA) that may increase your skin's sensitivity to the sun and particularly the possibility of sunburn. Use a sunscreen, wear protective clothing, and limit sun exposure while using this product and for a week afterwards.",
+      "support": [{ "doc": "src_fda_fe655552", "section": "How can AHAs be used safely?" }],
+      "enabled": true,
+      "required_terms": ["may increase", "sensitivity to the sun", "Use a sunscreen", "for a week afterwards"],
+      "negation_terms": []
+    },
+    {
+      "question_class": "Q2",
+      "supported_intent_ids": ["q2_bha_definition"],
+      "canonical_claim_text": "Currently, the BHA most commonly used in cosmetics is salicylic acid.",
+      "support": [{ "doc": "src_fda_efcb2124", "section": "Beta Hydroxy Acids" }],
+      "enabled": true,
+      "required_terms": ["salicylic acid", "most commonly used"],
+      "negation_terms": []
+    },
+    {
+      "question_class": "Q2",
+      "supported_intent_ids": ["q2_bha_definition"],
+      "canonical_claim_text": "From a chemist's perspective, salicylic acid is not a true BHA.",
+      "support": [{ "doc": "src_fda_efcb2124", "section": "Beta Hydroxy Acids" }],
+      "enabled": true,
+      "required_terms": ["salicylic acid", "chemist's perspective"],
+      "negation_terms": ["not a true BHA"]
+    },
+    {
+      "question_class": "Q2",
+      "supported_intent_ids": ["q2_fda_cosmetic_scope"],
+      "canonical_claim_text": "Until these safety assessments are completed, FDA advises that similar precautions be taken for the use of cosmetics containing AHAs and BHAs.",
+      "support": [{ "doc": "src_fda_efcb2124", "section": "Beta Hydroxy Acids" }],
+      "enabled": true,
+      "required_terms": ["FDA advises", "similar precautions", "AHAs and BHAs"],
+      "negation_terms": []
+    },
+    {
+      "question_class": "Q2",
+      "supported_intent_ids": ["q2_reviewed_safety_context"],
+      "canonical_claim_text": "Test any product that contains a BHA on a small area of skin before applying it to a large area.",
+      "support": [{ "doc": "src_fda_efcb2124", "section": "Beta Hydroxy Acids" }],
+      "enabled": true,
+      "required_terms": ["small area of skin"],
+      "negation_terms": []
+    },
+    {
+      "question_class": "Q2",
+      "supported_intent_ids": ["q2_reviewed_safety_context"],
+      "canonical_claim_text": "If you use cosmetics with BHAs and experience skin irritation or prolonged stinging, stop using the product and consult your physician.",
+      "support": [{ "doc": "src_fda_efcb2124", "section": "Beta Hydroxy Acids" }],
+      "enabled": true,
+      "required_terms": ["skin irritation", "prolonged stinging", "consult your physician"],
+      "negation_terms": []
+    },
+    {
+      "question_class": "Q2",
+      "supported_intent_ids": ["q2_reviewed_safety_context"],
+      "canonical_claim_text": "Avoid using BHA-containing products on infants and children.",
+      "support": [{ "doc": "src_fda_efcb2124", "section": "Beta Hydroxy Acids" }],
+      "enabled": true,
+      "required_terms": ["infants and children"],
+      "negation_terms": ["Avoid"]
+    },
+    {
+      "question_class": "Q2",
+      "supported_intent_ids": ["q2_reviewed_safety_context"],
+      "canonical_claim_text": "Use sun protection if you use a BHA product.",
+      "support": [{ "doc": "src_fda_efcb2124", "section": "Beta Hydroxy Acids" }],
+      "enabled": true,
+      "required_terms": ["sun protection"],
+      "negation_terms": []
+    },
+    {
+      "question_class": "Q2",
+      "supported_intent_ids": ["q2_reviewed_safety_context"],
+      "canonical_claim_text": "Follow the use instructions on the label. Do not exceed the recommended applications.",
+      "support": [{ "doc": "src_fda_efcb2124", "section": "Beta Hydroxy Acids" }],
+      "enabled": true,
+      "required_terms": ["use instructions on the label", "recommended applications"],
+      "negation_terms": ["Do not exceed"]
+    },
+    {
+      "question_class": "Q4",
+      "supported_intent_ids": ["q4_premarket_approval_rule", "q4_color_additive_exception"],
+      "canonical_claim_text": "The Federal Food, Drug, and Cosmetic Act does not require cosmetic products and ingredients to be approved by FDA before they go on the market, except for color additives that are not intended for use as coal tar hair dyes.",
+      "support": [{ "doc": "src_fda_90bf6651", "section": "Cosmetic Ingredients" }],
+      "enabled": true,
+      "required_terms": ["approved by FDA", "before they go on the market", "color additives", "coal tar hair dyes"],
+      "negation_terms": ["does not require", "except for", "not intended"]
+    },
+    {
+      "question_class": "Q4",
+      "supported_intent_ids": ["q4_fda_role"],
+      "canonical_claim_text": "However, they must be safe for consumers under labeled or customary conditions of use.",
+      "support": [{ "doc": "src_fda_90bf6651", "section": "Cosmetic Ingredients" }],
+      "enabled": true,
+      "required_terms": ["must be safe", "labeled or customary conditions of use"],
+      "negation_terms": []
+    },
+    {
+      "question_class": "Q4",
+      "supported_intent_ids": ["q4_fda_role"],
+      "canonical_claim_text": "Companies and individuals who market cosmetics have a legal responsibility for the safety of their products and ingredients.",
+      "support": [{ "doc": "src_fda_90bf6651", "section": "Cosmetic Ingredients" }],
+      "enabled": true,
+      "required_terms": ["legal responsibility", "safety"],
+      "negation_terms": []
+    }
+  ]
+}

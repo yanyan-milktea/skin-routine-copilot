@@ -91,14 +91,15 @@ test("milestone0: initial manifest validates exact Q1-Q5 FDA/AAD entries", () =>
   const result = validateSourceManifest(manifest);
   assert.equal(result.valid, true, JSON.stringify(result.issues));
   assert.deepEqual([...new Set(manifest.sources.flatMap((source) => source.question_classes))].sort(), ["Q1", "Q2", "Q3", "Q4", "Q5"]);
-  assert.equal(manifest.sources.every((source) => source.retrieval_policy === "exclude"), true);
+  assert.equal(manifest.sources.every((source) => source.retrieval_policy === (source.publisher === "FDA" ? "include" : "exclude")), true, "FDA reviewed and included; AAD still excluded");
 });
 
-test("milestone0: FDA policy review is recorded while exact-page corpus review remains closed", () => {
+test("FDA sources: policy review recorded, exact-page corpus review approved by a named reviewer, included", () => {
   const fdaSources = manifest.sources.filter((source) => source.publisher === "FDA");
   assert.equal(fdaSources.length, 4);
   for (const source of fdaSources) {
-    assert.equal(source.corpus_review.decision, "pending");
+    assert.deepEqual(source.corpus_review, { decision: "approved", reviewed_by: "yanyan-milktea", reviewed_at: "2026-11-11" });
+    assert.ok(source.review_due_at > source.corpus_review.reviewed_at, "a future freshness review is scheduled");
     assert.equal(source.snapshot_storage_review.decision, "approved");
     assert.equal(source.snapshot_storage_review.permission_reference, "https://www.fda.gov/about-fda/about-website/website-policies");
     assert.match(source.snapshot_storage_review.basis, /generally public domain unless otherwise noted/i);
@@ -106,7 +107,7 @@ test("milestone0: FDA policy review is recorded while exact-page corpus review r
     assert.match(source.snapshot_storage_review.basis, /attribution, canonical URL, copy date, document hash/i);
     assert.match(source.snapshot_storage_review.basis, /freshness monitoring/i);
     assert.match(source.snapshot_storage_review.basis, /no FDA name\/logo or endorsement use/i);
-    assert.equal(source.retrieval_policy, "exclude");
+    assert.equal(source.retrieval_policy, "include");
     assert.equal("normalized_text" in source, false);
     assert.equal("html" in source, false);
   }
@@ -208,11 +209,13 @@ test("milestone0: changed pages require two approvals bound to the same new hash
 });
 
 test("milestone0: soft expiry, hard expiry, pending review, and emergency disable are deterministic", () => {
-  const approved = approvedSourceForAvailability(manifest.sources[0]);
+  const approved = { ...approvedSourceForAvailability(manifest.sources[0]), review_due_at: "2026-11-14" };
+  const pending = { ...manifest.sources[0], corpus_review: { decision: "pending", reviewed_by: null, reviewed_at: null }, retrieval_policy: "exclude" };
   assert.equal(getSourceAvailability(approved, new Date("2026-11-14T00:00:00Z")), "available");
   assert.equal(getSourceAvailability(approved, new Date("2026-11-15T00:00:00Z")), "soft_expired");
   assert.equal(getSourceAvailability(approved, new Date("2026-12-15T00:00:00Z")), "hard_expired");
-  assert.equal(getSourceAvailability(manifest.sources[0], new Date("2026-08-14T00:00:00Z")), "pending_review");
+  assert.equal(getSourceAvailability(pending, new Date("2026-08-14T00:00:00Z")), "pending_review");
+  assert.equal(getSourceAvailability(manifest.sources.find((source) => source.publisher !== "FDA"), new Date("2026-11-11T00:00:00Z")), "pending_review", "AAD stays unavailable");
   assert.equal(getSourceAvailability({ ...approved, emergency_disabled: true, emergency_disable_reason: "Synthetic incident" }, new Date("2026-08-14T00:00:00Z")), "emergency_disabled");
 });
 
