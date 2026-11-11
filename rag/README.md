@@ -92,6 +92,21 @@ request:
 3. A reviewer checks each page for contrary notices before any snapshot is
    normalized, chunked, or turned into claim units in a later pull request.
 
+## Snapshots and draft claim units
+
+`node scripts/rag/normalize-snapshots.ts <fetch-dir>` turns a reviewed fetch into
+`sources/snapshots/<source_id>.md`: normalized Markdown from the page's `<main>`
+element (`lib/ingredient-normalize.ts`, `readability-normalizer@1.0.0`, no
+dependencies), with front matter binding the source, retrieval time, FDA
+"content current as of" date, raw HTML hash, parser, and document hash.
+`sources/snapshots/REVIEW.md` lists hashes, headings, chunk sizes and notice
+candidates for the reviewer.
+
+`sources/claim-units.v1.draft.json` holds draft claim units for Q1, Q2 and Q4.
+Each claim is an exact sentence from the cited section (tests check it appears
+verbatim in a chunk of that section). The draft and every manifest entry stay
+`pending`/`exclude` until a named reviewer approves them in a separate change.
+
 ## Synthetic fixture boundary
 
 The locked corpus under `fixtures/` is entirely synthetic. It uses the fictional
