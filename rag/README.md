@@ -75,6 +75,23 @@ Before any real snapshot is added, a later authorized review must record:
 No source becomes `include` merely because it is public or belongs to an
 allow-listed publisher.
 
+## Fetching real sources for review
+
+Real pages enter only through a manual review step, never through a user
+request:
+
+1. Run the **RAG source fetch (review only)** workflow (Actions → Run workflow).
+   It runs `node scripts/rag/fetch-sources.ts`, which fetches only sources whose
+   `snapshot_storage_review` is approved (today: the four FDA pages; AAD stays
+   excluded), with manual same-host HTTPS redirects, a 1 MB cap, an HTML-only
+   content type, and an identifying User-Agent (`lib/ingredient-fetch.ts`).
+2. The workflow pushes raw HTML, a fetch record (envelope, retrieval time, raw
+   hash) and copyright/reuse notice candidates to a separate
+   `rag-review/fetch-<run>` branch, plus a summary. It never changes `main`,
+   the manifest, or any index.
+3. A reviewer checks each page for contrary notices before any snapshot is
+   normalized, chunked, or turned into claim units in a later pull request.
+
 ## Synthetic fixture boundary
 
 The locked corpus under `fixtures/` is entirely synthetic. It uses the fictional

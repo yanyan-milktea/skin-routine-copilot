@@ -1,0 +1,43 @@
+name: RAG source fetch (review only)
+
+# Manual corpus-review step (design §4.4). Fetches the approved FDA source
+# pages and pushes the raw snapshots to a separate review branch. It never
+# touches main, the manifest, or the index, and needs no secrets.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: rag-fetch-sources
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Fetch approved sources
+        run: node scripts/rag/fetch-sources.ts "rag/review/fetch-${{ github.run_id }}"
+
+      - name: Push snapshots to a review branch
+        if: always()
+        run: |
+          branch="rag-review/fetch-${{ github.run_id }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$branch"
+          git add "rag/review/fetch-${{ github.run_id }}"
+          git commit -m "Corpus review: raw FDA source fetch (run ${{ github.run_id }})" || exit 0
+          git push origin "$branch"
+          echo "Pushed review branch $branch" >> "$GITHUB_STEP_SUMMARY"
+          cat "rag/review/fetch-${{ github.run_id }}/SUMMARY.md" >> "$GITHUB_STEP_SUMMARY"
