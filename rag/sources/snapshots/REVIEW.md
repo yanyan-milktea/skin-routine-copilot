@@ -2,7 +2,7 @@
 
 Normalizer: readability-normalizer@1.0.0 · fetcher: ingredient-fetcher-v1
 
-Every source below still has `corpus_review: pending` and `retrieval_policy: exclude` in the manifest. Approving them is a separate, named review step.
+Review decisions are recorded in `rag/sources/manifest.v1.json` and `rag/sources/claim-units.v1.json`, not by this script.
 
 ## Alpha Hydroxy Acids (Q1)
 

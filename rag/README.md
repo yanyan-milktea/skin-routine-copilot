@@ -38,9 +38,12 @@ approval: before a real snapshot or excerpt can be generated, a reviewer must
 still inspect the exact page for a contrary copyright notice. Any stored FDA
 material must retain publisher attribution, canonical URL, retrieval/copy date,
 and document hash; freshness monitoring remains mandatory. FDA names and logos
-must not be copied or used in a way that implies endorsement. Consequently, all
-four FDA entries still have `corpus_review: pending` and
-`retrieval_policy: exclude`; they are not currently build eligible.
+must not be copied or used in a way that implies endorsement.
+
+On 2026-11-11 the four FDA pages were fetched (run 43103586316), checked for
+contrary notices (none found), normalized into `sources/snapshots/`, and
+approved by the named corpus reviewer `yanyan-milktea`. They are now
+`retrieval_policy: include` with the next freshness review due 2027-02-11.
 
 The two AAD entries remain `snapshot_storage_review: pending` and
 `retrieval_policy: exclude`, so their derived `build_eligible` state is `false`.
@@ -53,10 +56,10 @@ without written permission. No such permission is recorded.
 
 | Question class | Publisher | Closeout state | Production meaning |
 | --- | --- | --- | --- |
-| Q1 | FDA | `future_eligible_after_exact_page_review` | Eligible for a future reviewed FDA corpus only after exact-page review, snapshot generation, hash binding, and corpus approval |
-| Q2 | FDA | `future_eligible_after_exact_page_review` | Same gate as Q1 |
+| Q1 | FDA | `approved_2026-11-11` | Reviewed snapshots and claim units; needs the production embedding build before it can answer |
+| Q2 | FDA | `approved_2026-11-11` | Same as Q1 |
 | Q3 | AAD | `blocked_pending_permission` | Cannot enter a distributable production corpus without written AAD permission |
-| Q4 | FDA | `future_eligible_after_exact_page_review` | Same gate as Q1 |
+| Q4 | FDA | `approved_2026-11-11` | Same as Q1 |
 | Q5 | AAD | `blocked_pending_permission` | Cannot enter a distributable production corpus without written AAD permission |
 
 Synthetic fixtures continue to exercise all Q1–Q5 contracts, but synthetic
@@ -102,10 +105,11 @@ dependencies), with front matter binding the source, retrieval time, FDA
 `sources/snapshots/REVIEW.md` lists hashes, headings, chunk sizes and notice
 candidates for the reviewer.
 
-`sources/claim-units.v1.draft.json` holds draft claim units for Q1, Q2 and Q4.
-Each claim is an exact sentence from the cited section (tests check it appears
-verbatim in a chunk of that section). The draft and every manifest entry stay
-`pending`/`exclude` until a named reviewer approves them in a separate change.
+`sources/claim-units.v1.json` holds the 19 reviewed claim units for Q1, Q2 and
+Q4. Each claim is an exact sentence from the cited section (tests check it
+appears verbatim in a chunk of that section). They were approved by
+`yanyan-milktea` on 2026-11-11. Changing a snapshot or a claim requires a new
+review.
 
 ## Synthetic fixture boundary
 
@@ -146,7 +150,7 @@ requires a new review and claim-unit ID where applicable.
   remain available for at most 30 days while review is pending.
 - After the 30-day grace period the source is hard expired and excluded.
 - Emergency disable has no grace period and overrides all approvals.
-- The initial manifest remains pending/excluded, so its sources are unavailable
+- AAD entries remain pending/excluded, so those sources are unavailable
   regardless of date.
 
 ## Offline validation

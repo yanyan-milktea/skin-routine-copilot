@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "corpus_id": "ingredient-intelligence",
-  "corpus_version": "2026-08-14.1",
+  "corpus_version": "2026-11-11.1",
   "approved_publishers": [
     "FDA",
     "American Academy of Dermatology"
@@ -23,9 +23,9 @@
         "allow_remote_resources": false
       },
       "corpus_review": {
-        "decision": "pending",
-        "reviewed_by": null,
-        "reviewed_at": null
+        "decision": "approved",
+        "reviewed_by": "yanyan-milktea",
+        "reviewed_at": "2026-11-11"
       },
       "snapshot_storage_review": {
         "decision": "approved",
@@ -35,11 +35,11 @@
         "permission_reference": "https://www.fda.gov/about-fda/about-website/website-policies",
         "max_public_excerpt_characters": 1200
       },
-      "review_due_at": "2026-11-14",
+      "review_due_at": "2027-02-11",
       "expiry_mode": "soft",
       "emergency_disabled": false,
       "emergency_disable_reason": null,
-      "retrieval_policy": "exclude",
+      "retrieval_policy": "include",
       "expected_content_type": "text/html"
     },
     {
@@ -58,9 +58,9 @@
         "allow_remote_resources": false
       },
       "corpus_review": {
-        "decision": "pending",
-        "reviewed_by": null,
-        "reviewed_at": null
+        "decision": "approved",
+        "reviewed_by": "yanyan-milktea",
+        "reviewed_at": "2026-11-11"
       },
       "snapshot_storage_review": {
         "decision": "approved",
@@ -70,11 +70,11 @@
         "permission_reference": "https://www.fda.gov/about-fda/about-website/website-policies",
         "max_public_excerpt_characters": 1200
       },
-      "review_due_at": "2026-11-14",
+      "review_due_at": "2027-02-11",
       "expiry_mode": "soft",
       "emergency_disabled": false,
       "emergency_disable_reason": null,
-      "retrieval_policy": "exclude",
+      "retrieval_policy": "include",
       "expected_content_type": "text/html"
     },
     {
@@ -93,9 +93,9 @@
         "allow_remote_resources": false
       },
       "corpus_review": {
-        "decision": "pending",
-        "reviewed_by": null,
-        "reviewed_at": null
+        "decision": "approved",
+        "reviewed_by": "yanyan-milktea",
+        "reviewed_at": "2026-11-11"
       },
       "snapshot_storage_review": {
         "decision": "approved",
@@ -105,11 +105,11 @@
         "permission_reference": "https://www.fda.gov/about-fda/about-website/website-policies",
         "max_public_excerpt_characters": 1200
       },
-      "review_due_at": "2026-11-14",
+      "review_due_at": "2027-02-11",
       "expiry_mode": "soft",
       "emergency_disabled": false,
       "emergency_disable_reason": null,
-      "retrieval_policy": "exclude",
+      "retrieval_policy": "include",
       "expected_content_type": "text/html"
     },
     {
@@ -163,9 +163,9 @@
         "allow_remote_resources": false
       },
       "corpus_review": {
-        "decision": "pending",
-        "reviewed_by": null,
-        "reviewed_at": null
+        "decision": "approved",
+        "reviewed_by": "yanyan-milktea",
+        "reviewed_at": "2026-11-11"
       },
       "snapshot_storage_review": {
         "decision": "approved",
@@ -175,11 +175,11 @@
         "permission_reference": "https://www.fda.gov/about-fda/about-website/website-policies",
         "max_public_excerpt_characters": 1200
       },
-      "review_due_at": "2026-11-14",
+      "review_due_at": "2027-02-11",
       "expiry_mode": "soft",
       "emergency_disabled": false,
       "emergency_disable_reason": null,
-      "retrieval_policy": "exclude",
+      "retrieval_policy": "include",
       "expected_content_type": "text/html"
     },
     {

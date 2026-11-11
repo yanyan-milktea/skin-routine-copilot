@@ -13,7 +13,7 @@ const snapshots = readdirSync(snapshotDir).filter((name) => name.endsWith(".md")
   const { meta, body } = parseCorpusMarkdown(readFileSync(new URL(name, snapshotDir), "utf8"));
   return { name, meta, body };
 });
-const draft = JSON.parse(readFileSync(new URL("rag/sources/claim-units.v1.draft.json", root), "utf8"));
+const draft = JSON.parse(readFileSync(new URL("rag/sources/claim-units.v1.json", root), "utf8"));
 
 test("snapshots: one per FDA source, metadata matches the manifest, document hash binds the text", () => {
   assert.equal(validateSourceManifest(manifest).valid, true);
@@ -32,12 +32,15 @@ test("snapshots: one per FDA source, metadata matches the manifest, document has
     assert.equal(/<\/?[a-z][^>]*>/i.test(body), false, `${name}: no HTML left`);
     assert.equal(/Content current as of/i.test(body), false, `${name}: page trailer removed`);
   }
-  assert.equal(manifest.sources.every((s) => s.retrieval_policy === "exclude" && s.corpus_review.decision === "pending"), true, "nothing is approved by this change");
+  for (const s of manifest.sources) {
+    if (s.publisher === "FDA") assert.equal(s.retrieval_policy, "include");
+    else assert.deepEqual([s.retrieval_policy, s.corpus_review.decision, s.snapshot_storage_review.decision], ["exclude", "pending", "pending"], "AAD stays out without written permission");
+  }
 });
 
-test("draft claims: each is verbatim in a chunk of the cited section, and none is approved yet", () => {
-  assert.equal(draft.review.decision, "pending");
-  assert.equal(draft.review.reviewed_by, null);
+test("claims: approved by a named reviewer, each verbatim in a chunk of the cited section", () => {
+  assert.deepEqual(draft.review, { decision: "approved", reviewed_by: "yanyan-milktea", reviewed_at: "2026-11-11", review_version: "claim-review-v1" });
+  assert.equal(draft.claim_units.length, 19);
   const chunks = snapshots.flatMap(({ meta, body }) => chunkDocument({
     source_id: meta.source_id, document_id: createDocumentId(meta.source_id, body.replace(/\n$/, "")), document_hash: meta.document_hash,
     publisher: meta.publisher, title: meta.title, canonical_url: meta.canonical_url, retrieved_at: meta.retrieved_at,

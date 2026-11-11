@@ -239,10 +239,10 @@ test("exact hybrid retrieval stays within p95 50 ms and p99 100 ms over 1,000 qu
 
 // --- Build scripts ------------------------------------------------------------------
 
-test("production build refuses while no source is build eligible", () => {
+test("production build refuses without an authorized embedding run, even with reviewed FDA sources", () => {
   const result = spawnSync(process.execPath, ["scripts/rag/build-index.ts", "production"], { cwd: ROOT, encoding: "utf8", env: { ...process.env, GEMINI_API_KEY: "" } });
   assert.equal(result.status, 2);
-  assert.match(result.stderr, /No build-eligible sources/);
+  assert.match(result.stderr, /authorized embedding run/);
 });
 
 test("synthetic build --check and verify-index pass on the checked-in artifacts", () => {
